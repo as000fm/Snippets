@@ -6,6 +6,8 @@
 	 */
 	@AutomatedTests(value = "source.txt", filenames = 0)
 	@AutomatedTests(value = "OutilsCommun")
+	@StrictAutomatedTests({ "OutilsCommun", "c2VjcmV0S2V5" }) // secretKey -> Base64("secretKey")
+	@StrictAutomatedTests({ "aVnxqL186Sz1t4MpodYomg==", "c2VjcmV0S2V5" }) // encryptedText -> encrypt("OutilsCommun", Base64("secretKey"))
 	final public static String getMIME(String filename) {
 		if (!isEmpty(filename)) {
 			File file = new File(filename);

@@ -1,0 +1,54 @@
+{
+	"lat": 33.44,
+	"lon": -94.04,
+	"timezone": "America/Chicago",
+	"timezone_offset": -21600,
+	"current": {
+		"dt": 1618317040,
+		"sunrise": 1618282134,
+		"sunset": 1618333901,
+		"temp": 284.07,
+		"feels_like": 282.84,
+		"pressure": 1019,
+		"humidity": 62,
+		"dew_point": 277.08,
+		"uvi": 0.89,
+		"clouds": 0,
+		"visibility": 10000,
+		"wind_speed": 6,
+		"wind_deg": 300,
+		"weather": [
+			{
+				"id": 500,
+				"main": "Rain",
+				"description": "light rain",
+				"icon": "10d"
+			}
+		],
+		"pop": 0
+	},
+	"hourly": [
+		{
+			"dt": 1618315200,
+			"temp": 282.58,
+			"feels_like": 280.4,
+			"pressure": 1019,
+			"humidity": 68,
+			"dew_point": 276.98,
+			"uvi": 1.4,
+			"clouds": 19,
+			"visibility": 306,
+			"wind_speed": 4.12,
+			"wind_deg": 296,
+			"wind_gust": 7.33,
+			"weather": [
+				{
+					"id": 801,
+					"main": "Clouds",
+					"description": "few clouds",
+					"icon": "02d"
+				}
+			]
+		}
+	]
+}

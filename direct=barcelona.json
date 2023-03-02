@@ -1,0 +1,105 @@
+[
+	{
+		"name": "Barcelona",
+		"local_names": {
+			"ar": "برشلونة",
+			"ascii": "Barcelona",
+			"az": "Barselona",
+			"bg": "Барселона",
+			"ca": "Barcelona",
+			"da": "Barcelona",
+			"de": "Barcelona",
+			"el": "Βαρκελώνη",
+			"en": "Barcelona",
+			"eu": "Bartzelona",
+			"fa": "بارسلون",
+			"feature_name": "Barcelona",
+			"fi": "Barcelona",
+			"fr": "Barcelone",
+			"gl": "Barcelona",
+			"he": "ברצלונה",
+			"hi": "बार्सिलोना",
+			"hu": "Barcelona",
+			"id": "Barcelona",
+			"it": "Barcellona",
+			"ja": "バルセロナ",
+			"la": "Barcino",
+			"lt": "Barselona",
+			"mk": "Барселона",
+			"nl": "Barcelona",
+			"no": "Barcelona",
+			"pl": "Barcelona",
+			"pt": "Barcelona",
+			"ro": "Barcelona",
+			"ru": "Барселона",
+			"sk": "Barcelona",
+			"sl": "Barcelona",
+			"sr": "Барселона",
+			"th": "บาร์เซโลนา",
+			"tr": "Barselona"
+		},
+		"lat": 41.3888,
+		"lon": 2.159,
+		"country": "ES"
+	},
+	{
+		"name": "Barcelona",
+		"local_names": {
+			"ascii": "Barcelona",
+			"de": "Barcelona",
+			"el": "Βαρκελώνη",
+			"en": "Barcelona",
+			"feature_name": "Barcelona",
+			"fr": "Barcelone",
+			"it": "Barcellona"
+		},
+		"lat": 41.3994,
+		"lon": 2.128,
+		"country": "ES"
+	},
+	{
+		"name": "Barcelona",
+		"local_names": {
+			"ascii": "Barcelona",
+			"bg": "Барселона",
+			"ca": "Barcelona",
+			"de": "Barcelona",
+			"el": "Βαρκελώνη",
+			"en": "Barcelona",
+			"fa": "بارسلونا، ونزوئلا",
+			"feature_name": "Barcelona",
+			"fr": "Barcelona",
+			"ja": "バルセロナ",
+			"lt": "Barselona",
+			"nl": "Barcelona",
+			"pl": "Barcelona",
+			"pt": "Barcelona",
+			"ru": "Барселона"
+		},
+		"lat": 10.1333,
+		"lon": -64.7,
+		"country": "VE"
+	},
+	{
+		"name": "Barcelona",
+		"local_names": {
+			"ascii": "Barcelona",
+			"de": "Barcelona",
+			"en": "Barcelona",
+			"feature_name": "Barcelona"
+		},
+		"lat": 8.1592,
+		"lon": 126.4342,
+		"country": "PH"
+	},
+	{
+		"name": "Barcelona",
+		"local_names": {
+			"ascii": "Barcelona",
+			"feature_name": "Barcelona"
+		},
+		"lat": 12.8683,
+		"lon": 124.1419,
+		"country": "PH"
+	}
+]

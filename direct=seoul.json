@@ -1,0 +1,60 @@
+[
+	{
+		"name": "Seoul",
+		"local_names": {
+			"af": "Seoel",
+			"ar": "سيول",
+			"ascii": "Seoul",
+			"bg": "Сеул",
+			"ca": "Seül",
+			"da": "Seoul",
+			"de": "Seoul",
+			"el": "Σεούλ",
+			"en": "Seoul",
+			"eu": "Seul",
+			"fa": "سئول",
+			"feature_name": "Seoul",
+			"fi": "Soul",
+			"fr": "Séoul",
+			"gl": "Seúl",
+			"he": "סאול",
+			"hi": "सियोल",
+			"hr": "Seul",
+			"hu": "Szöul",
+			"id": "Seoul",
+			"it": "Seul",
+			"ja": "ソウル特別市",
+			"la": "Seulum",
+			"lt": "Seulas",
+			"mk": "Сеул",
+			"nl": "Seoel",
+			"no": "Seoul",
+			"pl": "Seul",
+			"pt": "Seul",
+			"ro": "Сеул",
+			"ru": "Сеул",
+			"sk": "Soul",
+			"sl": "Seul",
+			"sr": "Сеул",
+			"th": "โซล",
+			"tr": "Seul",
+			"vi": "Seoul"
+		},
+		"lat": 37.5683,
+		"lon": 126.9778,
+		"country": "KR"
+	},
+	{
+		"name": "Seoul",
+		"local_names": {
+			"ascii": "Seoul",
+			"en": "Seoul",
+			"feature_name": "Seoul",
+			"it": "Seul",
+			"ja": "ソウル特別市"
+		},
+		"lat": 37.5833,
+		"lon": 127,
+		"country": "KR"
+	}
+]

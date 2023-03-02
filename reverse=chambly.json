@@ -1,0 +1,66 @@
+[
+	{
+		"name": "Chambly",
+		"local_names": {
+			"ar": "شومبلي، كيبك",
+			"ascii": "Chambly",
+			"fa": "شامبلی، کبک",
+			"feature_name": "Chambly",
+			"fr": "Chambly",
+			"ru": "Шамбли",
+			"sr": "Шамбли"
+		},
+		"lat": 45.4501,
+		"lon": -73.2825,
+		"country": "CA"
+	},
+	{
+		"name": "Carignan",
+		"local_names": {
+			"ar": "كارينيون",
+			"ascii": "Carignan",
+			"fa": "کارینیان، کبک",
+			"feature_name": "Carignan",
+			"fr": "Carignan",
+			"sr": "Карињан"
+		},
+		"lat": 45.4501,
+		"lon": -73.2992,
+		"country": "CA"
+	},
+	{
+		"name": "Saint-Mathias-sur-Richelieu",
+		"local_names": {
+			"ascii": "Saint-Mathias-sur-Richelieu",
+			"fa": "سن-ماتیاس-سور-ریشولیو، کبک",
+			"feature_name": "Saint-Mathias-sur-Richelieu"
+		},
+		"lat": 45.4668,
+		"lon": -73.2659,
+		"country": "CA"
+	},
+	{
+		"name": "Richelieu",
+		"local_names": {
+			"ascii": "Richelieu",
+			"feature_name": "Richelieu"
+		},
+		"lat": 45.4434,
+		"lon": -73.246,
+		"country": "CA"
+	},
+	{
+		"name": "Saint-Basile-le-Grand",
+		"local_names": {
+			"ar": "سان باسيلي لي جراند",
+			"ascii": "Saint-Basile-le-Grand",
+			"fa": "سن-بازیل-لو-گراند، کبک",
+			"feature_name": "Saint-Basile-le-Grand",
+			"fr": "Saint-Basile-le-Grand",
+			"sr": "Сен Базил ле Гран"
+		},
+		"lat": 45.5334,
+		"lon": -73.2825,
+		"country": "CA"
+	}
+]

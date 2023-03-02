@@ -1,0 +1,33 @@
+[
+	{
+		"name": "Nagoya",
+		"local_names": {
+			"ar": "ناغويا",
+			"ascii": "Nagoya",
+			"ca": "Nagoya",
+			"de": "Nagoya",
+			"en": "Nagoya",
+			"fa": "ناگویا، آیچی",
+			"feature_name": "Nagoya",
+			"fi": "Nagoya",
+			"fr": "Nagoya",
+			"gl": "Nagoia",
+			"hr": "Nagoja",
+			"id": "Nagoya",
+			"it": "Nagoya",
+			"ja": "名古屋市",
+			"la": "Nagoia",
+			"lt": "Nagoja",
+			"nl": "Nagoya",
+			"no": "Nagoya",
+			"pl": "Nagoja",
+			"pt": "Nagoia",
+			"ru": "Нагоя",
+			"th": "นะโงะยะ",
+			"vi": "Nagoya"
+		},
+		"lat": 35.1815,
+		"lon": 136.9064,
+		"country": "JP"
+	}
+]

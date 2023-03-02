@@ -1,0 +1,116 @@
+[
+	{
+		"name": "London",
+		"local_names": {
+			"af": "Londen",
+			"ar": "لندن",
+			"ascii": "London",
+			"az": "London",
+			"bg": "Лондон",
+			"ca": "Londres",
+			"da": "London",
+			"de": "London",
+			"el": "Λονδίνο",
+			"en": "London",
+			"eu": "Londres",
+			"fa": "لندن",
+			"feature_name": "London",
+			"fi": "Lontoo",
+			"fr": "Londres",
+			"gl": "Londres",
+			"he": "לונדון",
+			"hi": "लंदन",
+			"hr": "London",
+			"hu": "London",
+			"id": "London",
+			"it": "Londra",
+			"ja": "ロンドン",
+			"la": "Londinium",
+			"lt": "Londonas",
+			"mk": "Лондон",
+			"nl": "Londen",
+			"no": "London",
+			"pl": "Londyn",
+			"pt": "Londres",
+			"ro": "Londra",
+			"ru": "Лондон",
+			"sk": "Londýn",
+			"sl": "London",
+			"sr": "Лондон",
+			"th": "ลอนดอน",
+			"tr": "Londra",
+			"vi": "Luân Đôn",
+			"zu": "ILondon"
+		},
+		"lat": 51.5085,
+		"lon": -0.1257,
+		"country": "GB"
+	},
+	{
+		"name": "City of Westminster",
+		"local_names": {
+			"ascii": "City of Westminster",
+			"feature_name": "City of Westminster"
+		},
+		"lat": 51.5,
+		"lon": -0.1167,
+		"country": "GB"
+	},
+	{
+		"name": "Lambeth",
+		"local_names": {
+			"ascii": "Lambeth",
+			"en": "Lambeth",
+			"feature_name": "Lambeth"
+		},
+		"lat": 51.4963,
+		"lon": -0.1115,
+		"country": "GB"
+	},
+	{
+		"name": "Clerkenwell",
+		"local_names": {
+			"ascii": "Clerkenwell",
+			"feature_name": "Clerkenwell",
+			"hi": "क्लर्कनवेल",
+			"ru": "Кларкенуэлл"
+		},
+		"lat": 51.5244,
+		"lon": -0.1102,
+		"country": "GB"
+	},
+	{
+		"name": "City of London",
+		"local_names": {
+			"ar": "مدينة لندن",
+			"ascii": "City of London",
+			"bg": "Сити",
+			"ca": "La City",
+			"de": "London City",
+			"el": "Σίτι του Λονδίνου",
+			"en": "City of London",
+			"fa": "سیتی لندن",
+			"feature_name": "City of London",
+			"fi": "Lontoon City",
+			"fr": "Cité de Londres",
+			"gl": "Cidade de Londres",
+			"he": "הסיטי של לונדון",
+			"hi": "सिटी ऑफ़ लंदन",
+			"id": "Kota London",
+			"it": "Londra",
+			"ja": "シティ・オブ・ロンドン",
+			"la": "Civitas Londinium",
+			"lt": "Londono Sitis",
+			"pt": "Cidade de Londres",
+			"ru": "Сити",
+			"sr": "Сити",
+			"th": "นครลอนดอน",
+			"tr": "Londra Şehri",
+			"vi": "Thành phố Luân Đôn",
+			"zu": "Idolobha weLondon"
+		},
+		"lat": 51.5128,
+		"lon": -0.0918,
+		"country": "GB"
+	}
+]

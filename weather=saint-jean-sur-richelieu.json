@@ -1,0 +1,44 @@
+{
+	"coord": {
+		"lon": -73.2642,
+		"lat": 45.2774
+	},
+	"weather": [
+		{
+			"id": 804,
+			"main": "Clouds",
+			"description": "overcast clouds",
+			"icon": "04d"
+		}
+	],
+	"base": "stations",
+	"main": {
+		"temp": 24.92,
+		"feels_like": 25.14,
+		"temp_min": 22.78,
+		"temp_max": 27.28,
+		"pressure": 1014,
+		"humidity": 64
+	},
+	"visibility": 10000,
+	"wind": {
+		"speed": 0.89,
+		"deg": 43,
+		"gust": 1.34
+	},
+	"clouds": {
+		"all": 100
+	},
+	"dt": 1626468812,
+	"sys": {
+		"type": 2,
+		"id": 2000641,
+		"country": "CA",
+		"sunrise": 1626427241,
+		"sunset": 1626482231
+	},
+	"timezone": -14400,
+	"id": 6138495,
+	"name": "Saint-Jean-sur-Richelieu",
+	"cod": 200
+}

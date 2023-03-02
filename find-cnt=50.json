@@ -1,0 +1,1903 @@
+{
+	"message": "accurate",
+	"cod": "200",
+	"count": 50,
+	"list": [
+		{
+			"id": 6138495,
+			"name": "Saint-Jean-sur-Richelieu",
+			"coord": {
+				"lat": 45.3168,
+				"lon": -73.2659
+			},
+			"main": {
+				"temp": 25.28,
+				"feels_like": 25.51,
+				"temp_min": 23.39,
+				"temp_max": 27.81,
+				"pressure": 1013,
+				"humidity": 63
+			},
+			"dt": 1626466153,
+			"wind": {
+				"speed": 4.92,
+				"deg": 250
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5964337,
+			"name": "Grande-Ligne",
+			"coord": {
+				"lat": 45.2207,
+				"lon": -73.3011
+			},
+			"main": {
+				"temp": 25,
+				"feels_like": 25.2,
+				"temp_min": 23.28,
+				"temp_max": 27.71,
+				"pressure": 1015,
+				"humidity": 63
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 0.89,
+				"deg": 294
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138419,
+			"name": "Saint-Jacques-le-Mineur",
+			"coord": {
+				"lat": 45.2834,
+				"lon": -73.4159
+			},
+			"main": {
+				"temp": 25.19,
+				"feels_like": 25.41,
+				"temp_min": 23.27,
+				"temp_max": 27.7,
+				"pressure": 1015,
+				"humidity": 63
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.89,
+				"deg": 294
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6085960,
+			"name": "Napierville",
+			"coord": {
+				"lat": 45.1865,
+				"lon": -73.4047
+			},
+			"main": {
+				"temp": 24.92,
+				"feels_like": 25.14,
+				"temp_min": 23.25,
+				"temp_max": 27.68,
+				"pressure": 1016,
+				"humidity": 64
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 0.89,
+				"deg": 294
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138887,
+			"name": "Saint-Paul-de-l'Île-aux-Noix",
+			"coord": {
+				"lat": 45.1334,
+				"lon": -73.2824
+			},
+			"main": {
+				"temp": 24.92,
+				"feels_like": 25.19,
+				"temp_min": 23.39,
+				"temp_max": 27.82,
+				"pressure": 1016,
+				"humidity": 66,
+				"sea_level": 1016,
+				"grnd_level": 1013
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 3.26,
+				"deg": 270
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5974029,
+			"name": "Henryville",
+			"coord": {
+				"lat": 45.1334,
+				"lon": -73.1824
+			},
+			"main": {
+				"temp": 24.89,
+				"feels_like": 25.18,
+				"temp_min": 23.4,
+				"temp_max": 27.68,
+				"pressure": 1016,
+				"humidity": 67,
+				"sea_level": 1016,
+				"grnd_level": 1013
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 3.04,
+				"deg": 268
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6076966,
+			"name": "Montérégie",
+			"coord": {
+				"lat": 45.3834,
+				"lon": -73.0992
+			},
+			"main": {
+				"temp": 25.31,
+				"feels_like": 25.54,
+				"temp_min": 23.27,
+				"temp_max": 27.7,
+				"pressure": 1016,
+				"humidity": 63,
+				"sea_level": 1016,
+				"grnd_level": 1010
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 2.8,
+				"deg": 241
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138908,
+			"name": "Saint-Philippe",
+			"coord": {
+				"lat": 45.3501,
+				"lon": -73.4659
+			},
+			"main": {
+				"temp": 25.63,
+				"feels_like": 25.89,
+				"temp_min": 23.39,
+				"temp_max": 28.69,
+				"pressure": 1013,
+				"humidity": 63
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.45,
+				"deg": 272
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6122037,
+			"name": "Richelieu",
+			"coord": {
+				"lat": 45.4434,
+				"lon": -73.246
+			},
+			"main": {
+				"temp": 25.68,
+				"feels_like": 25.87,
+				"temp_min": 23.38,
+				"temp_max": 27.8,
+				"pressure": 1015,
+				"humidity": 60,
+				"sea_level": 1015,
+				"grnd_level": 1012
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 2.62,
+				"deg": 228
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6066350,
+			"name": "Marieville",
+			"coord": {
+				"lat": 45.4334,
+				"lon": -73.1658
+			},
+			"main": {
+				"temp": 25.61,
+				"feels_like": 25.79,
+				"temp_min": 23.38,
+				"temp_max": 27.81,
+				"pressure": 1015,
+				"humidity": 60,
+				"sea_level": 1015,
+				"grnd_level": 1012
+			},
+			"dt": 1626466153,
+			"wind": {
+				"speed": 2.67,
+				"deg": 234
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5919566,
+			"name": "Chambly",
+			"coord": {
+				"lat": 45.4501,
+				"lon": -73.2825
+			},
+			"main": {
+				"temp": 25.9,
+				"feels_like": 26.09,
+				"temp_min": 23.53,
+				"temp_max": 28.83,
+				"pressure": 1015,
+				"humidity": 59,
+				"sea_level": 1015,
+				"grnd_level": 1014
+			},
+			"dt": 1626466152,
+			"wind": {
+				"speed": 2.63,
+				"deg": 227
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5917117,
+			"name": "Carignan",
+			"coord": {
+				"lat": 45.4501,
+				"lon": -73.2992
+			},
+			"main": {
+				"temp": 25.89,
+				"feels_like": 26.08,
+				"temp_min": 23.51,
+				"temp_max": 28.81,
+				"pressure": 1015,
+				"humidity": 59,
+				"sea_level": 1015,
+				"grnd_level": 1014
+			},
+			"dt": 1626466405,
+			"wind": {
+				"speed": 2.65,
+				"deg": 227
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138095,
+			"name": "Sainte-Sabine",
+			"coord": {
+				"lat": 45.2334,
+				"lon": -73.0158
+			},
+			"main": {
+				"temp": 24.9,
+				"feels_like": 25.33,
+				"temp_min": 23.25,
+				"temp_max": 27.68,
+				"pressure": 1016,
+				"humidity": 72,
+				"sea_level": 1016,
+				"grnd_level": 1010
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 2.96,
+				"deg": 251
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138752,
+			"name": "Saint-Mathias-sur-Richelieu",
+			"coord": {
+				"lat": 45.4668,
+				"lon": -73.2659
+			},
+			"main": {
+				"temp": 25.94,
+				"feels_like": 26.1,
+				"temp_min": 23.52,
+				"temp_max": 28.83,
+				"pressure": 1015,
+				"humidity": 58,
+				"sea_level": 1015,
+				"grnd_level": 1014
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 2.59,
+				"deg": 223
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5951644,
+			"name": "Farnham",
+			"coord": {
+				"lat": 45.2834,
+				"lon": -72.9824
+			},
+			"main": {
+				"temp": 24.9,
+				"feels_like": 25.3,
+				"temp_min": 23.21,
+				"temp_max": 27.63,
+				"pressure": 1016,
+				"humidity": 71,
+				"sea_level": 1016,
+				"grnd_level": 1009
+			},
+			"dt": 1626466405,
+			"wind": {
+				"speed": 2.9,
+				"deg": 249
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5914826,
+			"name": "Candiac",
+			"coord": {
+				"lat": 45.3834,
+				"lon": -73.5159
+			},
+			"main": {
+				"temp": 25.81,
+				"feels_like": 26.01,
+				"temp_min": 23.45,
+				"temp_max": 28.75,
+				"pressure": 1013,
+				"humidity": 60
+			},
+			"dt": 1626466152,
+			"wind": {
+				"speed": 0.89,
+				"deg": 255
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6035592,
+			"name": "Lacolle",
+			"coord": {
+				"lat": 45.0834,
+				"lon": -73.3659
+			},
+			"main": {
+				"temp": 24.73,
+				"feels_like": 25.03,
+				"temp_min": 23.32,
+				"temp_max": 27.74,
+				"pressure": 1016,
+				"humidity": 68,
+				"sea_level": 1016,
+				"grnd_level": 1011
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 3.41,
+				"deg": 275
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138856,
+			"name": "Saint-Patrice-de-Sherrington",
+			"coord": {
+				"lat": 45.1668,
+				"lon": -73.5159
+			},
+			"main": {
+				"temp": 24.9,
+				"feels_like": 25.2,
+				"temp_min": 23.21,
+				"temp_max": 27.63,
+				"pressure": 1016,
+				"humidity": 67
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.89,
+				"deg": 294
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6049863,
+			"name": "La Prairie",
+			"coord": {
+				"lat": 45.4168,
+				"lon": -73.4992
+			},
+			"main": {
+				"temp": 26,
+				"feels_like": 26,
+				"temp_min": 23.51,
+				"temp_max": 28.81,
+				"pressure": 1013,
+				"humidity": 59
+			},
+			"dt": 1626466152,
+			"wind": {
+				"speed": 0.89,
+				"deg": 255
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138790,
+			"name": "Saint-Michel",
+			"coord": {
+				"lat": 45.2334,
+				"lon": -73.5659
+			},
+			"main": {
+				"temp": 25.05,
+				"feels_like": 25.33,
+				"temp_min": 23.15,
+				"temp_max": 27.58,
+				"pressure": 1015,
+				"humidity": 66
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.45,
+				"deg": 247
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6128089,
+			"name": "Rougemont",
+			"coord": {
+				"lat": 45.4334,
+				"lon": -73.0491
+			},
+			"main": {
+				"temp": 25.38,
+				"feels_like": 25.46,
+				"temp_min": 23.27,
+				"temp_max": 27.7,
+				"pressure": 1016,
+				"humidity": 57,
+				"sea_level": 1016,
+				"grnd_level": 1010
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 2.73,
+				"deg": 240
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5937612,
+			"name": "Delson",
+			"coord": {
+				"lat": 45.3668,
+				"lon": -73.5492
+			},
+			"main": {
+				"temp": 25.77,
+				"feels_like": 26.1,
+				"temp_min": 23.45,
+				"temp_max": 28.75,
+				"pressure": 1013,
+				"humidity": 65
+			},
+			"dt": 1626466405,
+			"wind": {
+				"speed": 0.45,
+				"deg": 272
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137509,
+			"name": "Saint-Bernard-de-Lacolle",
+			"coord": {
+				"lat": 45.0834,
+				"lon": -73.4159
+			},
+			"main": {
+				"temp": 24.66,
+				"feels_like": 24.96,
+				"temp_min": 23.25,
+				"temp_max": 27.67,
+				"pressure": 1016,
+				"humidity": 68,
+				"sea_level": 1016,
+				"grnd_level": 1010
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 3.5,
+				"deg": 274
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5909629,
+			"name": "Brossard",
+			"coord": {
+				"lat": 45.4501,
+				"lon": -73.4658
+			},
+			"main": {
+				"temp": 26.09,
+				"feels_like": 26.09,
+				"temp_min": 23.52,
+				"temp_max": 28.82,
+				"pressure": 1015,
+				"humidity": 56,
+				"sea_level": 1015,
+				"grnd_level": 1014
+			},
+			"dt": 1626466152,
+			"wind": {
+				"speed": 2.77,
+				"deg": 229
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5909628,
+			"name": "Brossard",
+			"coord": {
+				"lat": 45.4501,
+				"lon": -73.4659
+			},
+			"main": {
+				"temp": 26.08,
+				"feels_like": 26.08,
+				"temp_min": 23.52,
+				"temp_max": 28.82,
+				"pressure": 1015,
+				"humidity": 56,
+				"sea_level": 1015,
+				"grnd_level": 1014
+			},
+			"dt": 1626466405,
+			"wind": {
+				"speed": 2.77,
+				"deg": 229
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137573,
+			"name": "Saint-Césaire",
+			"coord": {
+				"lat": 45.4095,
+				"lon": -73.001
+			},
+			"main": {
+				"temp": 25.44,
+				"feels_like": 25.68,
+				"temp_min": 23.39,
+				"temp_max": 27.82,
+				"pressure": 1016,
+				"humidity": 63,
+				"sea_level": 1016,
+				"grnd_level": 1012
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 2.79,
+				"deg": 243
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6155094,
+			"name": "Stanbridge Station",
+			"coord": {
+				"lat": 45.1168,
+				"lon": -73.0324
+			},
+			"main": {
+				"temp": 24.77,
+				"feels_like": 25.16,
+				"temp_min": 23.25,
+				"temp_max": 26.61,
+				"pressure": 1016,
+				"humidity": 71,
+				"sea_level": 1016,
+				"grnd_level": 1010
+			},
+			"dt": 1626466410,
+			"wind": {
+				"speed": 2.68,
+				"deg": 264
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137633,
+			"name": "Saint-Constant",
+			"coord": {
+				"lat": 45.3668,
+				"lon": -73.5659
+			},
+			"main": {
+				"temp": 25.8,
+				"feels_like": 26.16,
+				"temp_min": 23.44,
+				"temp_max": 28.74,
+				"pressure": 1013,
+				"humidity": 66
+			},
+			"dt": 1626466153,
+			"wind": {
+				"speed": 0.89,
+				"deg": 255
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137571,
+			"name": "Saint-Césaire",
+			"coord": {
+				"lat": 45.4168,
+				"lon": -72.9991
+			},
+			"main": {
+				"temp": 25.43,
+				"feels_like": 25.67,
+				"temp_min": 23.38,
+				"temp_max": 27.8,
+				"pressure": 1016,
+				"humidity": 63,
+				"sea_level": 1016,
+				"grnd_level": 1012
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 2.78,
+				"deg": 243
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138987,
+			"name": "Saint-Rémi",
+			"coord": {
+				"lat": 45.2668,
+				"lon": -73.6159
+			},
+			"main": {
+				"temp": 25.31,
+				"feels_like": 25.62,
+				"temp_min": 23.21,
+				"temp_max": 28.51,
+				"pressure": 1015,
+				"humidity": 66
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.45,
+				"deg": 247
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138992,
+			"name": "Saint-Rémi",
+			"coord": {
+				"lat": 45.2587,
+				"lon": -73.6175
+			},
+			"main": {
+				"temp": 25.26,
+				"feels_like": 25.56,
+				"temp_min": 23.2,
+				"temp_max": 28.5,
+				"pressure": 1015,
+				"humidity": 66
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.45,
+				"deg": 247
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5897324,
+			"name": "Bedford",
+			"coord": {
+				"lat": 45.1334,
+				"lon": -72.9658
+			},
+			"main": {
+				"temp": 24.7,
+				"feels_like": 25.13,
+				"temp_min": 23.17,
+				"temp_max": 26.53,
+				"pressure": 1016,
+				"humidity": 73,
+				"sea_level": 1016,
+				"grnd_level": 1009
+			},
+			"dt": 1626466404,
+			"wind": {
+				"speed": 2.56,
+				"deg": 261
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137780,
+			"name": "Sainte-Catherine",
+			"coord": {
+				"lat": 45.4001,
+				"lon": -73.5825
+			},
+			"main": {
+				"temp": 25.96,
+				"feels_like": 25.96,
+				"temp_min": 23.45,
+				"temp_max": 28.75,
+				"pressure": 1013,
+				"humidity": 56
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.45,
+				"deg": 272
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5897323,
+			"name": "Bedford",
+			"coord": {
+				"lat": 45.1168,
+				"lon": -72.9824
+			},
+			"main": {
+				"temp": 24.74,
+				"feels_like": 25.15,
+				"temp_min": 23.22,
+				"temp_max": 26.58,
+				"pressure": 1016,
+				"humidity": 72,
+				"sea_level": 1016,
+				"grnd_level": 1010
+			},
+			"dt": 1626466404,
+			"wind": {
+				"speed": 2.56,
+				"deg": 263
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137489,
+			"name": "Saint-Basile-le-Grand",
+			"coord": {
+				"lat": 45.5334,
+				"lon": -73.2825
+			},
+			"main": {
+				"temp": 26.17,
+				"feels_like": 26.17,
+				"temp_min": 23.52,
+				"temp_max": 28.82,
+				"pressure": 1011,
+				"humidity": 56
+			},
+			"dt": 1626466153,
+			"wind": {
+				"speed": 0.89,
+				"deg": 310
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6094884,
+			"name": "Otterburn Park",
+			"coord": {
+				"lat": 45.5334,
+				"lon": -73.2159
+			},
+			"main": {
+				"temp": 26.04,
+				"feels_like": 26.04,
+				"temp_min": 23.48,
+				"temp_max": 28.78,
+				"pressure": 1014,
+				"humidity": 56
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 0.89,
+				"deg": 310
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137540,
+			"name": "Saint-Bruno-de-Montarville",
+			"coord": {
+				"lat": 45.5334,
+				"lon": -73.3492
+			},
+			"main": {
+				"temp": 26.02,
+				"feels_like": 26.02,
+				"temp_min": 23.29,
+				"temp_max": 28.59,
+				"pressure": 1012,
+				"humidity": 55
+			},
+			"dt": 1626466153,
+			"wind": {
+				"speed": 0.89,
+				"deg": 310
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6047861,
+			"name": "Laflèche",
+			"coord": {
+				"lat": 45.5001,
+				"lon": -73.4659
+			},
+			"main": {
+				"temp": 26.17,
+				"feels_like": 26.17,
+				"temp_min": 23.43,
+				"temp_max": 28.73,
+				"pressure": 1016,
+				"humidity": 54
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 0.45,
+				"deg": 311
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6173767,
+			"name": "Verdun",
+			"coord": {
+				"lat": 45.4501,
+				"lon": -73.5658
+			},
+			"main": {
+				"temp": 26.2,
+				"feels_like": 26.2,
+				"temp_min": 23.53,
+				"temp_max": 28.83,
+				"pressure": 1013,
+				"humidity": 54
+			},
+			"dt": 1626466410,
+			"wind": {
+				"speed": 0.45,
+				"deg": 272
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6052239,
+			"name": "Le Moyne",
+			"coord": {
+				"lat": 45.5001,
+				"lon": -73.4936
+			},
+			"main": {
+				"temp": 26.19,
+				"feels_like": 26.19,
+				"temp_min": 23.43,
+				"temp_max": 28.73,
+				"pressure": 1016,
+				"humidity": 54
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 0.45,
+				"deg": 311
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138345,
+			"name": "Saint-Hilaire",
+			"coord": {
+				"lat": 45.5584,
+				"lon": -73.1974
+			},
+			"main": {
+				"temp": 25.96,
+				"feels_like": 25.96,
+				"temp_min": 23.36,
+				"temp_max": 28.66,
+				"pressure": 1015,
+				"humidity": 56
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 0.89,
+				"deg": 310
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 99
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5134565,
+			"name": "Rouses Point",
+			"coord": {
+				"lat": 44.9939,
+				"lon": -73.3649
+			},
+			"main": {
+				"temp": 24.75,
+				"feels_like": 25.19,
+				"temp_min": 23.39,
+				"temp_max": 27.23,
+				"pressure": 1015,
+				"humidity": 73
+			},
+			"dt": 1626466194,
+			"wind": {
+				"speed": 2.24,
+				"deg": 360
+			},
+			"sys": {
+				"country": "US"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5898138,
+			"name": "Beloeil",
+			"coord": {
+				"lat": 45.5668,
+				"lon": -73.1992
+			},
+			"main": {
+				"temp": 26.17,
+				"feels_like": 26.17,
+				"temp_min": 23.5,
+				"temp_max": 28.8,
+				"pressure": 1015,
+				"humidity": 55
+			},
+			"dt": 1626466091,
+			"wind": {
+				"speed": 0.45,
+				"deg": 283
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 99
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6077340,
+			"name": "Mont-Saint-Hilaire",
+			"coord": {
+				"lat": 45.5668,
+				"lon": -73.1992
+			},
+			"main": {
+				"temp": 26.17,
+				"feels_like": 26.17,
+				"temp_min": 23.5,
+				"temp_max": 28.8,
+				"pressure": 1015,
+				"humidity": 55
+			},
+			"dt": 1626466091,
+			"wind": {
+				"speed": 0.45,
+				"deg": 283
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 99
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 5973740,
+			"name": "Hemmingford",
+			"coord": {
+				"lat": 45.0834,
+				"lon": -73.5825
+			},
+			"main": {
+				"temp": 24.6,
+				"feels_like": 24.87,
+				"temp_min": 23.14,
+				"temp_max": 27.57,
+				"pressure": 1016,
+				"humidity": 67,
+				"sea_level": 1016,
+				"grnd_level": 1008
+			},
+			"dt": 1626466406,
+			"wind": {
+				"speed": 3.63,
+				"deg": 269
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6945990,
+			"name": "LaSalle",
+			"coord": {
+				"lat": 45.4304,
+				"lon": -73.6352
+			},
+			"main": {
+				"temp": 26.06,
+				"feels_like": 26.06,
+				"temp_min": 23.38,
+				"temp_max": 28.68,
+				"pressure": 1013,
+				"humidity": 54
+			},
+			"dt": 1626466455,
+			"wind": {
+				"speed": 0.45,
+				"deg": 272
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138980,
+			"name": "Saint-Raymond",
+			"coord": {
+				"lat": 45.467,
+				"lon": -73.6095
+			},
+			"main": {
+				"temp": 26.18,
+				"feels_like": 26.18,
+				"temp_min": 23.41,
+				"temp_max": 28.71,
+				"pressure": 1015,
+				"humidity": 54,
+				"sea_level": 1015,
+				"grnd_level": 1012
+			},
+			"dt": 1626466093,
+			"wind": {
+				"speed": 3.07,
+				"deg": 223
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6137941,
+			"name": "Sainte-Julie",
+			"coord": {
+				"lat": 45.5834,
+				"lon": -73.3325
+			},
+			"main": {
+				"temp": 26.19,
+				"feels_like": 26.19,
+				"temp_min": 23.37,
+				"temp_max": 28.67,
+				"pressure": 1011,
+				"humidity": 55
+			},
+			"dt": 1626466153,
+			"wind": {
+				"speed": 0.89,
+				"deg": 310
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6059891,
+			"name": "Longueuil",
+			"coord": {
+				"lat": 45.5312,
+				"lon": -73.5181
+			},
+			"main": {
+				"temp": 26.39,
+				"feels_like": 26.39,
+				"temp_min": 23.5,
+				"temp_max": 28.8,
+				"pressure": 1016,
+				"humidity": 54
+			},
+			"dt": 1626466153,
+			"wind": {
+				"speed": 0.45,
+				"deg": 311
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		},
+		{
+			"id": 6138884,
+			"name": "Saint-Paul-d'Abbotsford",
+			"coord": {
+				"lat": 45.4334,
+				"lon": -72.8824
+			},
+			"main": {
+				"temp": 25.07,
+				"feels_like": 25.28,
+				"temp_min": 23.1,
+				"temp_max": 27.52,
+				"pressure": 1016,
+				"humidity": 63,
+				"sea_level": 1016,
+				"grnd_level": 1007
+			},
+			"dt": 1626466407,
+			"wind": {
+				"speed": 2.63,
+				"deg": 252
+			},
+			"sys": {
+				"country": "CA"
+			},
+			"rain": null,
+			"snow": null,
+			"clouds": {
+				"all": 100
+			},
+			"weather": [
+				{
+					"id": 804,
+					"main": "Clouds",
+					"description": "overcast clouds",
+					"icon": "04d"
+				}
+			]
+		}
+	]
+}

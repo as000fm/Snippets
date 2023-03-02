@@ -1,0 +1,615 @@
+package junit.src.outils.gson;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+
+import outils.base.OutilsBase;
+import outils.gson.AsOutilsGson;
+import outils.gson.OutilsGson;
+
+/**
+ * Cas de tests suppémentaires pour obtenir 100% de couverture
+ */
+@DisplayName("outils.gson.AsOutilsGson")
+public class AsOutilsGsonCasesTest {
+
+	@Test
+	@DisplayName("junit.src.outils.gson.testAsOutilsGsonCasesTest()")
+	final void testAsOutilsGsonCasesTest(TestInfo testInfo) throws Exception {
+		System.out.println(testInfo.getDisplayName());
+
+		// getAsString
+
+		JsonArray jsonArray = AsOutilsGson.getAsJsonArray(JsonParser.parseString(OutilsGson.toJson(new String[] { "A" })));
+
+		AsOutilsGson.getAsString(jsonArray);
+
+		// getAsJsonArray
+
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty("A", "B");
+
+		AsOutilsGson.getAsJsonArray(jsonObject);
+
+		// asBoolean
+
+		JsonArray booleanArray = new JsonArray();
+		booleanArray.add(true);
+
+		JsonArray booleanPrimitiveArray = new JsonArray();
+		booleanPrimitiveArray.add(new JsonPrimitive(true));
+
+		Map<String, Boolean> booleanDict = new HashMap<>();
+		booleanDict.put("A", Boolean.TRUE);
+
+		JsonObject booleanMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(booleanDict)));
+
+		Map<String, Boolean[]> booleanArrayDict = new HashMap<>();
+		booleanArrayDict.put("A", new Boolean[] { Boolean.TRUE });
+
+		JsonObject booleanArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(booleanArrayDict)));
+
+		Map<String, List<Boolean>> booleanListDict = new HashMap<>();
+		booleanListDict.put("A", OutilsBase.asList(Boolean.TRUE));
+
+		JsonObject booleanListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(booleanListDict)));
+
+		AsOutilsGson.asBooleanArray(booleanArray);
+		AsOutilsGson.asBooleanPrimitiveArray(booleanPrimitiveArray);
+		AsOutilsGson.asBooleanList((JsonElement) booleanArray);
+		AsOutilsGson.asBooleanList(booleanArray);
+		AsOutilsGson.asBooleanArrayList((JsonElement) booleanPrimitiveArray);
+		AsOutilsGson.asBooleanArrayList(booleanPrimitiveArray);
+		AsOutilsGson.asBooleanMap((JsonElement) booleanMap);
+		AsOutilsGson.asBooleanMap(booleanMap);
+		AsOutilsGson.asBooleanArrayMap((JsonElement) booleanArrayMap);
+		AsOutilsGson.asBooleanArrayMap(booleanArrayMap);
+		AsOutilsGson.asBooleanListMap((JsonElement) booleanListMap);
+		AsOutilsGson.asBooleanListMap(booleanListMap);
+
+		// asByte
+
+		JsonArray byteArray = new JsonArray();
+		byteArray.add((byte) 0);
+
+		JsonArray bytePrimitiveArray = new JsonArray();
+		bytePrimitiveArray.add(new JsonPrimitive((byte) 0));
+
+		Map<String, Byte> byteDict = new HashMap<>();
+		byteDict.put("A", (byte) 0);
+
+		JsonObject byteMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(byteDict)));
+
+		Map<String, Byte[]> byteArrayDict = new HashMap<>();
+		byteArrayDict.put("A", new Byte[] { (byte) 0 });
+
+		JsonObject byteArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(byteArrayDict)));
+
+		Map<String, List<Byte>> byteListDict = new HashMap<>();
+		byteListDict.put("A", OutilsBase.asList((byte) 0));
+
+		JsonObject byteListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(byteListDict)));
+
+		AsOutilsGson.asByteArray(byteArray);
+		AsOutilsGson.asBytePrimitiveArray(bytePrimitiveArray);
+		AsOutilsGson.asByteList((JsonElement) byteArray);
+		AsOutilsGson.asByteList(byteArray);
+		AsOutilsGson.asByteArrayList((JsonElement) bytePrimitiveArray);
+		AsOutilsGson.asByteArrayList(bytePrimitiveArray);
+		AsOutilsGson.asByteMap((JsonElement) byteMap);
+		AsOutilsGson.asByteMap(byteMap);
+		AsOutilsGson.asByteArrayMap((JsonElement) byteArrayMap);
+		AsOutilsGson.asByteArrayMap(byteArrayMap);
+		AsOutilsGson.asByteListMap((JsonElement) byteListMap);
+		AsOutilsGson.asByteListMap(byteListMap);
+
+		// asChar
+
+		JsonArray charArray = new JsonArray();
+		charArray.add('A');
+
+		JsonArray charPrimitiveArray = new JsonArray();
+		charPrimitiveArray.add(new JsonPrimitive('A'));
+
+		Map<String, Character> charDict = new HashMap<>();
+		charDict.put("A", 'A');
+
+		JsonObject charMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(charDict)));
+
+		Map<String, Character[]> charArrayDict = new HashMap<>();
+		charArrayDict.put("A", new Character[] { 'A' });
+
+		JsonObject charArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(charArrayDict)));
+
+		Map<String, List<Character>> charListDict = new HashMap<>();
+		charListDict.put("A", OutilsBase.asList('A'));
+
+		JsonObject charListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(charListDict)));
+
+		AsOutilsGson.asCharArray(charArray);
+		AsOutilsGson.asCharPrimitiveArray(charPrimitiveArray);
+		AsOutilsGson.asCharList((JsonElement) charArray);
+		AsOutilsGson.asCharList(charArray);
+		AsOutilsGson.asCharArrayList((JsonElement) charPrimitiveArray);
+		AsOutilsGson.asCharArrayList(charPrimitiveArray);
+		AsOutilsGson.asCharMap((JsonElement) charMap);
+		AsOutilsGson.asCharMap(charMap);
+		AsOutilsGson.asCharArrayMap((JsonElement) charArrayMap);
+		AsOutilsGson.asCharArrayMap(charArrayMap);
+		AsOutilsGson.asCharListMap((JsonElement) charListMap);
+		AsOutilsGson.asCharListMap(charListMap);
+
+		// asDouble
+
+		JsonArray doubleArray = new JsonArray();
+		doubleArray.add((double) 0);
+
+		JsonArray doublePrimitiveArray = new JsonArray();
+		doublePrimitiveArray.add(new JsonPrimitive((double) 0));
+
+		Map<String, Double> doubleDict = new HashMap<>();
+		doubleDict.put("A", (double) 0);
+
+		JsonObject doubleMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(doubleDict)));
+
+		Map<String, Double[]> doubleArrayDict = new HashMap<>();
+		doubleArrayDict.put("A", new Double[] { (double) 0 });
+
+		JsonObject doubleArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(doubleArrayDict)));
+
+		Map<String, List<Double>> doubleListDict = new HashMap<>();
+		doubleListDict.put("A", OutilsBase.asList((double) 0));
+
+		JsonObject doubleListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(doubleListDict)));
+
+		AsOutilsGson.asDoubleArray(doubleArray);
+		AsOutilsGson.asDoublePrimitiveArray(doublePrimitiveArray);
+		AsOutilsGson.asDoubleList((JsonElement) doubleArray);
+		AsOutilsGson.asDoubleList(doubleArray);
+		AsOutilsGson.asDoubleArrayList((JsonElement) doublePrimitiveArray);
+		AsOutilsGson.asDoubleArrayList(doublePrimitiveArray);
+		AsOutilsGson.asDoubleMap((JsonElement) doubleMap);
+		AsOutilsGson.asDoubleMap(doubleMap);
+		AsOutilsGson.asDoubleArrayMap((JsonElement) doubleArrayMap);
+		AsOutilsGson.asDoubleArrayMap(doubleArrayMap);
+		AsOutilsGson.asDoubleListMap((JsonElement) doubleListMap);
+		AsOutilsGson.asDoubleListMap(doubleListMap);
+
+		// asFloat
+
+		JsonArray floatArray = new JsonArray();
+		floatArray.add((float) 0);
+
+		JsonArray floatPrimitiveArray = new JsonArray();
+		floatPrimitiveArray.add(new JsonPrimitive((float) 0));
+
+		Map<String, Float> floatDict = new HashMap<>();
+		floatDict.put("A", (float) 0);
+
+		JsonObject floatMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(floatDict)));
+
+		Map<String, Float[]> floatArrayDict = new HashMap<>();
+		floatArrayDict.put("A", new Float[] { (float) 0 });
+
+		JsonObject floatArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(floatArrayDict)));
+
+		Map<String, List<Float>> floatListDict = new HashMap<>();
+		floatListDict.put("A", OutilsBase.asList((float) 0));
+
+		JsonObject floatListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(floatListDict)));
+
+		AsOutilsGson.asFloatArray(floatArray);
+		AsOutilsGson.asFloatPrimitiveArray(floatPrimitiveArray);
+		AsOutilsGson.asFloatList((JsonElement) floatArray);
+		AsOutilsGson.asFloatList(floatArray);
+		AsOutilsGson.asFloatArrayList((JsonElement) floatPrimitiveArray);
+		AsOutilsGson.asFloatArrayList(floatPrimitiveArray);
+		AsOutilsGson.asFloatMap((JsonElement) floatMap);
+		AsOutilsGson.asFloatMap(floatMap);
+		AsOutilsGson.asFloatArrayMap((JsonElement) floatArrayMap);
+		AsOutilsGson.asFloatArrayMap(floatArrayMap);
+		AsOutilsGson.asFloatListMap((JsonElement) floatListMap);
+		AsOutilsGson.asFloatListMap(floatListMap);
+
+		// asInt
+
+		JsonArray intArray = new JsonArray();
+		intArray.add((int) 0);
+
+		JsonArray intPrimitiveArray = new JsonArray();
+		intPrimitiveArray.add(new JsonPrimitive((int) 0));
+
+		Map<String, Integer> intDict = new HashMap<>();
+		intDict.put("A", (int) 0);
+
+		JsonObject intMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(intDict)));
+
+		Map<String, Integer[]> intArrayDict = new HashMap<>();
+		intArrayDict.put("A", new Integer[] { (int) 0 });
+
+		JsonObject intArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(intArrayDict)));
+
+		Map<String, List<Integer>> intListDict = new HashMap<>();
+		intListDict.put("A", OutilsBase.asList((int) 0));
+
+		JsonObject intListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(intListDict)));
+
+		AsOutilsGson.asIntArray(intArray);
+		AsOutilsGson.asIntPrimitiveArray(intPrimitiveArray);
+		AsOutilsGson.asIntList((JsonElement) intArray);
+		AsOutilsGson.asIntList(intArray);
+		AsOutilsGson.asIntArrayList((JsonElement) intPrimitiveArray);
+		AsOutilsGson.asIntArrayList(intPrimitiveArray);
+		AsOutilsGson.asIntMap((JsonElement) intMap);
+		AsOutilsGson.asIntMap(intMap);
+		AsOutilsGson.asIntArrayMap((JsonElement) intArrayMap);
+		AsOutilsGson.asIntArrayMap(intArrayMap);
+		AsOutilsGson.asIntListMap((JsonElement) intListMap);
+		AsOutilsGson.asIntListMap(intListMap);
+
+		// asLong
+
+		JsonArray longArray = new JsonArray();
+		longArray.add((long) 0);
+
+		JsonArray longPrimitiveArray = new JsonArray();
+		longPrimitiveArray.add(new JsonPrimitive((long) 0));
+
+		Map<String, Long> longDict = new HashMap<>();
+		longDict.put("A", (long) 0);
+
+		JsonObject longMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(longDict)));
+
+		Map<String, Long[]> longArrayDict = new HashMap<>();
+		longArrayDict.put("A", new Long[] { (long) 0 });
+
+		JsonObject longArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(longArrayDict)));
+
+		Map<String, List<Long>> longListDict = new HashMap<>();
+		longListDict.put("A", OutilsBase.asList((long) 0));
+
+		JsonObject longListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(longListDict)));
+
+		AsOutilsGson.asLongArray(longArray);
+		AsOutilsGson.asLongPrimitiveArray(longPrimitiveArray);
+		AsOutilsGson.asLongList((JsonElement) longArray);
+		AsOutilsGson.asLongList(longArray);
+		AsOutilsGson.asLongArrayList((JsonElement) longPrimitiveArray);
+		AsOutilsGson.asLongArrayList(longPrimitiveArray);
+		AsOutilsGson.asLongMap((JsonElement) longMap);
+		AsOutilsGson.asLongMap(longMap);
+		AsOutilsGson.asLongArrayMap((JsonElement) longArrayMap);
+		AsOutilsGson.asLongArrayMap(longArrayMap);
+		AsOutilsGson.asLongListMap((JsonElement) longListMap);
+		AsOutilsGson.asLongListMap(longListMap);
+
+		// asShort
+
+		JsonArray shortArray = new JsonArray();
+		shortArray.add((short) 0);
+
+		JsonArray shortPrimitiveArray = new JsonArray();
+		shortPrimitiveArray.add(new JsonPrimitive((short) 0));
+
+		Map<String, Short> shortDict = new HashMap<>();
+		shortDict.put("A", (short) 0);
+
+		JsonObject shortMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(shortDict)));
+
+		Map<String, Short[]> shortArrayDict = new HashMap<>();
+		shortArrayDict.put("A", new Short[] { (short) 0 });
+
+		JsonObject shortArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(shortArrayDict)));
+
+		Map<String, List<Short>> shortListDict = new HashMap<>();
+		shortListDict.put("A", OutilsBase.asList((short) 0));
+
+		JsonObject shortListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(shortListDict)));
+
+		AsOutilsGson.asShortArray(shortArray);
+		AsOutilsGson.asShortPrimitiveArray(shortPrimitiveArray);
+		AsOutilsGson.asShortList((JsonElement) shortArray);
+		AsOutilsGson.asShortList(shortArray);
+		AsOutilsGson.asShortArrayList((JsonElement) shortPrimitiveArray);
+		AsOutilsGson.asShortArrayList(shortPrimitiveArray);
+		AsOutilsGson.asShortMap((JsonElement) shortMap);
+		AsOutilsGson.asShortMap(shortMap);
+		AsOutilsGson.asShortArrayMap((JsonElement) shortArrayMap);
+		AsOutilsGson.asShortArrayMap(shortArrayMap);
+		AsOutilsGson.asShortListMap((JsonElement) shortListMap);
+		AsOutilsGson.asShortListMap(shortListMap);
+
+		// asBigDecimal
+
+		JsonArray bigDecimalArray = new JsonArray();
+		bigDecimalArray.add(new BigDecimal(0));
+
+		JsonArray bigDecimalPrimitiveArray = new JsonArray();
+		bigDecimalPrimitiveArray.add(new JsonPrimitive(new BigDecimal(0)));
+
+		Map<String, BigDecimal> bigDecimalDict = new HashMap<>();
+		bigDecimalDict.put("A", new BigDecimal(0));
+
+		JsonObject bigDecimalMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(bigDecimalDict)));
+
+		Map<String, BigDecimal[]> bigDecimalArrayDict = new HashMap<>();
+		bigDecimalArrayDict.put("A", new BigDecimal[] { new BigDecimal(0) });
+
+		JsonObject bigDecimalArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(bigDecimalArrayDict)));
+
+		Map<String, List<BigDecimal>> bigDecimalListDict = new HashMap<>();
+		bigDecimalListDict.put("A", OutilsBase.asList(new BigDecimal(0)));
+
+		JsonObject bigDecimalListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(bigDecimalListDict)));
+
+		AsOutilsGson.asBigDecimalArray(bigDecimalArray);
+		AsOutilsGson.asBigDecimalList((JsonElement) bigDecimalArray);
+		AsOutilsGson.asBigDecimalList(bigDecimalArray);
+		AsOutilsGson.asBigDecimalArrayList((JsonElement) bigDecimalPrimitiveArray);
+		AsOutilsGson.asBigDecimalArrayList(bigDecimalPrimitiveArray);
+		AsOutilsGson.asBigDecimalMap((JsonElement) bigDecimalMap);
+		AsOutilsGson.asBigDecimalMap(bigDecimalMap);
+		AsOutilsGson.asBigDecimalArrayMap((JsonElement) bigDecimalArrayMap);
+		AsOutilsGson.asBigDecimalArrayMap(bigDecimalArrayMap);
+		AsOutilsGson.asBigDecimalListMap((JsonElement) bigDecimalListMap);
+		AsOutilsGson.asBigDecimalListMap(bigDecimalListMap);
+
+		// asDate yyyy-MM-dd HH:mm ou yyyy-MM-dd HH:mm:ss
+
+		JsonArray dateArray = new JsonArray();
+		dateArray.add("2020-02-29 20:20");
+
+		JsonArray datePrimitiveArray = new JsonArray();
+		datePrimitiveArray.add(new JsonPrimitive("2020-02-29 20:20:02"));
+
+		Map<String, String> dateDict = new HashMap<>();
+		dateDict.put("A", "2020-02-29 20:20:02");
+
+		JsonObject dateMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(dateDict)));
+
+		Map<String, String[]> dateArrayDict = new HashMap<>();
+		dateArrayDict.put("A", new String[] { "2020-02-29 20:20:02" });
+
+		JsonObject dateArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(dateArrayDict)));
+
+		Map<String, List<String>> dateListDict = new HashMap<>();
+		dateListDict.put("A", OutilsBase.asList("2020-02-29 20:20:02"));
+
+		JsonObject dateListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(dateListDict)));
+
+		AsOutilsGson.asDateArray(dateArray);
+		AsOutilsGson.asDateList((JsonElement) dateArray);
+		AsOutilsGson.asDateList(dateArray);
+		AsOutilsGson.asDateArrayList((JsonElement) datePrimitiveArray);
+		AsOutilsGson.asDateArrayList(datePrimitiveArray);
+		AsOutilsGson.asDateMap((JsonElement) dateMap);
+		AsOutilsGson.asDateMap(dateMap);
+		AsOutilsGson.asDateArrayMap((JsonElement) dateArrayMap);
+		AsOutilsGson.asDateArrayMap(dateArrayMap);
+		AsOutilsGson.asDateListMap((JsonElement) dateListMap);
+		AsOutilsGson.asDateListMap(dateListMap);
+
+		// asInstant 1583025602029 (2020-02-29 20:20:02.029)
+
+		JsonArray instantArray = new JsonArray();
+		instantArray.add("1583025602029");
+
+		JsonArray instantPrimitiveArray = new JsonArray();
+		instantPrimitiveArray.add(new JsonPrimitive("1583025602029"));
+
+		Map<String, String> instantDict = new HashMap<>();
+		instantDict.put("A", "1583025602029");
+
+		JsonObject instantMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(instantDict)));
+
+		Map<String, String[]> instantArrayDict = new HashMap<>();
+		instantArrayDict.put("A", new String[] { "1583025602029" });
+
+		JsonObject instantArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(instantArrayDict)));
+
+		Map<String, List<String>> instantListDict = new HashMap<>();
+		instantListDict.put("A", OutilsBase.asList("1583025602029"));
+
+		JsonObject instantListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(instantListDict)));
+
+		AsOutilsGson.asInstantArray(instantArray);
+		AsOutilsGson.asInstantList((JsonElement) instantArray);
+		AsOutilsGson.asInstantList(instantArray);
+		AsOutilsGson.asInstantArrayList((JsonElement) instantPrimitiveArray);
+		AsOutilsGson.asInstantArrayList(instantPrimitiveArray);
+		AsOutilsGson.asInstantMap((JsonElement) instantMap);
+		AsOutilsGson.asInstantMap(instantMap);
+		AsOutilsGson.asInstantArrayMap((JsonElement) instantArrayMap);
+		AsOutilsGson.asInstantArrayMap(instantArrayMap);
+		AsOutilsGson.asInstantListMap((JsonElement) instantListMap);
+		AsOutilsGson.asInstantListMap(instantListMap);
+
+		// asObject
+
+		JsonArray objectArray = new JsonArray();
+		objectArray.add(new JsonObject());
+
+		JsonArray objectPrimitiveArray = new JsonArray();
+		objectPrimitiveArray.add(new JsonPrimitive(""));
+
+		Map<String, Object> objectDict = new HashMap<>();
+		objectDict.put("A", new JsonObject());
+
+		JsonObject objectMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(objectDict)));
+
+		Map<String, Object[]> objectArrayDict = new HashMap<>();
+		objectArrayDict.put("A", new Object[] { new JsonObject() });
+
+		JsonObject objectArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(objectArrayDict)));
+
+		Map<String, List<Object>> objectListDict = new HashMap<>();
+		objectListDict.put("A", OutilsBase.asList(new JsonObject()));
+
+		JsonObject objectListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(objectListDict)));
+
+		AsOutilsGson.asObjectArray(objectArray);
+		AsOutilsGson.asObjectList((JsonElement) objectArray);
+		AsOutilsGson.asObjectList(objectArray);
+		AsOutilsGson.asObjectArrayList((JsonElement) objectPrimitiveArray);
+		AsOutilsGson.asObjectArrayList(objectPrimitiveArray);
+		AsOutilsGson.asObjectMap((JsonElement) objectMap);
+		AsOutilsGson.asObjectMap(objectMap);
+		AsOutilsGson.asObjectArrayMap((JsonElement) objectArrayMap);
+		AsOutilsGson.asObjectArrayMap(objectArrayMap);
+		AsOutilsGson.asObjectListMap((JsonElement) objectListMap);
+		AsOutilsGson.asObjectListMap(objectListMap);
+
+		// asSqlDate yyyy-MM-dd HH:mm ou yyyy-MM-dd HH:mm:ss
+
+		JsonArray sqlDateArray = new JsonArray();
+		sqlDateArray.add("2020-02-29 20:20");
+
+		JsonArray sqlDatePrimitiveArray = new JsonArray();
+		sqlDatePrimitiveArray.add(new JsonPrimitive("2020-02-29 20:20:02"));
+
+		Map<String, String> sqlDateDict = new HashMap<>();
+		sqlDateDict.put("A", "2020-02-29 20:20:02");
+
+		JsonObject sqlDateMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(sqlDateDict)));
+
+		Map<String, String[]> sqlDateArrayDict = new HashMap<>();
+		sqlDateArrayDict.put("A", new String[] { "2020-02-29 20:20:02" });
+
+		JsonObject sqlDateArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(sqlDateArrayDict)));
+
+		Map<String, List<String>> sqlDateListDict = new HashMap<>();
+		sqlDateListDict.put("A", OutilsBase.asList("2020-02-29 20:20:02"));
+
+		JsonObject sqlDateListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(sqlDateListDict)));
+
+		AsOutilsGson.asSqlDateArray(sqlDateArray);
+		AsOutilsGson.asSqlDateList((JsonElement) sqlDateArray);
+		AsOutilsGson.asSqlDateList(sqlDateArray);
+		AsOutilsGson.asSqlDateArrayList((JsonElement) sqlDatePrimitiveArray);
+		AsOutilsGson.asSqlDateArrayList(sqlDatePrimitiveArray);
+		AsOutilsGson.asSqlDateMap((JsonElement) sqlDateMap);
+		AsOutilsGson.asSqlDateMap(sqlDateMap);
+		AsOutilsGson.asSqlDateArrayMap((JsonElement) sqlDateArrayMap);
+		AsOutilsGson.asSqlDateArrayMap(sqlDateArrayMap);
+		AsOutilsGson.asSqlDateListMap((JsonElement) sqlDateListMap);
+		AsOutilsGson.asSqlDateListMap(sqlDateListMap);
+
+		// asString
+
+		JsonArray stringArray = new JsonArray();
+		stringArray.add("Automated Test Value");
+
+		JsonArray stringPrimitiveArray = new JsonArray();
+		stringPrimitiveArray.add(new JsonPrimitive("Automated Test Value"));
+
+		Map<String, String> stringDict = new HashMap<>();
+		stringDict.put("A", "Automated Test Value");
+
+		JsonObject stringMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(stringDict)));
+
+		Map<String, String[]> stringArrayDict = new HashMap<>();
+		stringArrayDict.put("A", new String[] { "Automated Test Value" });
+
+		JsonObject stringArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(stringArrayDict)));
+
+		Map<String, List<String>> stringListDict = new HashMap<>();
+		stringListDict.put("A", OutilsBase.asList("Automated Test Value"));
+
+		JsonObject stringListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(stringListDict)));
+
+		AsOutilsGson.asStringArray(stringArray);
+		AsOutilsGson.asStringList((JsonElement) stringArray);
+		AsOutilsGson.asStringList(stringArray);
+		AsOutilsGson.asStringArrayList((JsonElement) stringPrimitiveArray);
+		AsOutilsGson.asStringArrayList(stringPrimitiveArray);
+		AsOutilsGson.asStringMap((JsonElement) stringMap);
+		AsOutilsGson.asStringMap(stringMap);
+		AsOutilsGson.asStringArrayMap((JsonElement) stringArrayMap);
+		AsOutilsGson.asStringArrayMap(stringArrayMap);
+		AsOutilsGson.asStringListMap((JsonElement) stringListMap);
+		AsOutilsGson.asStringListMap(stringListMap);
+
+		// asTime yyyy-MM-dd HH:mm ou yyyy-MM-dd HH:mm:ss
+
+		JsonArray timeArray = new JsonArray();
+		timeArray.add("2020-02-29 20:20");
+
+		JsonArray timePrimitiveArray = new JsonArray();
+		timePrimitiveArray.add(new JsonPrimitive("2020-02-29 20:20:02"));
+
+		Map<String, String> timeDict = new HashMap<>();
+		timeDict.put("A", "2020-02-29 20:20:02");
+
+		JsonObject timeMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(timeDict)));
+
+		Map<String, String[]> timeArrayDict = new HashMap<>();
+		timeArrayDict.put("A", new String[] { "2020-02-29 20:20:02" });
+
+		JsonObject timeArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(timeArrayDict)));
+
+		Map<String, List<String>> timeListDict = new HashMap<>();
+		timeListDict.put("A", OutilsBase.asList("2020-02-29 20:20:02"));
+
+		JsonObject timeListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(timeListDict)));
+
+		AsOutilsGson.asTimeArray(timeArray);
+		AsOutilsGson.asTimeList((JsonElement) timeArray);
+		AsOutilsGson.asTimeList(timeArray);
+		AsOutilsGson.asTimeArrayList((JsonElement) timePrimitiveArray);
+		AsOutilsGson.asTimeArrayList(timePrimitiveArray);
+		AsOutilsGson.asTimeMap((JsonElement) timeMap);
+		AsOutilsGson.asTimeMap(timeMap);
+		AsOutilsGson.asTimeArrayMap((JsonElement) timeArrayMap);
+		AsOutilsGson.asTimeArrayMap(timeArrayMap);
+		AsOutilsGson.asTimeListMap((JsonElement) timeListMap);
+		AsOutilsGson.asTimeListMap(timeListMap);
+
+		// asTimestamp yyyy-MM-dd HH:mm ou yyyy-MM-dd HH:mm:ss
+
+		JsonArray timestampArray = new JsonArray();
+		timestampArray.add("2020-02-29 20:20");
+
+		JsonArray timestampPrimitiveArray = new JsonArray();
+		timestampPrimitiveArray.add(new JsonPrimitive("2020-02-29 20:20:02"));
+
+		Map<String, String> timestampDict = new HashMap<>();
+		timestampDict.put("A", "2020-02-29 20:20:02");
+
+		JsonObject timestampMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(timestampDict)));
+
+		Map<String, String[]> timestampArrayDict = new HashMap<>();
+		timestampArrayDict.put("A", new String[] { "2020-02-29 20:20:02" });
+
+		JsonObject timestampArrayMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(timestampArrayDict)));
+
+		Map<String, List<String>> timestampListDict = new HashMap<>();
+		timestampListDict.put("A", OutilsBase.asList("2020-02-29 20:20:02"));
+
+		JsonObject timestampListMap = AsOutilsGson.getAsJsonObject(JsonParser.parseString(OutilsGson.toJson(timestampListDict)));
+
+		AsOutilsGson.asTimestampArray(timestampArray);
+		AsOutilsGson.asTimestampList((JsonElement) timestampArray);
+		AsOutilsGson.asTimestampList(timestampArray);
+		AsOutilsGson.asTimestampArrayList((JsonElement) timestampPrimitiveArray);
+		AsOutilsGson.asTimestampArrayList(timestampPrimitiveArray);
+		AsOutilsGson.asTimestampMap((JsonElement) timestampMap);
+		AsOutilsGson.asTimestampMap(timestampMap);
+		AsOutilsGson.asTimestampArrayMap((JsonElement) timestampArrayMap);
+		AsOutilsGson.asTimestampArrayMap(timestampArrayMap);
+		AsOutilsGson.asTimestampListMap((JsonElement) timestampListMap);
+		AsOutilsGson.asTimestampListMap(timestampListMap);
+	}
+
+}

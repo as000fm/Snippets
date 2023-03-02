@@ -28,34 +28,72 @@ public class AsOutilsGsonCasesTest {
 	@Test
 	@DisplayName("junit.src.outils.gson.testAsOutilsGsonCasesTest()")
 	final void testAsOutilsGsonCasesTest(TestInfo testInfo) throws Exception {
-		JsonElement element1 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson1.json"), FilesCharsetsTypes.UTF_8);
-		JsonElement element2 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson2.json"), FilesCharsetsTypes.UTF_8);
-		JsonElement element3 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson3.json"), FilesCharsetsTypes.UTF_8);
-		JsonElement element4 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson4.json"), FilesCharsetsTypes.UTF_8);
-		JsonElement element5 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson5.json"), FilesCharsetsTypes.UTF_8);
-		JsonElement element6 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson6.json"), FilesCharsetsTypes.UTF_8);
-		JsonElement element7 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson7.json"), FilesCharsetsTypes.UTF_8);
-		JsonElement element8 = OutilsGson.loadJsonElementsListFromFile(JunitHelper.getFullname(JunitHelper.getCurrentDirectory(), "tests", "files", "gson", "OutilsGson8.json"), FilesCharsetsTypes.UTF_8);
-		
-		JsonObject object3 = AsOutilsGson.getAsJsonObject(element3);
-		JsonObject object4 = AsOutilsGson.getAsJsonObject(element4);
-		JsonObject object5 = AsOutilsGson.getAsJsonObject(element5);
-		JsonObject object6 = AsOutilsGson.getAsJsonObject(element6);
-		
-		OutilsGson.mergeJsonObjects(object3, object4);
-		OutilsGson.mergeJsonObjects(object5, object6);
-		
-		JsonArray array1 = AsOutilsGson.getAsJsonArray(element1);
-		JsonArray array2 = AsOutilsGson.getAsJsonArray(element2);
-		JsonArray array7 = AsOutilsGson.getAsJsonArray(element7);
-		JsonArray array8 = AsOutilsGson.getAsJsonArray(element8);
-		
-		OutilsGson.mergeJsonArrays(array1, array2);
-		OutilsGson.mergeJsonArrays(array7, array8);
-		
-		OutilsGson.mergeJsonArray(array1);
-		OutilsGson.mergeJsonArray(array2);
-		OutilsGson.mergeJsonArray(array7);
-		OutilsGson.mergeJsonArray(array8);
+		String[] header = new String[] { "A", "B", "C" };
+
+		List<String[]> rows = new ArrayList<>();
+		rows.add(new String[] { "1", "2", "3" });
+		rows.add(new String[] { "4", "5", "6" });
+
+		CSVFileData csvFileData = new CSVFileData(header, rows);
+
+		TestsData<CSVFileData> csvFileTestsData = new TestsData<CSVFileData>(csvFileData);
+
+		ListesParseJSON.asCSVFileData("");
+		ListesParseJSON.asCSVFileData(csvFileTestsData.asJSON());
+
+		for (int i = -1; i <= 2; i++) {
+			ListesParseJSON.asCSVFileDataList(csvFileTestsData.asJSONList(i));
+			ListesParseJSON.asCSVFileDataMap(csvFileTestsData.asJSONMap(i));
+			ListesParseJSON.asCSVFileDataArray(csvFileTestsData.asJSONArray(i));
+			ListesParseJSON.asCSVFileDataArray(csvFileTestsData.getJsonArray(i));
+			ListesParseJSON.asCSVFileDataArrayList(csvFileTestsData.asJSONArrayList(i));
+			ListesParseJSON.asCSVFileDataArrayMap(csvFileTestsData.asJSONArrayMap(i));
+			ListesParseJSON.asCSVFileDataListMap(csvFileTestsData.asJSONListMap(i));
+		}
+
+		TestsData<IdValue> idValueTestsData = new TestsData<IdValue>(new IdValue(1L, "Value"));
+
+		ListesParseJSON.asIdValue("");
+		ListesParseJSON.asIdValue(idValueTestsData.asJSON());
+
+		for (int i = -1; i <= 2; i++) {
+			ListesParseJSON.asIdValueList(idValueTestsData.asJSONList(i));
+			ListesParseJSON.asIdValueMap(idValueTestsData.asJSONMap(i));
+			ListesParseJSON.asIdValueArray(idValueTestsData.asJSONArray(i));
+			ListesParseJSON.asIdValueArray(idValueTestsData.getJsonArray(i));
+			ListesParseJSON.asIdValueArrayList(idValueTestsData.asJSONArrayList(i));
+			ListesParseJSON.asIdValueArrayMap(idValueTestsData.asJSONArrayMap(i));
+			ListesParseJSON.asIdValueListMap(idValueTestsData.asJSONListMap(i));
+		}
+
+		TestsData<NameValue> nameValueTestsData = new TestsData<NameValue>(new NameValue("Name", "Value"));
+
+		ListesParseJSON.asNameValue("");
+		ListesParseJSON.asNameValue(nameValueTestsData.asJSON());
+
+		for (int i = -1; i <= 2; i++) {
+			ListesParseJSON.asNameValueList(nameValueTestsData.asJSONList(i));
+			ListesParseJSON.asNameValueMap(nameValueTestsData.asJSONMap(i));
+			ListesParseJSON.asNameValueArray(nameValueTestsData.asJSONArray(i));
+			ListesParseJSON.asNameValueArray(nameValueTestsData.getJsonArray(i));
+			ListesParseJSON.asNameValueArrayList(nameValueTestsData.asJSONArrayList(i));
+			ListesParseJSON.asNameValueArrayMap(nameValueTestsData.asJSONArrayMap(i));
+			ListesParseJSON.asNameValueListMap(nameValueTestsData.asJSONListMap(i));
+		}
+
+		TestsData<StringData> stringDataTestsData = new TestsData<StringData>(new StringData("Name", new Integer(1)));
+
+		ListesParseJSON.asStringData("");
+		ListesParseJSON.asStringData(stringDataTestsData.asJSON());
+
+		for (int i = -1; i <= 2; i++) {
+			ListesParseJSON.asStringDataList(stringDataTestsData.asJSONList(i));
+			ListesParseJSON.asStringDataMap(stringDataTestsData.asJSONMap(i));
+			ListesParseJSON.asStringDataArray(stringDataTestsData.asJSONArray(i));
+			ListesParseJSON.asStringDataArray(stringDataTestsData.getJsonArray(i));
+			ListesParseJSON.asStringDataArrayList(stringDataTestsData.asJSONArrayList(i));
+			ListesParseJSON.asStringDataArrayMap(stringDataTestsData.asJSONArrayMap(i));
+			ListesParseJSON.asStringDataListMap(stringDataTestsData.asJSONListMap(i));
+		}
 
 }

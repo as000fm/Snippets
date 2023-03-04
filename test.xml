@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="all" name="test">
+
+	<property environment="env" />
+
+	<property name="dir.project" location="${basedir}" />
+	<property name="dir.workspace" value="${dir.project}/.." />
+	<property name="dir.jarfile" value="${dir.project}/Release" />
+	
+	<target name="copy-jars" description="Copies files into the jar folder">
+		<copy todir="${dir.jarfile}" file="${dir.workspace}/Apache groovy/groovy-4.0.9.jar" />
+		<copy todir="${dir.jarfile}" file="${dir.workspace}/Apache libs/commons-cli-1.4.jar" />
+		<copy todir="${dir.jarfile}" file="${dir.workspace}/google-gson/gson-2.10.1.jar" />
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+	</target>
+
+	<target name="projects-jars" description="Generates the jars files for all projects">
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+	</target>
+
+	<target name="jar-manifest" description="Generates the jar file with manifest">
+		<jar destfile="${dir.jarfile}/atu-${buildNumber}.jar">
+			<manifest>
+				<attribute name="Main-Class" value="automated.tests.cli.AutomatedTestsUnits" />
+				<attribute name="Class-Path" value="./ commons-cli-1.4.jar groovy-4.0.9.jar gson-2.10.1.jar" />
+			</manifest>
+			<fileset dir="${dir.project}/bin" />
+		</jar>
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+	</target>
+	<target name="all" depends="clean,version-build,copy-jars,projects-jars,jar-manifest,command-files,manifest-jar,fichiers-commandes,jar,copy-files" description="Performs all" />
+
+</project>

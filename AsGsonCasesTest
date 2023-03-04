@@ -1,5 +1,57 @@
-public class HelloWorld {
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-    }
+package automated.tests.templates;
+
+import java.util.List;
+
+import automated.tests.annotations.NoParentMethodsTesting;
+import automated.tests.helpers.abstractions.TemplateProducer;
+import automated.tests.helpers.base.BasicsHelper;
+import automated.tests.helpers.common.CommonHelper;
+import automated.tests.helpers.types.FilesCharsetsTypes;
+
+/**
+ * Génération du modèle pour un nom de test de la classe du test unitaire
+ * @author Claude Toupin - 26 déc. 2021
+ */
+@NoParentMethodsTesting
+public class TestTemplate extends TemplateProducer {
+	/**
+	 * Constructeur de base
+	 * @param french Indicateur de textes en français
+	 * @throws Exception en cas d'erreur...
+	 */
+	public TestTemplate(boolean french) throws Exception {
+		super(TestTemplate.class.getResourceAsStream(TestTemplate.class.getSimpleName() + (french ? "FRA" : "ENG") + CommonHelper.TEXT_EXTENSION), FilesCharsetsTypes.UTF_8);
+	}
+
+	/**
+	 * Produit le code pour un nom de test de la classe du test unitaire
+	 * @param display Nom du test à afficher
+	 * @param name Nom complet du test unitaire
+	 * @param suppressWarnings Indicateur d'ajout de la suppression des avertissement au test unitaire
+	 * @param code Les lignes de code du nom de test unitaire
+	 * @return les lignes de codes pour un nom de test de la classe du test unitaire
+	 * @throws Exception en cas d'erreur...
+	 */
+	public List<String> produceTest(String display, String name, boolean suppressWarnings, String code) throws Exception {
+		return produceTest(display, name, suppressWarnings, BasicsHelper.asList(code));
+	}
+
+	/**
+	 * Produit le code pour un nom de test de la classe du test unitaire
+	 * @param display Nom du test à afficher
+	 * @param name Nom complet du test unitaire
+	 * @param suppressWarnings Indicateur d'ajout de la suppression des avertissements au test unitaire
+	 * @param code Les lignes de code du nom de test unitaire
+	 * @return les lignes de codes pour un nom de test de la classe du test unitaire
+	 * @throws Exception en cas d'erreur...
+	 */
+	public List<String> produceTest(String display, String name, boolean suppressWarnings, List<String> code) throws Exception {
+		getTagsDictionary().clear();
+		getTagsDictionary().put("display", display);
+		getTagsDictionary().put("name", name);
+		getTagsDictionary().put("suppressWarnings", suppressWarnings ? "@SuppressWarnings(\"unchecked\")" + CommonHelper.LINE_SEPARATOR + "\t" : "");
+		getTagsDictionary().put("code", CommonHelper.toCRLFList(code, false));
+
+		return produce();
+	}
 }

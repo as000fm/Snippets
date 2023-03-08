@@ -1,5 +1,336 @@
-public class HelloWorld {
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-    }
+	/**
+	 * Annotation de test
+	 */
+	final public static class TestAnnotation implements Annotation {
+
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.annotation.Annotation#annotationType()
+		 */
+		@Override
+		public Class<? extends Annotation> annotationType() {
+			return null;
+		}
+
+	}
+
+	/**
+	 * Énumration de test
+	 */
+	public enum TestEnum {
+		A, B, C
+	}
+
+	/** Extension d'un fichier texte **/
+	final public static String TEXT_EXTENSION = ".txt";
+
+	/** Répertoire temporaire de test **/
+	final public static String TEST_TEMP_DIR = getFullname(getTempDirectory(), getCurrentProject());
+
+	/** Valeur du texte des tests par défaut **/
+	final public static String TEST_STRING = "Automated Test Value";
+
+	/** Valeur du temps des tests par défaut: 2020-02-29 20:20:02.029 **/
+	final public static long TEST_TIME = 1583025602029L;
+
+	/** Nom du fichier de test par défaut **/
+	final public static String TEST_FILENAME = getFullname(getTempDirectory(), TEST_STRING);
+
+	/** Console d'impression **/
+	final private static PrintWriter CONSOLE;
+
+	static {
+		new File(TEST_TEMP_DIR).mkdirs();
+
+		String jcp = System.getProperty("java.class.path").toLowerCase().trim();
+
+		// Il s'agit d'une patch car il n'y a pas d'autre moyen de le savoir... :(
+		boolean eclipseIDE = (jcp.contains("eclipse") || jcp.contains("workspace")) && (System.console() == null);
+
+		String osName = asString(System.getProperty("os.name")).toLowerCase().trim();
+
+		boolean windowsOS = osName.startsWith("windows");
+
+		if (windowsOS) {
+			String oemcp = null;
+
+			if (asString(System.getProperty("java.version")).startsWith("1.8")) {
+				try {
+					Field charOutField = System.out.getClass().getDeclaredField("charOut");
+					charOutField.setAccessible(true);
+
+					oemcp = ((OutputStreamWriter) charOutField.get(System.out)).getEncoding();
+
+					if ("Cp1252".equals(oemcp)) {
+						// Impossible de forcer UTF-8 via un chcp 65001 :(
+						oemcp = "UTF8";
+					}
+				} catch (Exception e) {
+					oemcp = "Cp850";
+				}
+			} else {
+				// Encore une autre patch pour java 9 et plus :(
+				oemcp = eclipseIDE ? "UTF8" : "Cp850";
+			}
+
+			if (!isEmpty(oemcp)) {
+				PrintWriter console;
+
+				try {
+					console = new PrintWriter(new OutputStreamWriter(System.out, oemcp));
+				} catch (UnsupportedEncodingException e) {
+					System.err.println("Erreur lors de la creation de la console ayant le code de page " + oemcp + " : " + e.getLocalizedMessage());
+					console = new PrintWriter(new OutputStreamWriter(System.out));
+				}
+
+				CONSOLE = console;
+			} else {
+				CONSOLE = new PrintWriter(new OutputStreamWriter(System.out));
+			}
+		} else {
+			CONSOLE = new PrintWriter(new OutputStreamWriter(System.out));
+		}
+	}
+
+	/**
+	 * Création d'une liste de données sur demande à la Arrays.asList(T... a) mais pour une liste modifiable !!!
+	 * @param <T> Type java des valeurs de la liste
+	 * @param t Tableau de type <T> des valeurs de la liste
+	 * @return une liste
+	 */
+	@SafeVarargs
+	final public static <T> List<T> asList(T... t) {
+		if (t == null) {
+			return null;
+		}
+
+		List<T> list = new ArrayList<T>();
+
+		for (int i = 0; i < t.length; i++) {
+			list.add(t[i]);
+		}
+
+		return list;
+	}
+
+	/**
+	 * Création d'un dictionnaire de données sur demande à la Arrays.asList(T... a)
+	 * @param <K> Type java des clés du dictionnaire
+	 * @param <V> Type java des valeurs du dictionnaire
+	 * @param k Tableau de type <K> des clés du dictionnaire
+	 * @param v Tableau de type <V> des valeurs du dictionnaire
+	 * @return un dictionnaire
+	 */
+	final public static <K, V> Map<K, V> asMap(K[] k, V[] v) {
+		if ((k == null) || (v == null)) {
+			return null;
+		}
+
+		if (k.length != v.length) {
+			throw new RuntimeException("Le nombre d'items des clés (" + k.length + ") doit être égale au nombre de valeurs (" + v.length + ")");
+		}
+
+		Map<K, V> map = new HashMap<K, V>();
+
+		for (int i = 0; i < k.length; i++) {
+			map.put(k[i], v[i]);
+		}
+
+		return map;
+	}
+
+	/**
+	 * Traitement des strings pour eviter d'afficher un null
+	 * @param value Valeur à convertir
+	 * @return la string normaliser
+	 */
+	final public static String asString(String value) {
+		if (value != null) {
+			return value;
+		}
+
+		return "";
+	}
+
+	/**
+	 * Efface le contenu d'un répertoire
+	 * @param content Le contenu d'un répertoire
+	 */
+	final protected static void cleanDirectories(File[] content) {
+		if (content == null) {
+			return;
+		}
+
+		try {
+			for (int i = 0; i < content.length; i++) {
+				if (content[i].exists()) {
+					if (content[i].isFile()) {
+						Files.deleteIfExists(content[i].toPath());
+					} else if (content[i].isDirectory()) {
+						cleanDirectories(content[i].listFiles());
+						deleteEmptyDirectory(content[i], 10);
+					}
+				}
+			}
+		} catch (Exception e) {
+			// Ignore
+		}
+	}
+
+	/**
+	 * Nettoyage du reépertoire temporaire de test
+	 */
+	@SkipTesting
+	final public static void cleanTestTempDir() {
+		try {
+			File base = new File(TEST_TEMP_DIR);
+
+			if (!base.exists()) {
+				base.mkdirs();
+			} else if (base.isDirectory()) {
+				cleanDirectories(base.listFiles());
+			} else {
+				Files.deleteIfExists(base.toPath());
+				base.mkdirs();
+			}
+		} catch (Exception e) {
+			// Ignore
+		}
+	}
+
+	/**
+	 * Affichage d'un message à la console autant pour eclipse que pour cmd.exe
+	 * @param message Le message à afficher
+	 */
+	final public static void console(String message) {
+		CONSOLE.println(asString(message));
+		CONSOLE.flush();
+	}
+
+	/**
+	 * Supprresion d'un répertoire qui est vide
+	 * @param dir Répertoire vide à supprimer
+	 * @param retries Nombre d'essais
+	 */
+	final protected static void deleteEmptyDirectory(File dir, int retries) {
+		if (dir.exists() && dir.isDirectory()) {
+			if (dir.list().length == 0) {
+				try {
+					Files.deleteIfExists(dir.toPath());
+				} catch (Exception e) {
+					// Ignore
+				}
+			}
+
+			while (retries != 0) {
+				try {
+					if (dir.exists()) {
+						Files.deleteIfExists(dir.toPath());
+					}
+
+					break;
+				} catch (Exception dnee) {
+					if (retries > 0) {
+						retries--;
+
+						try {
+							Thread.sleep(500);
+						} catch (Exception e1) {
+							// Ignore...
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Extrait le répertoire courant
+	 * @return le répertoire courant
+	 */
+	@CoverageOnly
+	final public static String getCurrentDirectory() {
+		return System.getProperty("user.dir");
+	}
+
+	/**
+	 * Extrait le nom du répertoire courant
+	 * @return le nom du répertoire courant
+	 */
+	@CoverageOnly
+	final public static String getCurrentProject() {
+		return new File(getCurrentDirectory()).getAbsoluteFile().getName();
+	}
+
+	/**
+	 * Extrait le chemin complet d'un fichier
+	 * @param values Liste des valeurs du chemin complet d'un fichier à extraire
+	 * @return le chemin complet d'un fichier
+	 */
+	@AutomatedTests("a,b,c")
+	@AutomatedTests("new String[] { \"a\", \"b\", \"\\\\c\", \"d\\\\\", \"e\" }")
+	final public static String getFullname(String... values) {
+		String fullname = "";
+
+		if (values != null) {
+			for (String value : values) {
+				if (!isEmpty(value)) {
+					if (value.endsWith(File.separator)) {
+						value = value.substring(0, value.length() - 1);
+					}
+
+					if (value.startsWith(File.separator)) {
+						fullname += value;
+					} else {
+						if (!isEmpty(fullname)) {
+							if (!fullname.endsWith(File.separator)) {
+								fullname += File.separator;
+							}
+						}
+
+						fullname += value;
+					}
+				}
+			}
+		}
+
+		return fullname;
+	}
+
+	/**
+	 * Extrait le répertoire temporaire
+	 * @return le répertoire temporaire
+	 */
+	@CoverageOnly
+	final public static String getTempDirectory() {
+		return System.getProperty("java.io.tmpdir");
+	}
+
+	/**
+	 * Verifie si l'objet est vide
+	 * @param value Valeur à vérifier
+	 * @return Vrai si vide
+	 */
+	final public static boolean isEmpty(String value) {
+		return (value != null) ? value.isEmpty() : true;
+	}
+
+	/**
+	 * Indique que le test s'exécute
+	 * @return
+	 */
+	@CoverageOnly
+	final public static boolean isJunitTestsRunning() {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+		for (StackTraceElement element : stackTrace) {
+			if (element.getClassName().endsWith("Test") && element.getMethodName().startsWith("test")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }

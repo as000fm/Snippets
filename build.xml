@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="all" name="Outils Javadoc">
+
+	<property environment="env" />
+
+	<property name="dir.project" location="${basedir}" />
+	<property name="dir.workspace" value="${dir.project}/.." />
+	<property name="dir.jarfile" value="${dir.project}/Release" />
+	
+	<target name="clean" description="Removes files">
+		<eclipse.refreshLocal resource="${dir.workspace}" depth="infinite" />
+		<mkdir dir="${dir.jarfile}" />
+		<delete failOnError="false">
+			<fileset dir="${dir.jarfile}" includes="*.jar" />
+		</delete>
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+	</target>
+
+	<target name="jar" description="Generates the jar">
+		<jar destfile="${dir.jarfile}/outils-javadoc-1.0.jar">
+			<fileset dir="${dir.project}/bin" />
+			<fileset dir="${dir.project}/src" />
+		</jar>
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+	</target>
+
+	<target name="all" depends="clean,jar" description="Performs all" />
+
+</project>

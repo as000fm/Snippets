@@ -1,0 +1,18 @@
+nav:
+  - Home: 'index.md'
+  - About:
+    - Licence:
+      - toto: ['about\licence.md','about\release-notes.md']
+      - tata: ['about\licence.md','about\licence.md']
+    
+  - bcmaison: ['cf\bcmaison\GreetingResource.md', 'cf\bcmaison\SimpleMath.md']           
+  - project_tools: [
+    'project_tools\atu\StartAtuAuto.md',
+    'project_tools\atu\StartAtuFull.md',
+    'project_tools\classpath\CreateProjectClasspathFile.md',
+    'project_tools\classpath\ProjectTools.md',
+    'project_tools\qrcode\QRCodeGenerator.md',
+    'project_tools\vscode_tasks\CreateProjectVsCodeTasks.md',
+    'project_tools\vscode_tasks\GetInfoVsCodeTasksTemplate.md',
+    'project_tools\vscode_tasks\TasksInfo.md']
+  - Source: ['src\main\java\cf\bcmaison\GreetingResource.java.md', 'src\main\java\cf\bcmaison\SimpleMath.java.md']

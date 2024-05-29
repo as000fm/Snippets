@@ -1,0 +1,9 @@
+<div id="embed"></div>
+
+<script>
+fetch('https://example.com')
+  .then(response => response.text())
+  .then(data => {
+    document.getElementById('embed').innerHTML = data;
+  });
+</script>

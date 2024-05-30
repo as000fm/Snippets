@@ -1,0 +1,1 @@
+Get-WinEvent -FilterHashtable @{Logname='System'; ID=12} -MaxEvents 1 | ForEach-Object { $_.TimeCreated.ToString('yyyy-MM-dd HH:mm:ss') }

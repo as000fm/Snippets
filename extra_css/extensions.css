@@ -1,0 +1,14 @@
+[data-bs-theme=light] {
+	--ext-mark-color: #0000a0;
+	--ext-mark-background-color: #ffe800;
+}
+
+[data-bs-theme=dark] {
+	--ext-mark-color: #ffff00;
+	--ext-mark-background-color: #0020ff;
+}
+
+mark {
+  color: var(--ext-mark-color);
+  background-color: var(--ext-mark-background-color);
+}

@@ -1,0 +1,23 @@
+figure {
+    display: table;
+}
+
+figure img {
+    display: table-row;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+figcaption {
+    display: table-row;
+	text-align: center;
+	font-style: italic;
+}
+
+figcaption.top {
+	margin-top: 30px;
+}
+
+figcaption.bottom {
+	margin-bottom: 30px;
+}

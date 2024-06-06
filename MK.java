@@ -1,5 +1,6 @@
 package outils.abstractions;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -14,15 +15,20 @@ import outils.commun.OutilsCommun;
 import outils.types.FilesCharsetsTypes;
 
 /**
- * Inclusions de fichiers et convertisseur d'extensions Markdown à la Pandoc en code html pour MkDocs
+ * Extensions markdown converties en code html pour MkDocs
  * @author Claude Toupin - 2 juin 2024
  */
 public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
+	// Inclusion d'un fichier
+
 	/** Séparateur d'une paire nom=valeur d'un paramètre **/
 	private static final String PARAMETER_SEPARATOR = "=";
 
 	/** Séparateur de texte d'une valeur **/
 	private static final String TEXT_SEPARATOR = "\\\"";
+
+	/** Séparateur d'espaces blancs **/
+	private static final String SPACES_SEPARATOR = "\\s*";
 
 	/** Séparateur de groupes **/
 	private static final String GROUPS_SEPARATOR = ")|(";
@@ -72,6 +78,67 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	/** Nom du groupe de la valeur du mot clé indent de l'inclusion d'un fichier **/
 	private static final String INCLUDE_INDENT_VALUE_GROUP_NAME = "indentValue";
 
+	// Légende d'une figure (image)
+
+	/** Délimiteur de début de la légende d'une figure **/
+	private static final String START_FIGURE_CAPTION_DELIMITER = "!![";
+
+	/** Longueur du délimiteur de début de la légende d'une figure **/
+	private static final int START_FIGURE_CAPTION_DELIMITER_LENGTH = START_FIGURE_CAPTION_DELIMITER.length();
+
+	/** Délimiteur de début de séparation des attributs de la légende d'une figure **/
+	private static final String SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER = "]{";
+
+	/** Longueur du délimiteur de début de séparation des attributs de la légende d'une figure **/
+	private static final int SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH = SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER.length();
+
+	/** Délimiteur de fin de séparation des attributs de la légende d'une figure **/
+	private static final String SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER = "}(";
+
+	/** Longueur du délimiteur de fin de séparation des attributs de la légende d'une figure **/
+	private static final int SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH = SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER.length();
+
+	/** Délimiteur de séparation de la légende d'une figure **/
+	private static final String SPLIT_FIGURE_CAPTION_DELIMITER = "](";
+
+	/** Longueur du délimiteur de séparation de la légende d'une figure **/
+	private static final int SPLIT_FIGURE_CAPTION_DELIMITER_LENGTH = SPLIT_FIGURE_CAPTION_DELIMITER.length();
+
+	/** Délimiteur de fin de la légende d'une figure **/
+	private static final String END_FIGURE_CAPTION_DELIMITER = ")";
+
+	/** Longueur du délimiteur de fin de la légende d'une figure **/
+	private static final int END_FIGURE_CAPTION_DELIMITER_LENGTH = END_FIGURE_CAPTION_DELIMITER.length();
+
+	/** Indicateur de début du contenu de la position de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_POSITION_ATTRIBUTE_MARKER = ".";
+
+	/** Indicateur de début du contenu de l'attribut class de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_CLASS_ATTRIBUTE_MARKER = "#";
+
+	/** Indicateur de début du contenu de l'attribut style de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_STYLE_ATTRIBUTE_MARKER = "$";
+
+	/** Nom du groupe du texte alternatif (i.e. légende) de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_ALT_TEXT_GROUP_NAME = "altText";
+
+	/** Nom du groupe de la position des attributs de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_POSITION_GROUP_NAME = "position";
+
+	/** Nom du groupe du texte de l'attribut class de la balise html des attributs de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_CLASS_ATTRIBUTE_GROUP_NAME = "classAttribute";
+
+	/** Nom du groupe du texte de l'attribut style de la balise html des attributs de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_STYLE_ATTRIBUTE_GROUP_NAME = "styleAttribute";
+
+	/** Nom du groupe de l'url de l'image de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_IMAGE_URL_GROUP_NAME = "imageURL";
+
+	/** Nom du groupe du texte du titre de l'image de la légende d'une figure **/
+	private static final String FIGURE_CAPTION_TITLE_GROUP_NAME = "title";
+
+	// Extension Markdown
+
 	/** Délimiteur de début de l'extension Markdown **/
 	private static final String START_MARKDOWN_DELIMITER = "[";
 
@@ -90,13 +157,13 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	/** Longueur du délimiteur de fin de l'extension Markdown **/
 	private static final int END_MARKDOWN_DELIMITER_LENGTH = END_MARKDOWN_DELIMITER.length();
 
-	/** Indicateur de début du contenu de l'attribut class de la balise pour le patron MarkDown **/
+	/** Indicateur de début du contenu de la balise html pour le patron MarkDown **/
 	private static final String MARKDOWN_HTML_ATTRIBUTE_MARKER = ".";
 
-	/** Indicateur de début du contenu de l'attribut class de la balise pour le patron MarkDown **/
+	/** Indicateur de début du contenu de l'attribut class de la balise html pour le patron MarkDown **/
 	private static final String MARKDOWN_CLASS_ATTRIBUTE_MARKER = "#";
 
-	/** Indicateur de début du contenu de l'attribut class de la balise pour le patron MarkDown **/
+	/** Indicateur de début du contenu de l'attribut style de la balise html pour le patron MarkDown **/
 	private static final String MARKDOWN_STYLE_ATTRIBUTE_MARKER = "$";
 
 	/** Nom du groupe du texte usager pour le patron MarkDown **/
@@ -162,6 +229,9 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 
 	/** Patron pour extraire les données de l'inclusion d'un fichier **/
 	private Pattern includePattern;
+
+	/** Patron pour extraire les données de la légende d'une figure **/
+	private Pattern figureCaptionPattern;
 
 	/** Patron pour extraire les données de l'extension Markdown **/
 	private Pattern mardownPattern;
@@ -283,6 +353,29 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 
 		this.includePattern = Pattern.compile(sb.toString());
 
+		// Légende d'une figure: "!!\\[(?<altText>.*)\\](\\{(\\.(?<position>(top|bottom)))?(#(?<classAttribute>[^$]*))?(\\$(?<styleAttribute>[^}]*))?\\})?\\((?<imageURL>.*)\\s*\"(?<title>.*)\"\\)"
+
+		sb = new StringBuilder();
+		sb.append(OutilsBase.escapeRegExpMetaChars(START_FIGURE_CAPTION_DELIMITER));
+		sb.append(getGroupOption(FIGURE_CAPTION_ALT_TEXT_GROUP_NAME, ".", false));
+		sb.append(OutilsBase.escapeRegExpMetaChars("]"));
+		sb.append('(');
+		sb.append(OutilsBase.escapeRegExpMetaChars("{"));
+		sb.append(getMarkerGroup(FIGURE_CAPTION_POSITION_ATTRIBUTE_MARKER, FIGURE_CAPTION_POSITION_GROUP_NAME, "(top|bottom)", false, true));
+		sb.append(getMarkerGroup(FIGURE_CAPTION_CLASS_ATTRIBUTE_MARKER, FIGURE_CAPTION_CLASS_ATTRIBUTE_GROUP_NAME, "[^" + FIGURE_CAPTION_STYLE_ATTRIBUTE_MARKER + "]", true));
+		sb.append(getMarkerGroup(FIGURE_CAPTION_STYLE_ATTRIBUTE_MARKER, FIGURE_CAPTION_STYLE_ATTRIBUTE_GROUP_NAME, "[^}]", true));
+		sb.append(OutilsBase.escapeRegExpMetaChars("}"));
+		sb.append(")?");
+		sb.append(OutilsBase.escapeRegExpMetaChars("("));
+		sb.append(getGroupOption(FIGURE_CAPTION_IMAGE_URL_GROUP_NAME, ".", false));
+		sb.append(SPACES_SEPARATOR);
+		sb.append(TEXT_SEPARATOR);
+		sb.append(getGroupOption(FIGURE_CAPTION_TITLE_GROUP_NAME, ".", false));
+		sb.append(TEXT_SEPARATOR);
+		sb.append(OutilsBase.escapeRegExpMetaChars(END_FIGURE_CAPTION_DELIMITER));
+
+		this.figureCaptionPattern = Pattern.compile(sb.toString());
+
 		// Extension Markdown: "\\[(?<userText>.*)\\]\\{(\\.(?<htmlTag>[a-zA-Z]*))?(#(?<classAttribute>[^$]*))?(\\$(?<styleAttribute>[^}]*))?\\}";
 
 		sb = new StringBuilder();
@@ -322,12 +415,29 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	 * @return le texte du groupe
 	 */
 	protected String getGroupOption(String groupName, String text, boolean optional) {
+		return getGroupOption(groupName, text, true, optional);
+	}
+
+	/**
+	 * Extrait le texte d'un groupe avec option
+	 * @param groupName Le nom du groupe
+	 * @param text Le text à recherche
+	 * @param wildcard Indicateur de texte optionel
+	 * @param optional Indicateur de groupe optionel
+	 * @return le texte du groupe
+	 */
+	protected String getGroupOption(String groupName, String text, boolean wildcard, boolean optional) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(?<");
 		sb.append(groupName);
 		sb.append(">");
 		sb.append(text);
-		sb.append(optional ? "*))?" : "*)");
+
+		if (wildcard) {
+			sb.append('*');
+		}
+
+		sb.append(optional ? "))?" : ")");
 
 		return sb.toString();
 	}
@@ -341,17 +451,30 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	 * @return le texte du groupe
 	 */
 	protected String getMarkerGroup(String marker, String groupName, String text, boolean optional) {
+		return getMarkerGroup(marker, groupName, text, true, optional);
+	}
+
+	/**
+	 * Extrait le texte d'un groupe avec marqueur
+	 * @param marker Le marqueur du groupe
+	 * @param groupName Le nom du groupe
+	 * @param text Le text à recherche
+	 * @param wildcard Indicateur de texte optionel
+	 * @param optional Indicateur de groupe optionel
+	 * @return le texte du groupe
+	 */
+	protected String getMarkerGroup(String marker, String groupName, String text, boolean wildcard, boolean optional) {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		sb.append(OutilsBase.escapeRegExpMetaChars(marker));
-		sb.append(getGroupOption(groupName, text, optional));
+		sb.append(getGroupOption(groupName, text, wildcard, optional));
 
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Effectue la désindentation d'un texte
-	 * @param value Le texte à désindenter 
+	 * @param value Le texte à désindenter
 	 * @param dedentValue Le nombre de caratères de désindentation
 	 * @return le texte désindenté
 	 */
@@ -359,20 +482,19 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 		if (OutilsBase.isEmpty(value)) {
 			return value;
 		}
-		
+
 		int end = OutilsBase.max(0, OutilsBase.min(dedentValue, value.length()));
 
 		return value.substring(0, end).replace(" ", "") + value.substring(end);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see outils.abstractions.TemplateProducer#beforeProduceLine(java.lang.String)
+	/**
+	 * Effectue l'importation d'un fichier lors de la substitution d'une ligne donnée
+	 * @param line La ligne à substituer
+	 * @return la ligne substituée
+	 * @throws IOException en cas d'erreur...
 	 */
-	@Override
-	protected String beforeProduceLine(String line) throws Exception {
-		// Inclusion d'un fichier
-
+	protected String produceIncludeFile(String line) throws IOException {
 		int startPos = line.indexOf(START_INCLUDE_DELIMITER);
 
 		while (startPos != -1) {
@@ -527,14 +649,139 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 		return line;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see outils.abstractions.TemplateProducer#afterProduceLine(java.lang.String)
+	/**
+	 * Effectue la convertion de la légende d'une figure (image) en html lors de la substitution d'une ligne donnée
+	 * @param line La ligne à substituer
+	 * @return la ligne substituée
 	 */
-	@Override
-	protected String afterProduceLine(String line) throws Exception {
-		// Extension Markdown
+	protected String produceFigureCaption(String line) {
+		int startPos = line.indexOf(START_FIGURE_CAPTION_DELIMITER);
 
+		while (startPos != -1) {
+			int splitStartPos = line.indexOf(SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER, startPos + START_FIGURE_CAPTION_DELIMITER_LENGTH);
+			int splitEndPos = -1;
+			int splitPos = -1;
+
+			if (splitStartPos != -1) {
+				splitEndPos = line.indexOf(SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER, splitStartPos + SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH);
+			} else {
+				splitPos = line.indexOf(SPLIT_FIGURE_CAPTION_DELIMITER, startPos + START_FIGURE_CAPTION_DELIMITER_LENGTH);
+			}
+
+			boolean hasAttributes = (splitStartPos != -1) && (splitEndPos != -1);
+			boolean hasCaption = (splitPos != -1);
+
+			if (!hasAttributes && !hasCaption) {
+				break;
+			}
+
+			int endPos = line.indexOf(END_FIGURE_CAPTION_DELIMITER, hasAttributes ? (splitEndPos + SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH) : (splitPos + SPLIT_FIGURE_CAPTION_DELIMITER_LENGTH));
+
+			if (endPos == -1) {
+				break;
+			}
+
+			int endAt = endPos + END_FIGURE_CAPTION_DELIMITER_LENGTH;
+
+			String input = line.substring(startPos, endAt);
+
+			Matcher matcher = figureCaptionPattern.matcher(input);
+
+			if (matcher.matches()) {
+				StringBuilder sb = new StringBuilder(line.substring(0, startPos));
+
+				String altText = OutilsBase.asString(matcher.group(FIGURE_CAPTION_ALT_TEXT_GROUP_NAME));
+				String position = OutilsBase.asString(matcher.group(FIGURE_CAPTION_POSITION_GROUP_NAME)).trim();
+				String classAttribute = OutilsBase.asString(matcher.group(FIGURE_CAPTION_CLASS_ATTRIBUTE_GROUP_NAME)).trim();
+				String styleAttribute = OutilsBase.asString(matcher.group(FIGURE_CAPTION_STYLE_ATTRIBUTE_GROUP_NAME)).trim();
+				String imageURL = OutilsBase.asString(matcher.group(FIGURE_CAPTION_IMAGE_URL_GROUP_NAME)).trim();
+				String title = OutilsBase.asString(matcher.group(FIGURE_CAPTION_TITLE_GROUP_NAME)).trim();
+				
+				if (OutilsBase.isEmpty(position)) {
+					position = "bottom";
+				}
+
+				if (!OutilsBase.isEmpty(imageURL)) {
+					StringBuilder img = new StringBuilder("<img src=\"");
+					img.append(imageURL);
+					img.append('"');
+
+					if (!OutilsBase.isEmpty(title)) {
+						img.append(" title=\"");
+						img.append(title);
+						img.append('"');
+					}
+
+					if (!OutilsBase.isEmpty(altText)) {
+						img.append(" alt=\"");
+						img.append(OutilsBase.markdownToPlainText(altText));
+						img.append('"');
+					}
+
+					img.append('>');
+
+					StringBuilder figcaption = new StringBuilder("<figcaption class=\"");
+					figcaption.append(position);
+
+					if (!OutilsBase.isEmpty(classAttribute)) {
+						figcaption.append(' ');
+						figcaption.append(classAttribute);
+					}
+
+					figcaption.append('"');
+
+					if (!OutilsBase.isEmpty(styleAttribute)) {
+						figcaption.append(" style=\"");
+						figcaption.append(styleAttribute);
+						figcaption.append('"');
+					}
+
+					figcaption.append('>');
+					figcaption.append(OutilsBase.markdownToHTML(altText));
+					figcaption.append("</figcaption>");
+
+					boolean top = OutilsBase.areEquals(position, "top");
+					boolean bottom = OutilsBase.areEquals(position, "bottom");
+
+					sb.append("<figure>");
+
+					if (top) {
+						sb.append(figcaption.toString());
+					}
+
+					sb.append(img.toString());
+
+					if (bottom) {
+						sb.append(figcaption.toString());
+					}
+
+					sb.append("</figure>");
+
+				} else {
+					sb.append(input);
+				}
+
+				int length = sb.length();
+
+				sb.append(line.substring(endAt));
+
+				line = sb.toString();
+
+				endAt = length;
+			}
+
+			startPos = line.indexOf(START_FIGURE_CAPTION_DELIMITER, endAt);
+		}
+
+		return line;
+	}
+
+	/**
+	 * Effectue la convertion d'une extension markdown en html lors de la substitution d'une ligne donnée
+	 * @param line La ligne à substituer
+	 * @return la ligne substituée
+	 */
+	protected String produceMarkdownExtension(String line) {
 		int startPos = line.indexOf(START_MARKDOWN_DELIMITER);
 
 		while (startPos != -1) {
@@ -584,7 +831,13 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 							}
 						}
 
-						if (OutilsBase.isEmpty(tag)) {
+						if (!OutilsBase.isEmpty(tag)) {
+							boolean paragraph = (input.length() == line.length());
+							
+							if (paragraph) {
+								sb.append("<p>");
+							}
+							
 							sb.append('<');
 							sb.append(tag);
 
@@ -601,10 +854,14 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 							}
 
 							sb.append('>');
-							sb.append(userText);
+							sb.append(OutilsBase.markdownToHTML(userText));
 							sb.append("</");
 							sb.append(tag);
 							sb.append('>');
+							
+							if (paragraph) {
+								sb.append("</p>");
+							}
 						} else {
 							sb.append(input);
 						}
@@ -624,6 +881,24 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 		}
 
 		return line;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see outils.abstractions.TemplateProducer#beforeProduceLine(java.lang.String)
+	 */
+	@Override
+	protected String beforeProduceLine(String line) throws Exception {
+		return produceIncludeFile(line);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see outils.abstractions.TemplateProducer#afterProduceLine(java.lang.String)
+	 */
+	@Override
+	protected String afterProduceLine(String line) throws Exception {
+		return produceMarkdownExtension(produceFigureCaption(line));
 	}
 
 }

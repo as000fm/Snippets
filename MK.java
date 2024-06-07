@@ -1,6 +1,5 @@
 package outils.abstractions;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -19,8 +18,6 @@ import outils.types.FilesCharsetsTypes;
  * @author Claude Toupin - 2 juin 2024
  */
 public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
-	// Inclusion d'un fichier
-
 	/** Séparateur d'une paire nom=valeur d'un paramètre **/
 	private static final String PARAMETER_SEPARATOR = "=";
 
@@ -36,17 +33,25 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	/** Patron de valeur numérique **/
 	private static final String NUMBER_VALUE_PATTERN = "\\d+";
 
-	/** Délimiteur de début de l'inclusion d'un fichier **/
-	private static final String START_INCLUDE_DELIMITER = "{";
+	/** Délimiteur accolade de début d'une séquence **/
+	private static final String OPEN_BRACE_DELIMITER = "{";
 
-	/** Longueur du délimiteur de début de l'inclusion d'un fichier **/
-	private static final int START_INCLUDE_DELIMITER_LENGTH = START_INCLUDE_DELIMITER.length();
+	/** Délimiteur accolade de fin d'une séquence **/
+	private static final String CLOSE_BRACE_DELIMITER = "}";
 
-	/** Délimiteur de fin de l'inclusion d'un fichier **/
-	private static final String END_INCLUDE_DELIMITER = "}";
+	/** Délimiteur parenthèse de début d'une séquence **/
+	private static final String OPEN_PARENTHESE_DELIMITER = "(";
 
-	/** Longueur du délimiteur de fin de l'inclusion d'un fichier **/
-	private static final int END_INCLUDE_DELIMITER_LENGTH = END_INCLUDE_DELIMITER.length();
+	/** Délimiteur parenthèse de fin d'une séquence **/
+	private static final String CLOSE_PARENTHESE_DELIMITER = ")";
+
+	/** Délimiteur crochet de début d'une séquence **/
+	private static final String OPEN_BRACKET_DELIMITER = "[";
+
+	/** Délimiteur crochet de fin d'une séquence **/
+	private static final String CLOSE_BRACKET_DELIMITER = "]";
+
+	// Inclusion d'un fichier
 
 	/** Nom du groupe du mot clé include de l'inclusion d'un fichier **/
 	private static final String INCLUDE_INCLUDE_KEYWORD_GROUP_NAME = "include";
@@ -81,34 +86,10 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	// Légende d'une figure (image)
 
 	/** Délimiteur de début de la légende d'une figure **/
-	private static final String START_FIGURE_CAPTION_DELIMITER = "!![";
-
-	/** Longueur du délimiteur de début de la légende d'une figure **/
-	private static final int START_FIGURE_CAPTION_DELIMITER_LENGTH = START_FIGURE_CAPTION_DELIMITER.length();
-
-	/** Délimiteur de début de séparation des attributs de la légende d'une figure **/
-	private static final String SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER = "]{";
-
-	/** Longueur du délimiteur de début de séparation des attributs de la légende d'une figure **/
-	private static final int SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH = SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER.length();
-
-	/** Délimiteur de fin de séparation des attributs de la légende d'une figure **/
-	private static final String SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER = "}(";
-
-	/** Longueur du délimiteur de fin de séparation des attributs de la légende d'une figure **/
-	private static final int SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH = SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER.length();
-
-	/** Délimiteur de séparation de la légende d'une figure **/
-	private static final String SPLIT_FIGURE_CAPTION_DELIMITER = "](";
-
-	/** Longueur du délimiteur de séparation de la légende d'une figure **/
-	private static final int SPLIT_FIGURE_CAPTION_DELIMITER_LENGTH = SPLIT_FIGURE_CAPTION_DELIMITER.length();
+	private static final String START_FIGURE_CAPTION_DELIMITER = "!!" + OPEN_BRACKET_DELIMITER;
 
 	/** Délimiteur de fin de la légende d'une figure **/
-	private static final String END_FIGURE_CAPTION_DELIMITER = ")";
-
-	/** Longueur du délimiteur de fin de la légende d'une figure **/
-	private static final int END_FIGURE_CAPTION_DELIMITER_LENGTH = END_FIGURE_CAPTION_DELIMITER.length();
+	private static final String END_FIGURE_CAPTION_DELIMITER = CLOSE_PARENTHESE_DELIMITER;
 
 	/** Indicateur de début du contenu de la position de la légende d'une figure **/
 	private static final String FIGURE_CAPTION_POSITION_ATTRIBUTE_MARKER = ".";
@@ -140,22 +121,13 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	// Extension Markdown
 
 	/** Délimiteur de début de l'extension Markdown **/
-	private static final String START_MARKDOWN_DELIMITER = "[";
-
-	/** Longueur du délimiteur de début de l'extension Markdown **/
-	private static final int START_MARKDOWN_DELIMITER_LENGTH = START_MARKDOWN_DELIMITER.length();
+	private static final String START_MARKDOWN_DELIMITER = OPEN_BRACKET_DELIMITER;
 
 	/** Délimiteur de séparation de l'extension Markdown **/
-	private static final String SPLIT_MARKDOWN_DELIMITER = "]{";
-
-	/** Longueur du délimiteur de séparation de l'extension Markdown **/
-	private static final int SPLIT_MARKDOWN_DELIMITER_LENGTH = SPLIT_MARKDOWN_DELIMITER.length();
+	private static final String SPLIT_MARKDOWN_DELIMITER = CLOSE_BRACKET_DELIMITER + OPEN_BRACE_DELIMITER;
 
 	/** Délimiteur de fin de l'extension Markdown **/
-	private static final String END_MARKDOWN_DELIMITER = "}";
-
-	/** Longueur du délimiteur de fin de l'extension Markdown **/
-	private static final int END_MARKDOWN_DELIMITER_LENGTH = END_MARKDOWN_DELIMITER.length();
+	private static final String END_MARKDOWN_DELIMITER = CLOSE_BRACE_DELIMITER;
 
 	/** Indicateur de début du contenu de la balise html pour le patron MarkDown **/
 	private static final String MARKDOWN_HTML_ATTRIBUTE_MARKER = ".";
@@ -227,14 +199,111 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 		MARKDOWN_HTML_TAGS_DICT.put("wbr", "wbr"); // Represents a line break opportunity.
 	}
 
+	/**
+	 * Classe des données d'une substitution effectuée
+	 */
+	protected class PartData {
+		/** Début du texte dans la source **/
+		private final int start;
+
+		/** Fin du texte dans la source **/
+		private final int end;
+
+		/** Texte en entrée à substituer **/
+		private final String input;
+
+		/** Texte en sortie substitué **/
+		private String output;
+
+		/**
+		 * Constructeur de base
+		 * @param matcher Donnée d'une recherche par expression régulière
+		 */
+		public PartData(Matcher matcher) {
+			this(matcher.start(), matcher.end(), matcher.group());
+		}
+
+		/**
+		 * Constructeur de base
+		 * @param start Début du texte dans la source
+		 * @param end Fin du texte dans la source
+		 * @param input Texte en entrée à substituer
+		 */
+		public PartData(int start, int end, String input) {
+			this.start = start;
+			this.end = end;
+			this.input = input;
+			this.output = null;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return "PartData [start=" + start + ", end=" + end + ", input=" + input + ", output=" + output + "]";
+		}
+
+		/**
+		 * Extrait le champ start
+		 * @return un int
+		 */
+		public int getStart() {
+			return start;
+		}
+
+		/**
+		 * Extrait le champ end
+		 * @return un int
+		 */
+		public int getEnd() {
+			return end;
+		}
+
+		/**
+		 * Extrait le champ input
+		 * @return un String
+		 */
+		public String getInput() {
+			return input;
+		}
+
+		/**
+		 * Extrait le champ output
+		 * @return un String
+		 */
+		public String getOutput() {
+			return output;
+		}
+
+		/**
+		 * Modifie le champ output
+		 * @param output La valeur du champ output
+		 */
+		public void setOutput(String output) {
+			this.output = output;
+		}
+
+	}
+
+	/** Patron pour la recherche d'une inclusion d'un fichier **/
+	private Pattern includeSearchPattern;
+
 	/** Patron pour extraire les données de l'inclusion d'un fichier **/
 	private Pattern includePattern;
+
+	/** Patron pour la recherche d'une légende d'une figure **/
+	private Pattern figureCaptionSearchPattern;
 
 	/** Patron pour extraire les données de la légende d'une figure **/
 	private Pattern figureCaptionPattern;
 
+	/** Patron pour la recherche d'une extension Markdown **/
+	private Pattern markdownSearchPattern;
+
 	/** Patron pour extraire les données de l'extension Markdown **/
-	private Pattern mardownPattern;
+	private Pattern markdownPattern;
 
 	/**
 	 * Constructeur de base
@@ -324,10 +393,14 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	 * Initialisation
 	 */
 	protected void init() {
-		// Inclusion d'un fichier: "((?<include>include)=\\\"(?<includeValue>.*)\\\")|((?<startLine>start[-]?[Ll]ine)=(?<startLineValue>\\d+))|((?<endLine>end[-]?[Ll]ine)=(?<endLineValue>\\d+))|((?<dedent>dedent)=(?<dedentValue>\\d+))|((?<indent>indent)=(?<indentValue>\\d+))";
+		// Recherche de l'inclusion d'un fichier: \{[^\}]*\}
+
+		this.includeSearchPattern = Pattern.compile("\\{[^\\}]*\\}");
+
+		// Inclusion d'un fichier sans les accolades: ((?<include>include)=\"(?<includeValue>.*)\")|((?<startLine>start[-]?[Ll]ine)=(?<startLineValue>\d+))|((?<endLine>end[-]?[Ll]ine)=(?<endLineValue>\d+))|((?<dedent>dedent)=(?<dedentValue>\d+))|((?<indent>indent)=(?<indentValue>\d+))
 
 		StringBuilder sb = new StringBuilder();
-		sb.append('(');
+		sb.append(OPEN_PARENTHESE_DELIMITER);
 		sb.append(getGroup(INCLUDE_INCLUDE_KEYWORD_GROUP_NAME, INCLUDE_INCLUDE_KEYWORD_GROUP_NAME));
 		sb.append(OutilsBase.escapeRegExpMetaChars(PARAMETER_SEPARATOR));
 		sb.append(TEXT_SEPARATOR);
@@ -349,24 +422,28 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 		sb.append(getGroup(INCLUDE_INDENT_KEYWORD_GROUP_NAME, INCLUDE_INDENT_KEYWORD_GROUP_NAME));
 		sb.append(OutilsBase.escapeRegExpMetaChars(PARAMETER_SEPARATOR));
 		sb.append(getGroup(INCLUDE_INDENT_VALUE_GROUP_NAME, NUMBER_VALUE_PATTERN));
-		sb.append(')');
+		sb.append(CLOSE_PARENTHESE_DELIMITER);
 
 		this.includePattern = Pattern.compile(sb.toString());
 
-		// Légende d'une figure: "!!\\[(?<altText>.*)\\](\\{(\\.(?<position>(top|bottom)))?(#(?<classAttribute>[^$]*))?(\\$(?<styleAttribute>[^}]*))?\\})?\\((?<imageURL>.*)\\s*\"(?<title>.*)\"\\)"
+		// Recherche d'une légende d'une figure : !!\[[^\]]*\](\{[^\}]*\})?\([^\)]*\)
+
+		this.figureCaptionSearchPattern = Pattern.compile("!!\\[[^\\]]*\\](\\{[^\\}]*\\})?\\([^\\)]*\\)");
+
+		// Légende d'une figure: !!\[(?<altText>.*)\](\{(\.(?<position>(top|bottom)))?(#(?<classAttribute>[^$]*))?(\$(?<styleAttribute>[^}]*))?\})?\((?<imageURL>.*)\s*\"(?<title>.*)\"\)
 
 		sb = new StringBuilder();
 		sb.append(OutilsBase.escapeRegExpMetaChars(START_FIGURE_CAPTION_DELIMITER));
 		sb.append(getGroupOption(FIGURE_CAPTION_ALT_TEXT_GROUP_NAME, ".", false));
-		sb.append(OutilsBase.escapeRegExpMetaChars("]"));
-		sb.append('(');
-		sb.append(OutilsBase.escapeRegExpMetaChars("{"));
+		sb.append(OutilsBase.escapeRegExpMetaChars(CLOSE_BRACKET_DELIMITER));
+		sb.append(OPEN_PARENTHESE_DELIMITER);
+		sb.append(OutilsBase.escapeRegExpMetaChars(OPEN_BRACE_DELIMITER));
 		sb.append(getMarkerGroup(FIGURE_CAPTION_POSITION_ATTRIBUTE_MARKER, FIGURE_CAPTION_POSITION_GROUP_NAME, "(top|bottom)", false, true));
 		sb.append(getMarkerGroup(FIGURE_CAPTION_CLASS_ATTRIBUTE_MARKER, FIGURE_CAPTION_CLASS_ATTRIBUTE_GROUP_NAME, "[^" + FIGURE_CAPTION_STYLE_ATTRIBUTE_MARKER + "]", true));
 		sb.append(getMarkerGroup(FIGURE_CAPTION_STYLE_ATTRIBUTE_MARKER, FIGURE_CAPTION_STYLE_ATTRIBUTE_GROUP_NAME, "[^}]", true));
-		sb.append(OutilsBase.escapeRegExpMetaChars("}"));
+		sb.append(OutilsBase.escapeRegExpMetaChars(CLOSE_BRACE_DELIMITER));
 		sb.append(")?");
-		sb.append(OutilsBase.escapeRegExpMetaChars("("));
+		sb.append(OutilsBase.escapeRegExpMetaChars(OPEN_PARENTHESE_DELIMITER));
 		sb.append(getGroupOption(FIGURE_CAPTION_IMAGE_URL_GROUP_NAME, ".", false));
 		sb.append(SPACES_SEPARATOR);
 		sb.append(TEXT_SEPARATOR);
@@ -376,7 +453,11 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 
 		this.figureCaptionPattern = Pattern.compile(sb.toString());
 
-		// Extension Markdown: "\\[(?<userText>.*)\\]\\{(\\.(?<htmlTag>[a-zA-Z]*))?(#(?<classAttribute>[^$]*))?(\\$(?<styleAttribute>[^}]*))?\\}";
+		// Recherche d'une légende d'une figure : \[[^\]]*\]\{[^\}]*\}
+
+		this.markdownSearchPattern = Pattern.compile("\\[[^\\]]*\\]\\{[^\\}]*\\}");
+
+		// Extension Markdown: \[(?<userText>.*)\]\{(\.(?<htmlTag>[a-zA-Z]*))?(#(?<classAttribute>[^$]*))?(\$(?<styleAttribute>[^}]*))?\}
 
 		sb = new StringBuilder();
 		sb.append(OutilsBase.escapeRegExpMetaChars(START_MARKDOWN_DELIMITER));
@@ -387,7 +468,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 		sb.append(getMarkerGroup(MARKDOWN_STYLE_ATTRIBUTE_MARKER, MARKDOWN_STYLE_ATTRIBUTE_GROUP_NAME, "[^" + END_MARKDOWN_DELIMITER + "]", true));
 		sb.append(OutilsBase.escapeRegExpMetaChars(END_MARKDOWN_DELIMITER));
 
-		this.mardownPattern = Pattern.compile(sb.toString());
+		this.markdownPattern = Pattern.compile(sb.toString());
 	}
 
 	/**
@@ -437,7 +518,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 			sb.append('*');
 		}
 
-		sb.append(optional ? "))?" : ")");
+		sb.append(optional ? "))?" : CLOSE_PARENTHESE_DELIMITER);
 
 		return sb.toString();
 	}
@@ -492,24 +573,26 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	 * Effectue l'importation d'un fichier lors de la substitution d'une ligne donnée
 	 * @param line La ligne à substituer
 	 * @return la ligne substituée
-	 * @throws IOException en cas d'erreur...
+	 * @throws Exception en cas d'erreur...
 	 */
-	protected String produceIncludeFile(String line) throws IOException {
-		int startPos = line.indexOf(START_INCLUDE_DELIMITER);
+	protected String produceIncludeFile(String line) throws Exception {
+		if (OutilsBase.isEmpty(line)) {
+			return line;
+		}
 
-		while (startPos != -1) {
-			int endPos = line.indexOf(END_INCLUDE_DELIMITER, startPos + START_INCLUDE_DELIMITER_LENGTH);
+		List<PartData> partsList = new ArrayList<>();
 
-			if (endPos == -1) {
-				break;
-			}
+		Matcher search = includeSearchPattern.matcher(line);
 
-			int endAt = endPos + END_INCLUDE_DELIMITER_LENGTH;
+		while (search.find()) {
+			partsList.add(new PartData(search));
+		}
 
-			String input = line.substring(startPos + START_INCLUDE_DELIMITER_LENGTH, endPos);
+		for (PartData part : partsList) {
+			String input = part.getInput();
 
 			if (!OutilsBase.isEmpty(input)) {
-				String inputError = " -> " + line.substring(startPos, endAt);
+				String inputError = " -> " + input;
 
 				String includeValue = null;
 				Integer startLineValue = null;
@@ -517,7 +600,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 				Integer dedentValue = null;
 				String indentValue = null;
 
-				Matcher matcher = includePattern.matcher(input);
+				Matcher matcher = includePattern.matcher(input.substring(1, input.length() - 1));
 
 				while (matcher.find()) {
 					String group = matcher.group();
@@ -597,12 +680,12 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 				}
 
 				if (includeValue != null) {
-					StringBuilder sb = new StringBuilder(line.substring(0, startPos));
+					StringBuilder sb = new StringBuilder();
 
 					if (!OutilsBase.isEmpty(input)) {
-						sb.append(START_INCLUDE_DELIMITER);
+						sb.append(OPEN_BRACE_DELIMITER);
 						sb.append(input);
-						sb.append(END_INCLUDE_DELIMITER);
+						sb.append(CLOSE_BRACE_DELIMITER);
 					}
 
 					List<String> includeLines = OutilsCommun.loadListFromFile(includeValue);
@@ -626,27 +709,21 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 					}
 
 					if (!outputLines.isEmpty()) {
-						if (startPos > 0) {
+						if (part.getStart() > 0) {
 							sb.append(OutilsCommun.LINE_SEPARATOR);
 						}
 
 						sb.append(OutilsCommun.toCRLFList(outputLines, false));
 					}
 
-					int length = sb.length();
-
-					sb.append(line.substring(endAt));
-
-					line = sb.toString();
-
-					endAt = length;
+					part.setOutput(sb.toString());
+				} else {
+					part.setOutput(input);
 				}
 			}
-
-			startPos = line.indexOf(START_INCLUDE_DELIMITER, endAt);
 		}
 
-		return line;
+		return getLine(line, partsList);
 	}
 
 	/**
@@ -655,40 +732,25 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	 * @return la ligne substituée
 	 */
 	protected String produceFigureCaption(String line) {
-		int startPos = line.indexOf(START_FIGURE_CAPTION_DELIMITER);
+		if (OutilsBase.isEmpty(line)) {
+			return line;
+		}
 
-		while (startPos != -1) {
-			int splitStartPos = line.indexOf(SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER, startPos + START_FIGURE_CAPTION_DELIMITER_LENGTH);
-			int splitEndPos = -1;
-			int splitPos = -1;
+		List<PartData> partsList = new ArrayList<>();
 
-			if (splitStartPos != -1) {
-				splitEndPos = line.indexOf(SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER, splitStartPos + SPLIT_START_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH);
-			} else {
-				splitPos = line.indexOf(SPLIT_FIGURE_CAPTION_DELIMITER, startPos + START_FIGURE_CAPTION_DELIMITER_LENGTH);
-			}
+		Matcher search = figureCaptionSearchPattern.matcher(line);
 
-			boolean hasAttributes = (splitStartPos != -1) && (splitEndPos != -1);
-			boolean hasCaption = (splitPos != -1);
+		while (search.find()) {
+			partsList.add(new PartData(search));
+		}
 
-			if (!hasAttributes && !hasCaption) {
-				break;
-			}
-
-			int endPos = line.indexOf(END_FIGURE_CAPTION_DELIMITER, hasAttributes ? (splitEndPos + SPLIT_END_ATTRIBUTES_FIGURE_CAPTION_DELIMITER_LENGTH) : (splitPos + SPLIT_FIGURE_CAPTION_DELIMITER_LENGTH));
-
-			if (endPos == -1) {
-				break;
-			}
-
-			int endAt = endPos + END_FIGURE_CAPTION_DELIMITER_LENGTH;
-
-			String input = line.substring(startPos, endAt);
+		for (PartData part : partsList) {
+			String input = part.getInput();
 
 			Matcher matcher = figureCaptionPattern.matcher(input);
 
 			if (matcher.matches()) {
-				StringBuilder sb = new StringBuilder(line.substring(0, startPos));
+				StringBuilder sb = new StringBuilder();
 
 				String altText = OutilsBase.asString(matcher.group(FIGURE_CAPTION_ALT_TEXT_GROUP_NAME));
 				String position = OutilsBase.asString(matcher.group(FIGURE_CAPTION_POSITION_GROUP_NAME)).trim();
@@ -696,7 +758,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 				String styleAttribute = OutilsBase.asString(matcher.group(FIGURE_CAPTION_STYLE_ATTRIBUTE_GROUP_NAME)).trim();
 				String imageURL = OutilsBase.asString(matcher.group(FIGURE_CAPTION_IMAGE_URL_GROUP_NAME)).trim();
 				String title = OutilsBase.asString(matcher.group(FIGURE_CAPTION_TITLE_GROUP_NAME)).trim();
-				
+
 				if (OutilsBase.isEmpty(position)) {
 					position = "bottom";
 				}
@@ -761,19 +823,11 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 					sb.append(input);
 				}
 
-				int length = sb.length();
-
-				sb.append(line.substring(endAt));
-
-				line = sb.toString();
-
-				endAt = length;
+				part.setOutput(sb.toString());
 			}
-
-			startPos = line.indexOf(START_FIGURE_CAPTION_DELIMITER, endAt);
 		}
 
-		return line;
+		return getLine(line, partsList);
 	}
 
 	/**
@@ -782,29 +836,25 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 	 * @return la ligne substituée
 	 */
 	protected String produceMarkdownExtension(String line) {
-		int startPos = line.indexOf(START_MARKDOWN_DELIMITER);
+		if (OutilsBase.isEmpty(line)) {
+			return line;
+		}
 
-		while (startPos != -1) {
-			int splitPos = line.indexOf(SPLIT_MARKDOWN_DELIMITER, startPos + START_MARKDOWN_DELIMITER_LENGTH);
+		List<PartData> partsList = new ArrayList<>();
 
-			if (splitPos == -1) {
-				break;
-			}
+		Matcher search = markdownSearchPattern.matcher(line);
 
-			int endPos = line.indexOf(END_MARKDOWN_DELIMITER, splitPos + SPLIT_MARKDOWN_DELIMITER_LENGTH);
+		while (search.find()) {
+			partsList.add(new PartData(search));
+		}
 
-			if (endPos == -1) {
-				break;
-			}
+		for (PartData part : partsList) {
+			String input = part.getInput();
 
-			int endAt = endPos + END_MARKDOWN_DELIMITER_LENGTH;
-
-			String input = line.substring(startPos, endAt);
-
-			Matcher matcher = mardownPattern.matcher(input);
+			Matcher matcher = markdownPattern.matcher(input);
 
 			if (matcher.matches()) {
-				StringBuilder sb = new StringBuilder(line.substring(0, startPos));
+				StringBuilder sb = new StringBuilder();
 
 				String userText = OutilsBase.asString(matcher.group(MARKDOWN_USER_TEXT_GROUP_NAME));
 				String htmlTag = OutilsBase.asString(matcher.group(MARKDOWN_HTML_TAG_GROUP_NAME)).trim();
@@ -833,11 +883,11 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 
 						if (!OutilsBase.isEmpty(tag)) {
 							boolean paragraph = (input.length() == line.length());
-							
+
 							if (paragraph) {
 								sb.append("<p>");
 							}
-							
+
 							sb.append('<');
 							sb.append(tag);
 
@@ -858,7 +908,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 							sb.append("</");
 							sb.append(tag);
 							sb.append('>');
-							
+
 							if (paragraph) {
 								sb.append("</p>");
 							}
@@ -868,19 +918,40 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 					}
 				}
 
-				int length = sb.length();
-
-				sb.append(line.substring(endAt));
-
-				line = sb.toString();
-
-				endAt = length;
+				part.setOutput(sb.toString());
 			}
-
-			startPos = line.indexOf(START_MARKDOWN_DELIMITER, endAt);
 		}
 
-		return line;
+		return getLine(line, partsList);
+	}
+
+	/**
+	 * Extrait le contenu de la ligne depuis une liste de données substituées
+	 * @param line La ligne originale
+	 * @param partsList La liste des substitutions
+	 * @return la nouvelle ligne substituée
+	 */
+	protected String getLine(String line, List<PartData> partsList) {
+		if (partsList.isEmpty()) {
+			return line;
+		}
+
+		int pos = 0;
+
+		StringBuilder sb = new StringBuilder();
+
+		for (PartData part : partsList) {
+			sb.append(line.substring(pos, part.getStart()));
+			sb.append(part.getOutput());
+
+			pos = part.getEnd();
+		}
+
+		if (pos < line.length()) {
+			sb.append(line.substring(pos));
+		}
+
+		return sb.toString();
 	}
 
 	/*

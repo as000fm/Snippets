@@ -589,18 +589,20 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 		}
 
 		for (PartData part : partsList) {
-			String input = part.getInput();
+			String inputSearch = part.getInput();
 
-			if (!OutilsBase.isEmpty(input)) {
-				String inputError = " -> " + input;
+			if (!OutilsBase.isEmpty(inputSearch)) {
+				String inputError = " -> " + inputSearch;
 
 				String includeValue = null;
 				Integer startLineValue = null;
 				Integer endLineValue = null;
 				Integer dedentValue = null;
 				String indentValue = null;
+				
+				String input = inputSearch.substring(1, inputSearch.length() - 1);
 
-				Matcher matcher = includePattern.matcher(input.substring(1, input.length() - 1));
+				Matcher matcher = includePattern.matcher(inputSearch);
 
 				while (matcher.find()) {
 					String group = matcher.group();
@@ -718,7 +720,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 
 					part.setOutput(sb.toString());
 				} else {
-					part.setOutput(input);
+					part.setOutput(inputSearch);
 				}
 			}
 		}

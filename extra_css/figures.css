@@ -1,5 +1,5 @@
 figure {
-    display: table;
+    display: inline-block !important;
 }
 
 figure img {

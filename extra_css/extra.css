@@ -1,43 +1,68 @@
-@media (orientation: landscape) {
-    @media (min-width: 576px) {
-        .container, .container-sm {
-            max-width: 98% !important; /** 540px; **/
-        }
-    }
-    
-    @media (min-width: 768px) {
-        .container, .container-md, .container-sm {
-            max-width: 98% !important; /** 720px; **/
-        }
-    }
-    
-    @media (min-width: 992px) {
-        .container, .container-lg, .container-md, .container-sm {
-            max-width: 98% !important; /** 960px; **/
-        }
-    }
-    
-    @media (min-width: 1200px) {
-        .container, .container-lg, .container-md, .container-sm, .container-xl {
-            max-width: 98% !important; /** 1140px **/
-        }
-    }
-    
-    @media (min-width: 1400px) {
-        .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
-            max-width: 98% !important; /* 1320px */
-        }
-    }
-    
-    @media (min-width: 768px) {
-        /** Left column **/
-        .col-md-3 {
-            width: 25% !important; /** 25% **/
-        }
-    
-        /** Right column **/
-        .col-md-9 {
-            width: 75% !important; /** 75% **/
-        }
-    }
+@media ( orientation : landscape) {
+	@media ( min-width : 1220px) {
+		.md-main__inner.md-grid {
+			max-width: 86rem; /** 61rem **/
+		}
+	}
+}
+
+tr.header {
+    border-top-width: thin;
+}
+
+th {
+    background-color: #00b0ff1a !important;
+    border-color: #00b0ff;
+}
+
+div.returns th {
+    background-color: #64dd171a !important;
+    border-color: #64dd17;
+}
+
+div.exceptions th {
+    background-color: #ff17441a !important;
+    border-color: #ff1744;
+}
+
+th:not(th:last-child), td:not(td:last-child) {
+    border-right-width: thin;
+}
+
+tr:not(tr:last-child) {
+    border-bottom-width: thin;
+}
+
+tr.odd, tr.even {
+    vertical-align: middle;
+}
+
+td ul {
+    margin-bottom: 0 !important;
+}
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4, .md-typeset h5 {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.md-typeset .admonition, .md-typeset details {
+	font-size: 0.75rem
+}
+
+.md-typeset table:not([class]) th, .md-typeset table:not([class]) td {
+	padding: .5em;
+	vertical-align: middle;
+}
+
+.md-typeset table:not([class]) {
+    border-color: #00b0ff !important;
+}
+
+.md-typeset .returns table:not([class]) {
+    border-color: #64dd17 !important;
+}
+
+.md-typeset .exceptions table:not([class]) {
+    border-color: #ff1744 !important;
 }

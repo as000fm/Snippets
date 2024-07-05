@@ -42,8 +42,8 @@ theme:
       toggle:
         icon: material/weather-night 
         name: Passer au thème foncé
-      primary: light blue
-      accent: deep orange
+      primary: custom
+      accent: teal
 
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
@@ -51,8 +51,8 @@ theme:
       toggle:
         icon: material/brightness-auto
         name: Passer automatiquement au thème système
-      primary: blue
-      accent: orange
+      primary: custom
+      accent: light green
 
 markdown_extensions:
   # Table of content

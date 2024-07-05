@@ -1,9 +1,43 @@
-@media ( orientation : landscape) {
-	@media ( min-width : 1220px) {
+@media (orientation : landscape) {
+	@media (min-width : 1220px) {
 		.md-main__inner.md-grid {
 			max-width: 86rem; /** 61rem **/
 		}
 	}
+}
+
+:root {
+	--md-primary-fg-color: #00874d;
+	--md-primary-fg-color--light: #00bb6b;
+	--md-primary-fg-color--dark: #376350;
+}
+
+[data-md-color-scheme="default"] {
+	--md-primary-fg-color: #00874d;
+	--md-primary-fg-color--light: #00bb6b;
+	--md-primary-fg-color--dark: #376350;
+}
+
+[data-md-color-scheme="slate"] {
+	--md-primary-fg-color: #376350;
+	--md-primary-fg-color--light: #00bb6b;
+	--md-primary-fg-color--dark: #376350;
+}
+
+@media only screen and (prefers-color-scheme: light) {
+    :root:not([data-md-color-scheme="slate"]) {
+	--md-primary-fg-color: #00874d;
+	--md-primary-fg-color--light: #00bb6b;
+	--md-primary-fg-color--dark: #376350;
+    }
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+    :root:not([data-md-color-scheme="default"]) {
+	--md-primary-fg-color: #376350;
+	--md-primary-fg-color--light: #00bb6b;
+	--md-primary-fg-color--dark: #376350;
+    }
 }
 
 tr.header {

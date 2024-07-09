@@ -1,23 +1,24 @@
-figure {
-    display: inline-block !important;
+/** .md-typeset -> material **/
+figure, .md-typeset figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1em;
 }
 
-figure img {
-    display: table-row;
-	margin-top: 0 !important;
-	margin-bottom: 0 !important;
+figure img, .md-typeset figure img {
+    margin: 0 auto;
 }
 
-figcaption {
-    display: table-row;
-	text-align: center;
-	font-style: italic;
+figcaption, .md-typeset figcaption {
+    text-align: center;
+    font-style: italic;
+    margin-top: 0.5em;
+    margin-bottom: 0;
 }
 
-figcaption.top {
-	margin-top: 30px;
-}
-
-figcaption.bottom {
-	margin-bottom: 30px;
+/** MkDocs **/
+.col-md-9 img {
+    display: block;
+    margin: 0 auto;
 }

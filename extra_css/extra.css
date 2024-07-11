@@ -1,7 +1,16 @@
-@media (orientation : landscape) {
-	@media (min-width : 1220px) {
+@media ( orientation : landscape) {
+	@media ( min-width : 1220px) {
 		.md-main__inner.md-grid {
 			max-width: 86rem; /** 61rem **/
+		}
+		.md-header__inner.md-grid {
+			max-width: 80rem; /** 61rem **/
+		}
+		.md-tabs .md-grid {
+			max-width: 80rem; /** 61rem **/
+		}
+		.md-footer__inner.md-grid {
+			max-width: 80rem; /** 61rem **/
 		}
 	}
 }

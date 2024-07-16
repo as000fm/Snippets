@@ -397,14 +397,14 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 
 		this.includeSearchPattern = Pattern.compile("\\{[^\\}]*\\}");
 
-		// Inclusion d'un fichier sans les accolades: ((?<include>include)=\"(?<includeValue>.*)\")|((?<startLine>start[-]?[Ll]ine)=(?<startLineValue>\d+))|((?<endLine>end[-]?[Ll]ine)=(?<endLineValue>\d+))|((?<dedent>dedent)=(?<dedentValue>\d+))|((?<indent>indent)=(?<indentValue>\d+))
+		// Inclusion d'un fichier sans les accolades: ((?<include>include)=\"(?<includeValue>[^\"]*?)\")|((?<startLine>start[-]?[Ll]ine)=(?<startLineValue>\d+))|((?<endLine>end[-]?[Ll]ine)=(?<endLineValue>\d+))|((?<dedent>dedent)=(?<dedentValue>\d+))|((?<indent>indent)=(?<indentValue>\d+))
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(OPEN_PARENTHESE_DELIMITER);
 		sb.append(getGroup(INCLUDE_INCLUDE_KEYWORD_GROUP_NAME, INCLUDE_INCLUDE_KEYWORD_GROUP_NAME));
 		sb.append(OutilsBase.escapeRegExpMetaChars(PARAMETER_SEPARATOR));
 		sb.append(TEXT_SEPARATOR);
-		sb.append(getGroupOption(INCLUDE_INCLUDE_VALUE_GROUP_NAME, ".", false));
+		sb.append(getGroupOption(INCLUDE_INCLUDE_VALUE_GROUP_NAME, "[^\\\"]*?", false, false));
 		sb.append(TEXT_SEPARATOR);
 		sb.append(GROUPS_SEPARATOR);
 		sb.append(getGroup(INCLUDE_START_LINE_KEYWORD_GROUP_NAME, "start[-]?[Ll]ine"));
@@ -453,7 +453,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 
 		this.figureCaptionPattern = Pattern.compile(sb.toString());
 
-		// Recherche d'une légende d'une figure : \[[^\]]*\]\{[^\}]*\}
+		// Recherche d'une extension Markdown : \[[^\]]*\]\{[^\}]*\}
 
 		this.markdownSearchPattern = Pattern.compile("\\[[^\\]]*\\]\\{[^\\}]*\\}");
 
@@ -715,7 +715,7 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 							sb.append(OutilsCommun.LINE_SEPARATOR);
 						}
 
-						sb.append(OutilsCommun.toCRLFList(outputLines, false));
+						sb.append(OutilsCommun.toEOL(outputLines, false));
 					}
 
 					part.setOutput(sb.toString());
@@ -826,6 +826,8 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 				}
 
 				part.setOutput(sb.toString());
+			} else {
+				part.setOutput(input);
 			}
 		}
 
@@ -921,6 +923,8 @@ public class MarkdownExtensionsTemplateProducer extends TemplateProducer {
 				}
 
 				part.setOutput(sb.toString());
+			} else {
+				part.setOutput(input);
 			}
 		}
 

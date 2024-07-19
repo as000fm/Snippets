@@ -28,6 +28,12 @@ import outils.listes.StringData;
  */
 public class OutilsCompression {
 
+	/** java.io.File.separator de unix/linux **/
+	public static final String UNIX_FILE_SEPARATOR = "/";
+
+	/** java.io.File.separatorChar de unix/linux **/
+	public static final char UNIX_FILE_SEPARATOR_CHAR = '/';
+
 	/**
 	 * Normalization d'un chemin de nom de répertoire ou fichier en format unix
 	 * @param path le chemin à normaliser

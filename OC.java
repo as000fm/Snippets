@@ -35,6 +35,39 @@ public class OutilsCompression {
 	public static final char UNIX_FILE_SEPARATOR_CHAR = '/';
 
 	/**
+	 * Extrait le chemin complet d'un fichier unix/linux
+	 * @param values Liste des valeurs du chemin complet d'un fichier à extraire
+	 * @return le chemin complet d'un fichier unix/linux
+	 */
+	public static final String getUnixFullname(String... values) {
+		String fullname = "";
+
+		if (values != null) {
+			for (String value : values) {
+				if (!isEmpty(value)) {
+					if (value.endsWith(UNIX_FILE_SEPARATOR)) {
+						value = value.substring(0, value.length() - 1);
+					}
+
+					if (value.startsWith(UNIX_FILE_SEPARATOR)) {
+						fullname += value;
+					} else {
+						if (!isEmpty(fullname)) {
+							if (!fullname.endsWith(UNIX_FILE_SEPARATOR)) {
+								fullname += UNIX_FILE_SEPARATOR;
+							}
+						}
+
+						fullname += value;
+					}
+				}
+			}
+		}
+
+		return fullname;
+	}
+
+	/**
 	 * Normalization d'un chemin de nom de répertoire ou fichier en format unix
 	 * @param path le chemin à normaliser
 	 * @return le chemin normalisé

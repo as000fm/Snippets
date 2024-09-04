@@ -1,36 +1,118 @@
-<project name="BuildWar" default="war" basedir=".">
-    <!-- Define the temporary directory -->
-    <property name="temp.dir" location="${java.io.tmpdir}/temp"/>
-    
-    <!-- Define the war directory -->
-    <property name="war.dir" value="war"/>
-    
-    <!-- Copy the content of war directory to a temporary location -->
-    <target name="copy">
-        <copy todir="${temp.dir}">
-            <fileset dir="${war.dir}"/>
-        </copy>
-    </target>
-    
-    <!-- Delete the file META-INF\context.xml in the temporary location -->
-    <target name="delete" depends="copy">
-        <delete file="${temp.dir}/META-INF/context.xml"/>
-    </target>
-    
-    <!-- Rename the file META-INF\context-war.xml to META-INF\context.xml in the temporary location -->
-    <target name="rename" depends="delete">
-        <move file="${temp.dir}/META-INF/context-war.xml" tofile="${temp.dir}/META-INF/context.xml"/>
-    </target>
-    
-    <!-- Zip the content of the temporary location to generate the war file into the current directory -->
-    <target name="war" depends="rename">
-        <war destfile="project.war" webxml="${temp.dir}/WEB-INF/web.xml">
-            <fileset dir="${temp.dir}"/>
-        </war>
-    </target>
-    
-    <!-- Erase the temporary location when done -->
-    <target name="clean" depends="war">
-        <delete dir="${temp.dir}"/>
-    </target>
+<?xml version="1.0" encoding="utf-8" ?>
+<project default="all" name="Uptime Kuma Monitor Service">
+	<property environment="env" />
+
+	<property name="dir.project" location="${basedir}" />
+	<property name="dir.workspace" value="${dir.project}/.." />
+	<property name="dir.deploy" location="${java.io.tmpdir}"/>
+	<property name="dir.deploy.projects" location="${dir.deploy}/project_monitor"/>
+
+	<tstamp>
+		<format property="builtDateTime" pattern="yyyy-MM-dd HH:mm" />
+	</tstamp>
+
+	<path id="deploy.class.path">
+		<dirset dir="war\WEB-INF\classes" />
+		<dirset dir="src" />
+	</path>
+
+	<target name="version-build" description="New build version">
+		<propertyfile file="src\monitor\version\VersionConstants.properties" comment="Fichier de version du build">
+			<entry key="buildDateTime" value="${builtDateTime}" />
+			<entry key="buildNumber" type="int" operation="+"  default="-1" />
+		</propertyfile>
+		<property file="src\monitor\version\VersionConstants.properties" />
+		<copy file="src\monitor\version\VersionConstants.properties" tofile="war\WEB-INF\classes\monitor\version\VersionConstants.properties" overwrite="true" />
+		<echo message="Build number is ${buildNumber}" />
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+	</target>
+
+	<target name="version-rebuild" description="Rebuild version">
+		<property file="src\monitor\version\VersionConstants.properties" />
+		<propertyfile file="src\monitor\version\VersionConstants.properties" comment="Fichier de version du build">
+			<entry key="buildDateTime" value="${builtDateTime}" />
+			<entry key="buildNumber" value="${buildNumber}" />
+		</propertyfile>
+		<property file="src\monitor\version\VersionConstants.properties" />
+		<copy file="src\monitor\version\VersionConstants.properties" tofile="war\WEB-INF\classes\monitor\version\VersionConstants.properties" overwrite="true" />
+		<echo message="Rebuild number is ${buildNumber}" />
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+	</target>
+
+	<path id="project.class.path">
+		<pathelement location="war\WEB-INF\classes" />
+		<pathelement location="..\Outils\src" />
+		<pathelement location="..\Outils\bin" />
+		<pathelement location="..\OutilsGWT\src" />
+		<pathelement location="..\OutilsGWT\bin" />
+		<pathelement location="..\SGBD\src" />
+		<pathelement location="..\SGBD\bin" />
+		<pathelement location="..\Ant-Pom libs\gson-2.10.1.jar" />
+		<pathelement location="..\Ant-Pom libs\mysql-connector-j-8.4.0.jar" />
+		<pathelement location="..\Ant-Pom libs\protobuf-java-3.25.1.jar" />
+		<pathelement location="..\Ant-Pom libs\sqlite-jdbc-3.45.3.0.jar" />
+		<pathelement location="..\Ant-Pom libs\slf4j-api-1.7.36.jar" />
+		<fileset dir="war\WEB-INF\lib" includes="**\*.jar" />
+		<fileset dir="C:\eclipse\apache-tomcat-9.0.88\lib" includes="**\*.jar" />
+	</path>
+
+	<target name="projects-jars" description="Packages projects jars">
+		<mkdir dir="${dir.deploy.projects}" />
+		<delete>
+			<fileset dir="${dir.deploy.projects}" includes="*.jar" />
+		</delete>
+		<jar destfile="${dir.deploy.projects}\Outils.jar">
+			<fileset dir="..\Outils\bin" />
+		</jar>
+		<copy file="${dir.deploy.projects}\Outils.jar" tofile="war\WEB-INF\lib\Outils.jar" overwrite="true" />
+	</target>
+
+	<target name="java-compile" depends="projects-jars" description="Compiles java source to bytecode">
+		<mkdir dir="war\WEB-INF\lib" />
+		<mkdir dir="war\WEB-INF\classes" />
+		<javac includeantruntime="false" srcdir="src" includes="**" encoding="utf-8" destdir="war\WEB-INF\classes" source="11" target="11" nowarn="true" debug="true" debuglevel="lines,vars,source">
+			<classpath>
+				<path refid="project.class.path" />
+			</classpath>
+		</javac>
+		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
+		<copy todir="war\WEB-INF\classes">
+			<fileset dir="src" excludes="**\*.java" />
+		</copy>
+	</target>
+
+	<target name="prepare" depends="java-compile" description="Prepares for the war packaging">
+		<java failonerror="true" fork="true" className="tools.DeployUptimeKumaMonitorService" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<path refid="deploy.class.path" />
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\OutilsGWT\bin" />
+				<pathelement location="..\SGBD\bin" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+		</java>
+	</target>
+
+	<target name="build" depends="version-build,java-compile" description="Builds this project" />
+
+	<target name="rebuild" depends="version-rebuild,java-compile" description="Rebuilds this project" />
+
+	<target name="war" description="Creates a war file">
+		<delete>
+			<fileset dir="." includes="UptimeKumaMonitorService*.war" />
+		</delete>
+		<war destfile="UptimeKumaMonitorService##${buildNumber}.war" basedir="${dir.deploy}/deploy_monitor" />
+	</target>
+
+	<target name="clean" description="Cleans the war directories">
+		<delete dir="war\WEB-INF\classes" failOnError="false" />
+	</target>
+
+	<target name="rebuild-all" depends="clean,rebuild,war" description="Rebuilds all" />
+
+	<target name="all" depends="clean,build,war" description="Performs all" />
+
+
 </project>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de connexion</title>
+    <style>
+        /* Mise en page globale */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #121212; /* Fond sombre */
+            font-family: Arial, sans-serif;
+            color: #ffffff; /* Texte clair */
+        }
+
+        /* Style du conteneur de connexion */
+        .login-container {
+            background-color: #1e1e1e; /* Conteneur sombre */
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Style des champs de saisie */
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #444444; /* Bordure sombre */
+            background-color: #333333; /* Fond des champs */
+            color: #ffffff; /* Texte des champs */
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style du bouton de connexion */
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Effet de hover pour le bouton */
+        .login-container button:hover {
+            background-color: #45a049;
+        }
+
+        /* Titre de la page */
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff; /* Couleur du texte du titre */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Connexion</h2>
+        <form action="" method="post">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" id="username" name="username" placeholder="Entrez votre nom d'utilisateur" required>
+
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" required>
+
+            <button type="submit">Se connecter</button>
+        </form>
+    </div>
+
+</body>
+</html>

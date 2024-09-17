@@ -3,10 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
     <title>Page de connexion</title>
     <style>
-        /* Mise en page globale */
+        :root {
+            --background-color: #f0f0f0;
+            --container-color: #ffffff;
+            --input-background-color: #ffffff;
+            --input-border-color: #ccc;
+            --text-color: #000000;
+            --button-background-color: #4CAF50;
+            --button-text-color: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #121212;
+            --container-color: #1e1e1e;
+            --input-background-color: #333333;
+            --input-border-color: #444444;
+            --text-color: #ffffff;
+            --button-background-color: #4CAF50;
+            --button-text-color: #ffffff;
+        }
+
+        [data-theme="system"] {
+            --background-color: #f0f0f0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            [data-theme="system"] {
+                --background-color: #121212;
+                --container-color: #1e1e1e;
+                --input-background-color: #333333;
+                --input-border-color: #444444;
+                --text-color: #ffffff;
+                --button-background-color: #4CAF50;
+                --button-text-color: #ffffff;
+            }
+        }
+
         body, html {
             margin: 0;
             padding: 0;
@@ -14,62 +48,82 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #121212; /* Fond sombre */
+            background-color: var(--background-color);
             font-family: Arial, sans-serif;
-            color: #ffffff; /* Texte clair */
+            color: var(--text-color);
         }
 
-        /* Style du conteneur de connexion */
         .login-container {
-            background-color: #1e1e1e; /* Conteneur sombre */
+            background-color: var(--container-color);
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
         }
 
-        /* Style des champs de saisie */
-        .login-container input[type="text"],
-        .login-container input[type="password"] {
+        input[type="text"],
+        input[type="password"] {
             width: 100%;
             padding: 12px;
             margin: 10px 0 20px 0;
-            border: 1px solid #444444; /* Bordure sombre */
-            background-color: #333333; /* Fond des champs */
-            color: #ffffff; /* Texte des champs */
+            border: 1px solid var(--input-border-color);
+            background-color: var(--input-background-color);
+            color: var(--text-color);
             border-radius: 4px;
             box-sizing: border-box;
         }
 
-        /* Style du bouton de connexion */
-        .login-container button {
+        button {
             width: 100%;
             padding: 12px;
-            background-color: #4CAF50;
-            color: white;
+            background-color: var(--button-background-color);
+            color: var(--button-text-color);
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
         }
 
-        /* Effet de hover pour le bouton */
-        .login-container button:hover {
+        button:hover {
             background-color: #45a049;
         }
+        
+        .theme-label {
+            margin-top: 20px;
+        }
 
-        /* Titre de la page */
-        .login-container h2 {
+        .theme-toggle {
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .theme-toggle button {
+            margin: 0 5px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .theme-toggle button:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
             text-align: center;
             margin-bottom: 30px;
-            color: #ffffff; /* Couleur du texte du titre */
         }
+
     </style>
 </head>
 <body>
 
-    <div class="login-container">
+    <div class="login-container" id="loginContainer">
         <h2>Connexion</h2>
         <form action="" method="post">
             <label for="username">Nom d'utilisateur</label>
@@ -80,7 +134,33 @@
 
             <button type="submit">Se connecter</button>
         </form>
+
+        <p class="theme-label">Sélection du thème</p>
+        <div class="theme-toggle">
+            <button id="lightThemeBtn">Clair</button>
+            <button id="darkThemeBtn">Sombre</button>
+            <button id="systemThemeBtn">Automatique</button>
+        </div>
     </div>
+
+    <script>
+        const lightThemeBtn = document.getElementById('lightThemeBtn');
+        const darkThemeBtn = document.getElementById('darkThemeBtn');
+        const systemThemeBtn = document.getElementById('systemThemeBtn');
+        const rootElement = document.documentElement;
+
+        function setTheme(theme) {
+            rootElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        lightThemeBtn.addEventListener('click', () => setTheme('light'));
+        darkThemeBtn.addEventListener('click', () => setTheme('dark'));
+        systemThemeBtn.addEventListener('click', () => setTheme('system'));
+
+        const savedTheme = localStorage.getItem('theme') || 'system';
+        setTheme(savedTheme);
+    </script>
 
 </body>
 </html>

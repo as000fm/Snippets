@@ -1,0 +1,58 @@
+package passwords;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import java.security.SecureRandom;
+import java.util.Base64;
+
+public class PasswordHashing {
+	/** Nom du chiffrage PBKDF2 **/
+	private static final String PBKDF2_CIPHER = "PBKDF2WithHmacSHA256";
+
+	/** Nombre d'itération du chiffrage PBKDF2 **/
+	private static final int PBKDF2_ITERATIONS = 65536;
+
+	/** Longueur de la clé du chiffrage PBKDF2 **/
+	private static final int PBKDF2_KEY_LENGTH = 256;
+
+	/** Générateur de nombres aléatoires **/
+	private static final SecureRandom RANDOM = new SecureRandom();
+	
+	public static void main(String[] args) throws Exception {
+		String password = "Toto le chien élève #1234";
+		
+		String stored = hashPasswordWithPBKDF2(password);
+		
+		System.out.println(stored);
+		
+		System.out.println(checkPasswordWithPBKDF2(password, stored));
+		System.out.println(checkPasswordWithPBKDF2("Toto le chien élève #123", stored));
+	}
+
+	public static String hashPasswordWithPBKDF2(String password) throws Exception {
+		byte[] salt = new byte[16];
+		RANDOM.nextBytes(salt);
+		
+		PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH);
+		
+		SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_CIPHER);
+
+		byte[] hash = factory.generateSecret(spec).getEncoded();
+
+		return Base64.getEncoder().encodeToString(salt) + ":" + Base64.getEncoder().encodeToString(hash);
+	}
+
+	public static boolean checkPasswordWithPBKDF2(String password, String stored) throws Exception {
+		String[] parts = stored.split(":");
+		byte[] salt = Base64.getDecoder().decode(parts[0]);
+		byte[] hash = Base64.getDecoder().decode(parts[1]);
+
+		PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH);
+		
+		SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_CIPHER);
+		
+		byte[] testHash = factory.generateSecret(spec).getEncoded();
+
+		return java.util.Arrays.equals(hash, testHash);
+	}
+}

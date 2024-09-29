@@ -1,21 +1,85 @@
-	/** Liste des sous-répertoires de base d'un projet java **/
-	public static final String[] JAVA_LIST_DIR = new String[] { "cases", "src" };
-
-	/** Sous-répertoires de base de sortie des tests automatisés d'un projet java **/
-	public static final String JAVA_OUTPUT_DIR = "tests";
-
-	/** Liste des sous-répertoires de base d'un projet maven **/
-	public static final String[] MAVEN_LIST_DIR = new String[] { "src\\main\\java", "src\\test\\java" };
-
-	/** Sous-répertoires de base des resources d'un projet maven **/
-	public static final String MAVEN_RESOURCES_DIR = "src\\test\\resources";
-
-	/** Sous-répertoires de base de sortie des tests automatisés d'un projet maven **/
-	public static final String MAVEN_OUTPUT_DIR = "src\\test\\java";
+	/**
+	 * Génération des cas de tests automatisés pour un projet java
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 */
+	@SkipTesting
+	public static void javaAutomatedTestsUnits(CodeGenerationsTypes codeGenerationType) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, null, null, codeGenerationType, false, false);
+	}
 
 	/**
-	 * Extrait la liste des paramètres pour la génération des cas de tests automatisés
-	 * @param french Indicateur de paramètres en français ou non
+	 * Génération des cas de tests automatisés pour un projet java
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
+	 */
+	@SkipTesting
+	public static void javaAutomatedTestsUnits(CodeGenerationsTypes codeGenerationType, boolean debug) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, null, null, codeGenerationType, debug, false);
+	}
+
+	/**
+	 * Génération des cas de tests automatisés pour un projet java
+	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 */
+	@SkipTesting
+	public static void javaAutomatedTestsUnits(String packageName, CodeGenerationsTypes codeGenerationType) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, packageName, null, codeGenerationType, false, false);
+	}
+
+	/**
+	 * Génération des cas de tests automatisés pour un projet java
+	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
+	 */
+	@SkipTesting
+	public static void javaAutomatedTestsUnits(String packageName, CodeGenerationsTypes codeGenerationType, boolean debug) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, packageName, null, codeGenerationType, debug, false);
+	}
+
+	/**
+	 * Génération des cas de tests automatisés pour un projet maven
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 */
+	@SkipTesting
+	public static void mavenAutomatedTestsUnits(CodeGenerationsTypes codeGenerationType) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, null, null, codeGenerationType, false, false);
+	}
+
+	/**
+	 * Génération des cas de tests automatisés pour un projet maven
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
+	 */
+	@SkipTesting
+	public static void mavenAutomatedTestsUnits(CodeGenerationsTypes codeGenerationType, boolean debug) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, null, null, codeGenerationType, debug, false);
+	}
+
+	/**
+	 * Génération des cas de tests automatisés pour un projet maven
+	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 */
+	@SkipTesting
+	public static void mavenAutomatedTestsUnits(String packageName, CodeGenerationsTypes codeGenerationType) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, packageName, null, codeGenerationType, false, false);
+	}
+
+	/**
+	 * Génération des cas de tests automatisés pour un projet maven
+	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
+	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
+	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
+	 */
+	@SkipTesting
+	public static void mavenAutomatedTestsUnits(String packageName, CodeGenerationsTypes codeGenerationType, boolean debug) {
+		generateAutomatedTestsUnits(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, packageName, null, codeGenerationType, debug, false);
+	}
+
+	/**
+	 * Génération des cas de tests automatisés
 	 * @param project Nom du projet dans l'IDE
 	 * @param source Répertoire source des classes Java pour générer les tests automatisés depuis
 	 * @param list Liste des sous-répertoires du paramètre source des classes Java pour générer les tests automatisés depuis
@@ -26,80 +90,8 @@
 	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
 	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
 	 * @param statistics Extrait les statistiques du nombre de classes, constructeurs et de méthodes sans produire aucun code des cas de test Junit
-	 * @return la liste des paramètres
 	 */
-	protected static String[] getAutomatedTestsUnitsArguments(boolean french, String project, String source, String[] list, String resources, String output, String packageName, String documentation, CodeGenerationsTypes codeGenerationType, boolean debug, boolean statistics) {
-		if (codeGenerationType == null) {
-			throw new RuntimeException(french ? "Pas de type de génération du code de spécifié" : "No code generation type provided");
-		}
-
-		List<String> argsList = new ArrayList<>();
-
-		if (!BasicsHelper.isEmpty(project)) {
-			argsList.add(OptionsTypes.PROJECT.asOption(french));
-			argsList.add(project);
-		}
-
-		if (!BasicsHelper.isEmpty(source)) {
-			argsList.add(OptionsTypes.SOURCE.asOption(french));
-			argsList.add(source);
-		}
-
-		if (!BasicsHelper.isEmpty(list)) {
-			StringBuilder sb = new StringBuilder();
-
-			for (String item : list) {
-				if (sb.length() != 0) {
-					sb.append(',');
-				}
-
-				sb.append(item);
-			}
-
-			argsList.add(OptionsTypes.LIST.asOption(french));
-			argsList.add(sb.toString());
-		}
-
-		if (!BasicsHelper.isEmpty(resources)) {
-			argsList.add(OptionsTypes.RESOURCES.asOption(french));
-			argsList.add(resources);
-		}
-
-		if (!BasicsHelper.isEmpty(output)) {
-			argsList.add(OptionsTypes.OUTPUT.asOption(french));
-			argsList.add(output);
-		}
-
-		if (!BasicsHelper.isEmpty(packageName)) {
-			argsList.add(OptionsTypes.PACKAGE.asOption(french));
-			argsList.add(packageName);
-		}
-
-		if (!BasicsHelper.isEmpty(documentation)) {
-			argsList.add(OptionsTypes.DOCUMENTATION.asOption(french));
-			argsList.add(documentation);
-		}
-
-		switch (codeGenerationType) {
-			case AUTO_UPDATE:
-				argsList.add(OptionsTypes.AUTO.asOption(french));
-				break;
-			case FULL:
-				break;
-			case REFRESH:
-				argsList.add(OptionsTypes.REFRESH.asOption(french));
-				break;
-			default:
-				throw new RuntimeException("Pas de traitement pour " + codeGenerationType);
-		}
-
-		if (debug) {
-			argsList.add(OptionsTypes.DEBUG.asOption(french));
-		}
-
-		if (statistics) {
-			argsList.add(OptionsTypes.STATISTICS.asOption(french));
-		}
-
-		return argsList.toArray(new String[argsList.size()]);
+	@SkipTesting
+	public static void generateAutomatedTestsUnits(String project, String source, String[] list, String resources, String output, String packageName, String documentation, CodeGenerationsTypes codeGenerationType, boolean debug, boolean statistics) {
+		main(AutomatedTestsUnitsBase.getAutomatedTestsUnitsArguments(false, project, source, list, resources, output, packageName, documentation, codeGenerationType, debug, statistics));
 	}

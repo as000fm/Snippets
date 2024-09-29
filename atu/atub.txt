@@ -1,98 +1,32 @@
-	/**
-	 * Génération des cas de tests automatisés pour un projet java
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 */
-	@SkipTesting
-	public static void javaTestsUnitairesAutomatises(CodeGenerationsTypes codeGenerationType) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, null, null, codeGenerationType, false, false);
-	}
+import automated.tests.annotations.SkipTesting;
+import automated.tests.cli.AutomatedTestsUnits;
+import automated.tests.cli.TestsUnitairesAutomatises;
+import automated.tests.types.CodeGenerationsTypes;
 
-	/**
-	 * Génération des cas de tests automatisés pour un projet java
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
-	 */
-	@SkipTesting
-	public static void javaTestsUnitairesAutomatises(CodeGenerationsTypes codeGenerationType, boolean debug) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, null, null, codeGenerationType, debug, false);
-	}
+/**
+ * Génération des tests unitaires automatisés du projet Java
+ */
+@SkipTesting
+public class JavaAutomatedTestsBuilder {
 
-	/**
-	 * Génération des cas de tests automatisés pour un projet java
-	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 */
-	@SkipTesting
-	public static void javaTestsUnitairesAutomatises(String packageName, CodeGenerationsTypes codeGenerationType) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, packageName, null, codeGenerationType, false, false);
-	}
+    public static void main(String[] args) {
+        boolean french = true; // Indicateur de générer les commentaires en français dans les tests unitaires générés
+        // boolean french = false; // Indicateur de générer les commentaires en anglais dans les tests unitaires générés
 
-	/**
-	 * Génération des cas de tests automatisés pour un projet java
-	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
-	 */
-	@SkipTesting
-	public static void javaTestsUnitairesAutomatises(String packageName, CodeGenerationsTypes codeGenerationType, boolean debug) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.JAVA_LIST_DIR, null, AutomatedTestsUnitsBase.JAVA_OUTPUT_DIR, packageName, null, codeGenerationType, debug, false);
-	}
+        CodeGenerationsTypes codeGenerationType = CodeGenerationsTypes.AUTO_UPDATE; // Régénère uniquement les cas de tests Junit des classes source Java modifiées
+        // CodeGenerationsTypes codeGenerationType = CodeGenerationsTypes.FULL; // Supprime tout et régénère tous les cas de test Junit de toutes les classes source Java
+        // CodeGenerationsTypes codeGenerationType = CodeGenerationsTypes.REFRESH; // Régénère tous les cas de tests Junit, mais sans supprimer tout au début
 
-	/**
-	 * Génération des cas de tests automatisés pour un projet maven
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 */
-	@SkipTesting
-	public static void mavenTestsUnitairesAutomatises(CodeGenerationsTypes codeGenerationType) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, null, null, codeGenerationType, false, false);
-	}
+        boolean debug = false; // Exécution de l'outil sans mode de débogage pour les tests effectués en langage Groovy lors de l'analyse
+        // boolean debug = true; // Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit !!!
 
-	/**
-	 * Génération des cas de tests automatisés pour un projet maven
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
-	 */
-	@SkipTesting
-	public static void mavenTestsUnitairesAutomatises(CodeGenerationsTypes codeGenerationType, boolean debug) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, null, null, codeGenerationType, debug, false);
-	}
+        String packageName = null; // Nom du package de base Java du répertoire de sortie pour les cas de test Junit générés. Par défaut: junit
 
-	/**
-	 * Génération des cas de tests automatisés pour un projet maven
-	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 */
-	@SkipTesting
-	public static void mavenTestsUnitairesAutomatises(String packageName, CodeGenerationsTypes codeGenerationType) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, packageName, null, codeGenerationType, false, false);
-	}
+        if (french) {
+            TestsUnitairesAutomatises.javaTestsUnitairesAutomatises(packageName, codeGenerationType, debug);
+        } else {
+            AutomatedTestsUnits.javaAutomatedTestsUnits(packageName, codeGenerationType, debug);
+        }
+    }
 
-	/**
-	 * Génération des cas de tests automatisés pour un projet maven
-	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
-	 */
-	@SkipTesting
-	public static void mavenTestsUnitairesAutomatises(String packageName, CodeGenerationsTypes codeGenerationType, boolean debug) {
-		generateTestsUnitairesAutomatises(null, null, AutomatedTestsUnitsBase.MAVEN_LIST_DIR, AutomatedTestsUnitsBase.MAVEN_RESOURCES_DIR, AutomatedTestsUnitsBase.MAVEN_OUTPUT_DIR, packageName, null, codeGenerationType, debug, false);
-	}
-
-	/**
-	 * Génération des cas de tests automatisés
-	 * @param project Nom du projet dans l'IDE
-	 * @param source Répertoire source des classes Java pour générer les tests automatisés depuis
-	 * @param list Liste des sous-répertoires du paramètre source des classes Java pour générer les tests automatisés depuis
-	 * @param resources Répertoire des fichiers ressources pour les cas de tests Junit générés
-	 * @param output Répertoire de sortie pour les cas de tests Junit générés
-	 * @param packageName Package de base Java du répertoire de sortie du paramètre output pour les cas de test Junit générés
-	 * @param documentation Répertoire de sortie de la documentation pour les cas de tests Junit générés
-	 * @param codeGenerationType Type de génération du code (voir automated.tests.types.CodeGenerationsTypes)
-	 * @param debug Exécute en mode débogage en effectuant un seul test à la fois en langage Groovy. Utile pour suivre les problèmes, mais ralentit la génération de cas de tests Junit
-	 * @param statistics Extrait les statistiques du nombre de classes, constructeurs et de méthodes sans produire aucun code des cas de test Junit
-	 */
-	@SkipTesting
-	public static void generateTestsUnitairesAutomatises(String project, String source, String[] list, String resources, String output, String packageName, String documentation, CodeGenerationsTypes codeGenerationType, boolean debug, boolean statistics) {
-		main(AutomatedTestsUnitsBase.getAutomatedTestsUnitsArguments(true, project, source, list, resources, output, packageName, documentation, codeGenerationType, debug, statistics));
-	}
-
+}

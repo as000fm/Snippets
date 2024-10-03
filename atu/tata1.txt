@@ -1,0 +1,46 @@
+package automated.tests.annotations;
+
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+/**
+ * Annotation pour indiquer que les tests automatisés doivent être faits avec les valeurs par défaut non-nulles seulement
+ * @author Claude Toupin - 25 déc. 2021
+ */
+@Retention(RUNTIME)
+@Target({ METHOD, CONSTRUCTOR })
+public @interface StrictAutomatedTestsSets {
+	/**
+	 * Indicateur d'ajouter toutes les valeurs nullables si possible
+	 * @return un boolean
+	 */
+	boolean nullables() default false;
+
+	/**
+	 * Indicateur d'ajouter les valeurs de test itérables si possible (ex: ajouter les 2 valeurs false et true pour un boolean)
+	 * @return un boolean
+	 */
+	boolean iterate() default false;
+
+	/**
+	 * Indicateur d'effectuer les itérations des valeurs de test en séquence pour miniser le nombre de tests à effectuer
+	 * @return un boolean
+	 */
+	boolean sequence() default false;
+
+	/**
+	 * Indicateur d'effectuer les itérations en séquence complete contiguë
+	 * @return un boolean
+	 */
+	boolean contiguous() default false;
+
+	/**
+	 * Indicateur d'effectuer les itérations en ordre de séquence des paramètres (false -> ordre de séquence inverse des paramètres)
+	 * @return un boolean
+	 */
+	boolean foward() default false;
+}

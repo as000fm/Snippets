@@ -103,7 +103,8 @@ public class TestData extends TemplateProducerBase {
 				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
 						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
 						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
-						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+						AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
 				) //
 		;
 
@@ -118,7 +119,8 @@ public class TestData extends TemplateProducerBase {
 								"and", //
 								AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
 								AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
-								AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS //
+								AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+								AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
 						) //
 						+ " annotations" //
 		;
@@ -168,7 +170,8 @@ public class TestData extends TemplateProducerBase {
 				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
 						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
 						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
-						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+						AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
 				) //
 		;
 
@@ -178,7 +181,8 @@ public class TestData extends TemplateProducerBase {
 						"and", //
 						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
 						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
-						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+						AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
 				) //
 				+ " annotations" //
 		;

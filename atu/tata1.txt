@@ -42,5 +42,5 @@ public @interface StrictAutomatedTestsSets {
 	 * Indicateur d'effectuer les itérations en ordre de séquence des paramètres (false -> ordre de séquence inverse des paramètres)
 	 * @return un boolean
 	 */
-	boolean foward() default false;
+	boolean forward() default false;
 }

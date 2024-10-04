@@ -39,7 +39,7 @@ public @interface StrictAutomatedTestsSets {
 	boolean contiguous() default false;
 
 	/**
-	 * Indicateur d'effectuer les itérations en ordre de séquence des paramètres (false -> ordre de séquence inverse des paramètres)
+	 * Indicateur de progression de la séquence d'instances contiguës en ordre débutant par toutes les valeurs nulles (false -> ordre inversée débutant par toutes les valeurs non nulles)
 	 * @return un boolean
 	 */
 	boolean forward() default false;

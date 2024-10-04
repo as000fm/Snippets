@@ -1,0 +1,268 @@
+package automated.tests.helpers.base;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import automated.tests.annotations.SkipAllExceptions;
+
+/**
+ * Classe de génération de toutes les itérations possibles pour les groupes d'eléments d'une liste ex: [a, b, c], [d], [e, f] -> [[a, d, e], [a, d, f], [b, d, e], [b, d, f], [c, d, e], [c, d, f]]
+ * @author Claude Toupin - 17 janv. 2022
+ */
+@SkipAllExceptions
+public class Iterations<T> {
+	/** Liste des items à itérer **/
+	private final List<List<T>> itemsList;
+
+	/** Liste des itérations des items */
+	private final List<List<T>> iterationsList;
+
+	/**
+	 * Constructeur de base
+	 */
+	public Iterations() {
+		this.itemsList = new ArrayList<>();
+		this.iterationsList = new ArrayList<>();
+	}
+
+	/**
+	 * Constructeur de base
+	 * @param forward Indicateur de génération depuis le début des items des itérations
+	 * @param contiguous Indicateur de génération contiguë des itérations
+	 * @param items Tableau des items à itérer
+	 */
+	@SafeVarargs
+	public Iterations(boolean forward, boolean contiguous, T[]... items) {
+		this();
+		iterate(forward, contiguous, items);
+	}
+
+	/**
+	 * Constructeur de base
+	 * @param forward Indicateur de génération depuis le début des items des itérations
+	 * @param contiguous Indicateur de génération contiguë des itérations
+	 * @param items Liste des items à itérer
+	 */
+	@SafeVarargs
+	public Iterations(boolean forward, boolean contiguous, List<T>... items) {
+		this();
+		iterate(forward, contiguous, items);
+	}
+
+	/**
+	 * Constructeur de base
+	 * @param forward Indicateur de génération depuis le début des items des itérations
+	 * @param contiguous Indicateur de génération contiguë des itérations
+	 * @param items Liste des items à itérer
+	 */
+	public Iterations(boolean forward, boolean contiguous, List<List<T>> items) {
+		this();
+		iterate(forward, contiguous, items);
+	}
+
+	/**
+	 * Génération de toutes les itérations possibles depuis le début des items pour les groupes d'eléments d'une liste ex: [a, b, c], [d], [e, f] -> [[a, d, e], [b, d, e], [c, d, e], [a, d, f], [b, d, f], [c, d, f]]
+	 * @param index Index du groupe d'éléments
+	 * @param liste Liste de l'itération courante
+	 * @return la liste des listes d'itérations de l'index courant
+	 */
+	protected List<List<T>> generateForwardIterations(int index, List<T> liste) {
+		List<List<T>> iterations = new ArrayList<>();
+	
+		if (index >= 0) {
+			for (T item : itemsList.get(index)) {
+				List<T> iterationCourante = new ArrayList<>();
+				iterationCourante.addAll(liste);
+				iterationCourante.add(0, item);
+	
+				if ((index - 1) >= 0) {
+					iterations.addAll(generateForwardIterations(index - 1, iterationCourante));
+				} else {
+					iterations.add(iterationCourante);
+				}
+			}
+		}
+	
+		return iterations;
+	}
+
+	/**
+	 * Génération de toutes les itérations possibles depuis la fin des items pour les groupes d'eléments d'une liste ex: [a, b, c], [d], [e, f] -> [[a, d, e], [a, d, f], [b, d, e], [b, d, f], [c, d, e], [c, d, f]]
+	 * @param index Index du groupe d'éléments
+	 * @param liste Liste de l'itération courante
+	 * @return la liste des listes d'itérations de l'index courant
+	 */
+	protected List<List<T>> generateReverseIterations(int index, List<T> liste) {
+		List<List<T>> iterations = new ArrayList<>();
+
+		if (index < itemsList.size()) {
+			for (T item : itemsList.get(index)) {
+				List<T> iterationCourante = new ArrayList<>();
+				iterationCourante.addAll(liste);
+				iterationCourante.add(item);
+
+				if ((index + 1) < itemsList.size()) {
+					iterations.addAll(generateReverseIterations(index + 1, iterationCourante));
+				} else {
+					iterations.add(iterationCourante);
+				}
+			}
+		}
+
+		return iterations;
+	}
+
+	/**
+	 * Génération de toutes les itérations contiguës possibles depuis le début des items pour les groupes d'eléments d'une liste ex: [null, b, c], [null, d], [null, f] -> [[null, null, null], [b, null, null], [c, null, null], [b, d, null], [c, d, null], [b, d, f], [c, d, f]]
+	 * @param index Index du groupe d'éléments
+	 * @param liste Liste de l'itération courante
+	 * @return la liste des listes d'itérations de l'index courant
+	 */
+	protected List<List<T>> generateForwardContiguousIterations(int index, Set<Integer> contigues, List<T> liste) {
+		List<List<T>> iterations = new ArrayList<List<T>>();
+	
+		if (index >= 0) {
+			for (T item : itemsList.get(index)) {
+				if ((item != null) || !contigues.contains(index)) {
+					if (item == null) {
+						contigues.add(index);
+					}
+	
+					List<T> iterationCourante = new ArrayList<T>();
+					iterationCourante.addAll(liste);
+					iterationCourante.add(0, item);
+	
+					if ((index - 1) >= 0) {
+						iterations.addAll(generateForwardContiguousIterations(index - 1, contigues, iterationCourante));
+					} else {
+						iterations.add(iterationCourante);
+					}
+				}
+			}
+		}
+	
+		return iterations;
+	}
+
+	/**
+	 * Génération de toutes les itérations contiguës possibles depuis la fin des items pour les groupes d'eléments d'une liste ex: [null, b, c], [null, d], [null, f] -> [[null, null, null], [null, null, f], [null, d, f], [b, d, f], [c, d, f]]
+	 * @param index Index du groupe d'éléments
+	 * @param contigues Liste des indexes pour la contiguité
+	 * @param liste Liste de l'itération courante
+	 * @return la liste des listes d'itérations de l'index courant
+	 */
+	protected List<List<T>> generateReverseContiguousIterations(int index, Set<Integer> contigues, List<T> liste) {
+		List<List<T>> iterations = new ArrayList<>();
+
+		if (index < itemsList.size()) {
+			for (T item : itemsList.get(index)) {
+				if ((item != null) || !contigues.contains(index)) {
+					if (item == null) {
+						contigues.add(index);
+					}
+
+					List<T> iterationCourante = new ArrayList<>();
+					iterationCourante.addAll(liste);
+					iterationCourante.add(item);
+
+					if ((index + 1) < itemsList.size()) {
+						iterations.addAll(generateReverseContiguousIterations(index + 1, contigues, iterationCourante));
+					} else {
+						iterations.add(iterationCourante);
+					}
+				}
+			}
+		}
+
+		return iterations;
+	}
+
+	/**
+	 * Génération de toutes les itérations possibles pour les groupes d'éléments de la liste d'items courante à itérer
+	 * @param forward Indicateur de génération depuis le début des items des itérations
+	 * @param contiguous Indicateur de génération contiguë des itérations
+	 */
+	public void iterate(boolean forward, boolean contiguous) {
+		iterationsList.clear();
+
+		if (!itemsList.isEmpty()) {
+			if (forward) {
+				if (contiguous) {
+					iterationsList.addAll(generateForwardContiguousIterations(itemsList.size() - 1, new HashSet<>(), new ArrayList<T>()));
+				} else {
+					iterationsList.addAll(generateForwardIterations(itemsList.size() - 1, new ArrayList<T>()));
+				}
+			} else {
+				if (contiguous) {
+					iterationsList.addAll(generateReverseContiguousIterations(0, new HashSet<>(), new ArrayList<T>()));
+				} else {
+					iterationsList.addAll(generateReverseIterations(0, new ArrayList<T>()));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
+	 * @param forward Indicateur de génération depuis le début des items des itérations
+	 * @param contiguous Indicateur de génération contiguë des itérations
+	 * @param items Tableau des items à itérer
+	 */
+	public void iterate(boolean forward, boolean contiguous, @SuppressWarnings("unchecked") T[]... items) {
+		itemsList.clear();
+
+		if (items != null) {
+			for (int i = 0; i < items.length; i++) {
+				itemsList.add(BasicsHelper.asList(items[i]));
+			}
+		}
+
+		iterate(forward, contiguous);
+	}
+
+	/**
+	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
+	 * @param forward Indicateur de génération depuis le début des items des itérations
+	 * @param contiguous Indicateur de génération contiguë des itérations
+	 * @param items Liste des items à itérer
+	 */
+	public void iterate(boolean forward, boolean contiguous, @SuppressWarnings("unchecked") List<T>... items) {
+		itemsList.clear();
+
+		if (items != null) {
+			itemsList.addAll(BasicsHelper.asList(items));
+		}
+
+		iterate(forward, contiguous);
+	}
+
+	/**
+	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
+	 * @param forward Indicateur de génération depuis le début des items des itérations
+	 * @param contiguous Indicateur de génération contiguë des itérations
+	 * @param items Liste des items à itérer
+	 */
+	public void iterate(boolean forward, boolean contiguous, List<List<T>> items) {
+		itemsList.clear();
+		itemsList.addAll(items);
+
+		iterate(forward, contiguous);
+	}
+
+	/**
+	 * Extrait le champ itemsList
+	 * @return un List<List<T>>
+	 */
+	public List<List<T>> getItemsList() {
+		return itemsList;
+	}
+
+	/**
+	 * Extrait le champ iterationsList
+	 * @return un List<List<T>>
+	 */
+	public List<List<T>> getIterationsList() {
+		return iterationsList;
+	}
+}

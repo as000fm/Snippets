@@ -581,7 +581,7 @@ public class TestData extends TemplateProducerBase {
 							this.strictTesting = true;
 
 							StrictAutomatedTestsSets strictAutomatedTestsSets = (StrictAutomatedTestsSets) annotation;
-							annotationTestSetsList.addAll(getTestsSetsList(equalsMethod, !strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.iterate(), strictAutomatedTestsSets.sequence(), strictAutomatedTestsSets.contiguous(), strictAutomatedTestsSets.foward(), parametersList));
+							annotationTestSetsList.addAll(getTestsSetsList(equalsMethod, !strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.iterate(), strictAutomatedTestsSets.sequence(), strictAutomatedTestsSets.contiguous(), strictAutomatedTestsSets.forward(), parametersList));
 							hasStrictAutomatedTests = true;
 							break;
 						case STRICT_SEQUENCE_TESTS_SETS:
@@ -594,7 +594,7 @@ public class TestData extends TemplateProducerBase {
 							this.strictTesting = true;
 
 							StrictSequenceTestsSets strictSequenceTestsSets = (StrictSequenceTestsSets) annotation;
-							annotationTestSetsList.addAll(getTestsSetsList(equalsMethod, !strictSequenceTestsSets.nullables(), strictSequenceTestsSets.nullables(), strictSequenceTestsSets.iterate(), strictSequenceTestsSets.sequence(), strictSequenceTestsSets.contiguous(), strictSequenceTestsSets.foward(), parametersList));
+							annotationTestSetsList.addAll(getTestsSetsList(equalsMethod, !strictSequenceTestsSets.nullables(), strictSequenceTestsSets.nullables(), strictSequenceTestsSets.iterate(), strictSequenceTestsSets.sequence(), strictSequenceTestsSets.contiguous(), strictSequenceTestsSets.forward(), parametersList));
 							hasStrictAutomatedTests = true;
 							break;
 						case EQUALS_TESTS:

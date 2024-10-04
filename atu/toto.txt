@@ -36,6 +36,7 @@ import automated.tests.cases.JunitAutomatedTestsCases;
 import automated.tests.helpers.AutomatedTestsHelper;
 import automated.tests.helpers.abstractions.TemplateProducerBase;
 import automated.tests.helpers.base.BasicsHelper;
+import automated.tests.helpers.base.IterateValueFilter;
 import automated.tests.helpers.base.Iterations;
 import automated.tests.helpers.common.CommonHelper;
 import automated.tests.helpers.reflexions.ReflexionsHelper;
@@ -92,6 +93,9 @@ public class TestData extends TemplateProducerBase {
 
 	/** Message d'erreur des annotations du test des méthodes mutuellement exclusives en anglais **/
 	private static final String ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_ENG;
+	
+	/** Filtre des données d'une itération **/
+	private static final IterateValueFilter ITERATE_VALUE_FILTER = (item) -> (item == null) || "null".equals(item) || ((String) item).contains(" null");
 
 	static {
 		AUTOMATED_TESTS_ERROR_MESSAGE_FRA = "Les annotations " //
@@ -931,9 +935,9 @@ public class TestData extends TemplateProducerBase {
 				items[i] = array;
 			}
 
-			Iterations<String> iterations = new Iterations<>(items);
+			Iterations<String> iterations = new Iterations<>(false, false, items);
 
-			for (List<String> iteration : iterations.getIterationsListe()) {
+			for (List<String> iteration : iterations.getIterationsList()) {
 				String[] values = iteration.toArray(new String[iteration.size()]);
 
 				annotationTestSetsList.add(getTestSetData(annotationFilenames, annotationProcess, annotationThrowsException, values, parametersList));
@@ -1495,53 +1499,35 @@ public class TestData extends TemplateProducerBase {
 		List<TestSetData> valuesList = new ArrayList<>();
 
 		if (iterate && sequence) {
-			List<List<String>> sequencesList = new ArrayList<>();
+			List<List<String>> testsList = new ArrayList<>();
 
-			for (int pos = -1; pos < parametersList.size(); pos++) {
-				List<String> testsList = new ArrayList<>();
+			boolean suppressWarnings = false;
 
-				boolean suppressWarnings = false;
+			boolean valuesThrowsException = false;
 
-				boolean valuesThrowsException = false;
+			for (int index = 0; index < parametersList.size(); index++) {
+				String name = parametersList.get(index).getName();
 
-				for (int index = 0; index < parametersList.size(); index++) {
-					String name = parametersList.get(index).getName();
+				List<String> items = new ArrayList<>();
 
-					TestSetData dictTest;
-
-					List<TestSetData> dictList = valuesDict.get(name);
-
-					if (dictList.size() >= 2) {
-						if (contiguous) {
-							dictTest = dictList.get((index <= pos) ? 1 : 0);
-						} else {
-							dictTest = dictList.get((index == pos) ? 1 : 0);
-						}
-					} else {
-						dictTest = dictList.get(0);
-					}
-
+				for (TestSetData dictTest : valuesDict.get(name)) {
 					suppressWarnings |= dictTest.isSuppressWarnings();
 
 					valuesThrowsException |= dictTest.isValuesThrowsException();
 
-					testsList.add(dictTest.getValuesList().get(0));
+					items.addAll(dictTest.getValuesList());
 				}
 
-				if (!sequencesList.contains(testsList)) {
-					sequencesList.add(testsList);
+				testsList.add(items);
+			}
 
-					TestSetData testSetData = new TestSetData();
-					testSetData.getValuesList().addAll(testsList);
-					testSetData.setSuppressWarnings(suppressWarnings);
-					testSetData.setValuesThrowsException(valuesThrowsException);
+			for (List<String> values : new Iterations<String>(forward, contiguous, ITERATE_VALUE_FILTER, testsList).getIterationsList()) {
+				TestSetData testSetData = new TestSetData();
+				testSetData.getValuesList().addAll(values);
+				testSetData.setSuppressWarnings(suppressWarnings);
+				testSetData.setValuesThrowsException(valuesThrowsException);
 
-					if (forward) {
-						valuesList.add(testSetData);
-					} else {
-						valuesList.add(0, testSetData);
-					}
-				}
+				valuesList.add(testSetData);
 			}
 		} else {
 			for (int index = parametersList.size() - 1; index >= 0; index--) {

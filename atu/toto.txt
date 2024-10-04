@@ -1495,6 +1495,8 @@ public class TestData extends TemplateProducerBase {
 		List<TestSetData> valuesList = new ArrayList<>();
 
 		if (iterate && sequence) {
+			List<List<String>> sequencesList = new ArrayList<>();
+
 			for (int pos = -1; pos < parametersList.size(); pos++) {
 				List<String> testsList = new ArrayList<>();
 
@@ -1526,15 +1528,19 @@ public class TestData extends TemplateProducerBase {
 					testsList.add(dictTest.getValuesList().get(0));
 				}
 
-				TestSetData testSetData = new TestSetData();
-				testSetData.getValuesList().addAll(testsList);
-				testSetData.setSuppressWarnings(suppressWarnings);
-				testSetData.setValuesThrowsException(valuesThrowsException);
+				if (!sequencesList.contains(testsList)) {
+					sequencesList.add(testsList);
 
-				if (forward) {
-					valuesList.add(testSetData);
-				} else {
-					valuesList.add(0, testSetData);
+					TestSetData testSetData = new TestSetData();
+					testSetData.getValuesList().addAll(testsList);
+					testSetData.setSuppressWarnings(suppressWarnings);
+					testSetData.setValuesThrowsException(valuesThrowsException);
+
+					if (forward) {
+						valuesList.add(testSetData);
+					} else {
+						valuesList.add(0, testSetData);
+					}
 				}
 			}
 		} else {

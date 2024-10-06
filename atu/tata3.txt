@@ -1,261 +1,40 @@
-package automated.tests.types;
+package automated.tests.annotations;
 
-import java.lang.annotation.Annotation;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import automated.tests.annotations.AddAnnotationsForTesting;
-import automated.tests.annotations.AddFailTestValue;
-import automated.tests.annotations.AddImportsForTesting;
-import automated.tests.annotations.AllowRuntimeExceptions;
-import automated.tests.annotations.AutomatedTests;
-import automated.tests.annotations.AutomatedTestsCases;
-import automated.tests.annotations.CoverageOnly;
-import automated.tests.annotations.CoverageTestsCases;
-import automated.tests.annotations.DefaultParameterTestValue;
-import automated.tests.annotations.DefaultTestFilename;
-import automated.tests.annotations.DefaultTestValue;
-import automated.tests.annotations.EqualsTests;
-import automated.tests.annotations.EqualsTestsCases;
-import automated.tests.annotations.EqualsTestsSets;
-import automated.tests.annotations.GenericTestType;
-import automated.tests.annotations.MethodsTestsCases;
-import automated.tests.annotations.NoParentMethodsTesting;
-import automated.tests.annotations.NotForTestMethodsInstance;
-import automated.tests.annotations.ParentDepthLevelMethodsTesting;
-import automated.tests.annotations.SkipAllExceptions;
-import automated.tests.annotations.SkipExceptions;
-import automated.tests.annotations.SkipImportsForTesting;
-import automated.tests.annotations.SkipTesting;
-import automated.tests.annotations.StaticMethodsFirst;
-import automated.tests.annotations.StrictAutomatedTests;
-import automated.tests.annotations.StrictAutomatedTestsCases;
-import automated.tests.annotations.StrictAutomatedTestsSets;
-import automated.tests.annotations.StrictSequenceTestsSets;
-import automated.tests.annotations.TestExecutionOrder;
-import automated.tests.annotations.TestMethodsInstance;
-import automated.tests.annotations.UseGWTMockito;
-import automated.tests.annotations.UseMockito;
-import automated.tests.helpers.base.BasicsHelper;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Énumération des types d'annotations pour les tests automatisés
- * @author Claude Toupin - 26 déc. 2021
+ * Annotation pour indiquer que les tests automatisés doivent être faits avec les valeurs par défaut en séquence complete contiguë
+ * @author Claude Toupin - 25 déc. 2021
  */
-@SkipTesting
-public enum AutomatedTestsAnnotationsTypes {
-	// Classes supplémentaires à importer pour effectuer les tests
-	ADD_IMPORTS_FOR_TESTING(AddImportsForTesting.class), //
-	ADD_IMPORTS_FOR_TESTING_LIST(AddImportsForTesting.List.class), //
-	// Annotations supplémentaires à ajouter aux classes de tests
-	ADD_ANNOTATIONS_FOR_TESTING(AddAnnotationsForTesting.class), //
-	ADD_ANNOTATIONS_FOR_TESTING_LIST(AddAnnotationsForTesting.List.class), //
-	// Classes à ne pas importer pour effectuer les tests
-	SKIP_IMPORTS_FOR_TESTING(SkipImportsForTesting.class), //
-	SKIP_IMPORTS_FOR_TESTING_LIST(SkipImportsForTesting.List.class), //
-	// Types génériques à utiliser pour effectuer les tests
-	GENERIC_TEST_TYPE(GenericTestType.class), //
-	GENERIC_TEST_TYPE_LIST(GenericTestType.List.class), //
-	// Tests avec valeurs par défaut
-	AUTOMATED_TESTS(AutomatedTests.class), //
-	AUTOMATED_TESTS_LIST(AutomatedTests.List.class), //
-	AUTOMATED_TESTS_CASES(AutomatedTestsCases.class), //
-	AUTOMATED_TESTS_CASES_LIST(AutomatedTestsCases.List.class), //
-	// Tests sans valeur par défaut
-	STRICT_AUTOMATED_TESTS(StrictAutomatedTests.class), //
-	STRICT_AUTOMATED_TESTS_LIST(StrictAutomatedTests.List.class), //
-	STRICT_AUTOMATED_TESTS_CASES(StrictAutomatedTestsCases.class), //
-	STRICT_AUTOMATED_TESTS_CASES_LIST(StrictAutomatedTestsCases.List.class), //
-	// Tests avec valeurs par défaut non-nulles seulement
-	STRICT_AUTOMATED_TESTS_SETS(StrictAutomatedTestsSets.class), //
-	// Tests avec valeurs par défaut non-nulles seulement
-	STRICT_SEQUENCE_TESTS_SETS(StrictSequenceTestsSets.class), //
-	// Tests des des valeurs des constructeurs pour les tests automatisés de la méthode boolean equals(Object obj)
-	EQUALS_TESTS(EqualsTests.class), //
-	EQUALS_TESTS_LIST(EqualsTests.List.class), //
-	EQUALS_TESTS_CASES(EqualsTestsCases.class), //
-	EQUALS_TESTS_CASES_LIST(EqualsTestsCases.List.class), //
-	EQUALS_TESTS_SETS(EqualsTestsSets.class), //
-	// Tests avec valeurs en échec par défaut
-	ADD_FAIL_TEST_VALUE(AddFailTestValue.class), //
-	// Valeurs par défaut
-	DEFAULT_PARAMETER_TEST_VALUE(DefaultParameterTestValue.class), //
-	DEFAULT_PARAMETER_TEST_VALUE_LIST(DefaultParameterTestValue.List.class), //
-	DEFAULT_TEST_FILENAME(DefaultTestFilename.class), //
-	DEFAULT_TEST_VALUE(DefaultTestValue.class), //
-	DEFAULT_TEST_VALUE_LIST(DefaultTestValue.List.class), //
-	// Gestion des tests unitaires
-	COVERAGE_ONLY(CoverageOnly.class), //
-	SKIP_TESTING(SkipTesting.class), //
-	PARENT_DEPTH_LEVEL_METHODS_TESTING(ParentDepthLevelMethodsTesting.class), //
-	NO_PARENT_METHODS_TESTING(NoParentMethodsTesting.class), //
-	TEST_METHODS_INSTANCE(TestMethodsInstance.class), //
-	NOT_FOR_TEST_METHODS_INSTANCE(NotForTestMethodsInstance.class), //
-	STATIC_METHODS_FIRST(StaticMethodsFirst.class), //
-	// Cas de tests supplémentaires à être exécutés
-	COVERAGE_TESTS_CASES(CoverageTestsCases.class), //
-	COVERAGE_TESTS_CASES_LIST(CoverageTestsCases.List.class), //
-	// Annotations pour Mockito
-	USE_GWT_MOCKITO(UseGWTMockito.class), //
-	USE_MOCKITO(UseMockito.class), //
-	// Appels à être exécutés avant et après pour les méthodes non statiques publiques des cas de tests
-	METHODS_TESTS_CASES(MethodsTestsCases.class), //
-	// Ordre d'exécution du test du constructeur ou de la méthode (ordre croissant)
-	TEST_EXECUTION_ORDER(TestExecutionOrder.class), //
-	// Traitement des exceptions
-	ALLOW_RUNTIME_EXCEPTIONS(AllowRuntimeExceptions.class), //
-	SKIP_ALL_EXCEPTIONS(SkipAllExceptions.class), //
-	SKIP_EXCEPTIONS(SkipExceptions.class), //
-	SKIP_EXCEPTIONS_LIST(SkipExceptions.List.class), //
-	;
-
-	/** Classe de l'annotation **/
-	private final Class<?> annotationClass;
+@Retention(RUNTIME)
+@Target({ METHOD, CONSTRUCTOR })
+public @interface StrictSequenceTestsSets {
+	/**
+	 * Indicateur d'ajouter toutes les valeurs nullables si possible
+	 * @return un boolean
+	 */
+	boolean nullables() default true;
 
 	/**
-	 * Constructeur de base
-	 * @param annotationClass Classe de l'annotation
+	 * Indicateur d'ajout de la séquence de valeurs de tests supplémentaires (ex: ajouter les 2 valeurs false et true pour un boolean)
+	 * @return un boolean
 	 */
-	private AutomatedTestsAnnotationsTypes(Class<?> annotationClass) {
-		this.annotationClass = annotationClass;
-	}
+	boolean sequence() default true;
 
 	/**
-	 * Extrait le type d'annotation pour une valeur donnée
-	 * @param value La valeur à extraire
-	 * @return le type d'annotation (null sinon...)
+	 * Indicateur d'effectuer les itérations en séquence complete contiguë
+	 * @return un boolean
 	 */
-	@AutomatedTests({ "SkipExceptions", "automated.tests.annotations.TestMethodsInstance" })
-	public static final AutomatedTestsAnnotationsTypes getAutomatedTestsAnnotationType(String value) {
-		if (!BasicsHelper.isEmpty(value)) {
-			for (AutomatedTestsAnnotationsTypes type : AutomatedTestsAnnotationsTypes.values()) {
-				if (BasicsHelper.areEquals(type.getAnnotationClass().getName(), value) || BasicsHelper.areEquals(type.getAnnotationClass().getSimpleName(), value)) {
-					return type;
-				}
-			}
-		}
-
-		return null;
-	}
+	boolean contiguous() default true;
 
 	/**
-	 * Extrait le type d'annotation pour une valeur donnée
-	 * @param value La valeur à extraire
-	 * @return le type d'annotation (null sinon...)
+	 * Indicateur de progression de la séquence d'instances contiguës en ordre débutant par toutes les valeurs nulles (false -> ordre inversée débutant par toutes les valeurs non nulles)
+	 * @return un boolean
 	 */
-	public static final AutomatedTestsAnnotationsTypes getAutomatedTestsAnnotationType(Class<?> value) {
-		if (value != null) {
-			for (AutomatedTestsAnnotationsTypes type : AutomatedTestsAnnotationsTypes.values()) {
-				if (type.getAnnotationClass().equals(value)) {
-					return type;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Indique si une liste d'annotations contient un type d'annotation donné
-	 * @param annotations La liste des annotations d'une classe, construteur ou méthode obtenues par réflexion
-	 * @param type Le type d'annotation à vérifier
-	 * @return vrai si la liste d'annotations contient le type d'annotation donné
-	 */
-	public static final boolean hasAnnotationType(Annotation[] annotations, AutomatedTestsAnnotationsTypes type) {
-		if (!BasicsHelper.isEmpty(annotations) && (type != null)) {
-			for (Annotation annotation : annotations) {
-				if (type.getAnnotationClass().equals(annotation.annotationType())) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Extrait une annotation depuis une liste d'annotations pour un type d'annotation donné
-	 * @param annotations La liste des annotations d'une classe, construteur ou méthode obtenues par réflexion
-	 * @param type Le type d'annotation à extraire
-	 * @return l'annotation trouvée (null sinon...)
-	 */
-	@AutomatedTests({ "new JunitHelper.TestAnnotation()", "AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS" })
-	public static final Annotation getAnnotation(Annotation[] annotations, AutomatedTestsAnnotationsTypes type) {
-		if (!BasicsHelper.isEmpty(annotations) && (type != null)) {
-			for (Annotation annotation : annotations) {
-				if (type.getAnnotationClass().equals(annotation.annotationType())) {
-					return annotation;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Extrait sous forme de texte la liste des types d'annotations pour les tests automatisés
-	 * @return le text de la liste des types d'annotations pour les tests automatisés
-	 */
-	public static final String getAutomatedTestsAnnotationsTypesList() {
-		return getAutomatedTestsAnnotationsTypesList(AutomatedTestsAnnotationsTypes.values());
-	}
-
-	/**
-	 * Extrait sous forme de texte la liste des types d'annotations pour les tests automatisés
-	 * @param conjonction La conjonction pour la dernière annotation de la liste
-	 * @return le text de la liste des types d'annotations pour les tests automatisés
-	 */
-	public static final String getAutomatedTestsAnnotationsTypesList(String conjonction) {
-		return getAutomatedTestsAnnotationsTypesList(conjonction, AutomatedTestsAnnotationsTypes.values());
-	}
-
-	/**
-	 * Extrait sous forme de texte la liste des types d'annotations pour les tests automatisés donnés
-	 * @param types La liste des types d'annotations pour les tests automatisés à extraire
-	 * @return le text de la liste des types d'annotations pour les tests automatisés
-	 */
-	public static final String getAutomatedTestsAnnotationsTypesList(AutomatedTestsAnnotationsTypes... types) {
-		return getAutomatedTestsAnnotationsTypesList("et", types);
-	}
-
-	/**
-	 * Extrait sous forme de texte la liste des types d'annotations pour les tests automatisés donnés
-	 * @param conjonction La conjonction pour la dernière annotation de la liste
-	 * @param types La liste des types d'annotations pour les tests automatisés à extraire
-	 * @return le text de la liste des types d'annotations pour les tests automatisés
-	 */
-	public static final String getAutomatedTestsAnnotationsTypesList(String conjonction, AutomatedTestsAnnotationsTypes... types) {
-		StringBuilder text = new StringBuilder();
-
-		if (!BasicsHelper.isEmpty(types)) {
-			for (int i = 0; i < types.length; i++) {
-				if (i > 0) {
-					text.append(((i + 1) == types.length) ? (" " + BasicsHelper.asString(conjonction).trim() + " ") : ", ");
-				}
-
-				text.append(types[i].toString());
-			}
-		}
-
-		return text.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Enum#toString()
-	 */
-	@Override
-	public String toString() {
-		if (BasicsHelper.areEquals("List", annotationClass.getSimpleName())) {
-			return "@" + annotationClass.getName().replace("$List", "");
-		}
-
-		return "@" + annotationClass.getSimpleName();
-	}
-
-	/**
-	 * Extrait le champ annotationClass
-	 * @return un Class<?>
-	 */
-	public Class<?> getAnnotationClass() {
-		return annotationClass;
-	}
+	boolean forward() default true;
 }

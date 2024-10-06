@@ -1,360 +1,2235 @@
-package automated.tests.helpers.base;
+package automated.tests.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import automated.tests.annotations.SkipAllExceptions;
+import java.util.Map;
+import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import automated.tests.annotations.AutomatedTests;
+import automated.tests.annotations.AutomatedTestsCases;
+import automated.tests.annotations.EqualsTests;
+import automated.tests.annotations.EqualsTestsCases;
+import automated.tests.annotations.EqualsTestsSets;
+import automated.tests.annotations.NoParentMethodsTesting;
+import automated.tests.annotations.SkipExceptions;
+import automated.tests.annotations.SkipImportsForTesting;
+import automated.tests.annotations.SkipTesting;
+import automated.tests.annotations.StrictAutomatedTests;
+import automated.tests.annotations.StrictAutomatedTestsCases;
+import automated.tests.annotations.StrictAutomatedTestsSets;
+import automated.tests.annotations.StrictSequenceTestsSets;
+import automated.tests.annotations.TestExecutionOrder;
+import automated.tests.annotations.data.AutomatedTestsCaseData;
+import automated.tests.annotations.interfaces.IAutomatedTestsCases;
+import automated.tests.cases.JunitAutomatedTestsCases;
+import automated.tests.helpers.AutomatedTestsHelper;
+import automated.tests.helpers.abstractions.TemplateProducerBase;
+import automated.tests.helpers.base.BasicsHelper;
+import automated.tests.helpers.base.IterateValueFilter;
+import automated.tests.helpers.base.Iterations;
+import automated.tests.helpers.common.CommonHelper;
+import automated.tests.helpers.reflexions.ReflexionsHelper;
+import automated.tests.helpers.reflexions.data.ConstructorInfoData;
+import automated.tests.helpers.reflexions.data.MethodInfoData;
+import automated.tests.helpers.reflexions.data.ParameterInfoData;
+import automated.tests.helpers.reflexions.data.TypeInfoData;
+import automated.tests.helpers.reflexions.data.filters.ConstructorModifiersFilter;
+import automated.tests.types.AutomatedTestsAnnotationsTypes;
+import junit.JunitHelper;
 
 /**
- * Classe de génération de toutes les itérations possibles pour les groupes d'eléments d'une liste ex: [a, b, c], [d], [e, f] -> [[a, d, e], [a, d, f], [b, d, e], [b, d, f], [c, d, e], [c, d, f]]
- * @author Claude Toupin - 17 janv. 2022
+ * Classe des données d'un test
+ * @author Claude Toupin - 26 déc. 2021
  */
-@SkipAllExceptions
-public class Iterations<T> {
-	/** Liste des items à itérer **/
-	private final List<List<T>> itemsList;
+@SkipImportsForTesting({ List.class, Map.class, ParameterInfoData.class })
+@NoParentMethodsTesting
+public class TestData extends TemplateProducerBase {
+	/** Type générique par défaut **/
+	public static final TypeInfoData DEFAULT_GENERIC_TYPE = new TypeInfoData(String.class);
 
-	/** Liste des itérations des items */
-	private final List<List<T>> iterationsList;
+	/** Type générique par défaut pour une énumération **/
+	public static final TypeInfoData DEFAULT_ENUM_GENERIC_TYPE = new TypeInfoData(JunitHelper.TestEnum.class);
+
+	/** Type générique par défaut pour un tableau **/
+	public static final TypeInfoData DEFAULT_ARRAY_GENERIC_TYPE = new TypeInfoData(String[].class);
+
+	/** Code d'initialisation de l'énumération de test **/
+	public static final String TEST_ENUM_INIT_CODE = "enum TestEnum { A, B, C };";
+
+	/** Appel au code de nettoyage d'un test **/
+	public static final String USE_GWT_MOCKITO = "com.google.gwtmockito.GwtMockito.initMocks(this);";
+
+	/** Message d'erreur des annotations des valeurs de tests mutuellement exclusives en français **/
+	private static final String AUTOMATED_TESTS_ERROR_MESSAGE_FRA;
+
+	/** Message d'erreur des annotations des valeurs de tests mutuellement exclusives en anglais **/
+	private static final String AUTOMATED_TESTS_ERROR_MESSAGE_ENG;
+
+	/** Message d'erreur des annotations des valeurs de tests des constructeurs pour la méthode boolean equals(Object obj) mutuellement exclusives en français **/
+	private static final String EQUALS_TESTS_ERROR_MESSAGE_FRA;
+
+	/** Message d'erreur des annotations des valeurs de tests des constructeurs pour la méthode boolean equals(Object obj) mutuellement exclusives en anglais **/
+	private static final String EQUALS_TESTS_ERROR_MESSAGE_ENG;
+
+	/** Message d'erreur des annotations du test des méthodes mutuellement exclusives en français **/
+	private static final String TEST_METHODS_ERROR_MESSAGE_FRA;
+
+	/** Message d'erreur des annotations du test des méthodes mutuellement exclusives en anglais **/
+	private static final String TEST_METHODS_ERROR_MESSAGE_ENG;
+
+	/** Message d'erreur des annotations du test des méthodes mutuellement exclusives en français **/
+	private static final String ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_FRA;
+
+	/** Message d'erreur des annotations du test des méthodes mutuellement exclusives en anglais **/
+	private static final String ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_ENG;
+
+	/** Filtre des données d'une itération **/
+	private static final IterateValueFilter ITERATE_VALUE_FILTER = (item) -> (item == null) || "null".equals(item) || ((String) item).contains(" null");
+
+	static {
+		AUTOMATED_TESTS_ERROR_MESSAGE_FRA = "Les annotations " //
+				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS, //
+						AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS_CASES //
+				) //
+				+ " sont mutuellement exclusives avec les annotations " //
+				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+						AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
+				) //
+		;
+
+		AUTOMATED_TESTS_ERROR_MESSAGE_ENG = //
+				AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						"and", //
+						AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS, //
+						AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS_CASES //
+				) //
+						+ " annotations are mutually exclusive with " //
+						+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+								"and", //
+								AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
+								AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
+								AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+								AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
+						) //
+						+ " annotations" //
+		;
+
+		EQUALS_TESTS_ERROR_MESSAGE_FRA = "Les annotations " //
+				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						AutomatedTestsAnnotationsTypes.EQUALS_TESTS, //
+						AutomatedTestsAnnotationsTypes.EQUALS_TESTS_CASES, //
+						AutomatedTestsAnnotationsTypes.EQUALS_TESTS_SETS //
+				) //
+				+ " sont mutuellement exclusives avec l'annotation " //
+				+ AutomatedTestsAnnotationsTypes.COVERAGE_ONLY //
+		;
+
+		EQUALS_TESTS_ERROR_MESSAGE_ENG = AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+				AutomatedTestsAnnotationsTypes.EQUALS_TESTS, //
+				AutomatedTestsAnnotationsTypes.EQUALS_TESTS_CASES, //
+				AutomatedTestsAnnotationsTypes.EQUALS_TESTS_SETS //
+		) //
+				+ " annotations are mutually exclusive with " //
+				+ AutomatedTestsAnnotationsTypes.COVERAGE_ONLY //
+				+ " annotation" //
+		;
+
+		TEST_METHODS_ERROR_MESSAGE_FRA = "L'annotation " //
+				+ AutomatedTestsAnnotationsTypes.TEST_METHODS_INSTANCE //
+				+ " est mutuellement exclusive avec les annotations " //
+				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						AutomatedTestsAnnotationsTypes.NOT_FOR_TEST_METHODS_INSTANCE, //
+						AutomatedTestsAnnotationsTypes.COVERAGE_ONLY //
+				) //
+		;
+
+		TEST_METHODS_ERROR_MESSAGE_ENG = AutomatedTestsAnnotationsTypes.TEST_METHODS_INSTANCE //
+				+ " annotation is mutually exclusive with " //
+				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						"and", //
+						AutomatedTestsAnnotationsTypes.NOT_FOR_TEST_METHODS_INSTANCE, //
+						AutomatedTestsAnnotationsTypes.COVERAGE_ONLY //
+				) //
+				+ " annotations" //
+		;
+
+		ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_FRA = "L'annotation" //
+				+ AutomatedTestsAnnotationsTypes.ADD_FAIL_TEST_VALUE //
+				+ " est mutuellement exclusive avec les annotations " //
+				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+						AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
+				) //
+		;
+
+		ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_ENG = AutomatedTestsAnnotationsTypes.ADD_FAIL_TEST_VALUE //
+				+ " annotation is mutually exclusive with " //
+				+ AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationsTypesList( //
+						"and", //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, //
+						AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS, //
+						AutomatedTestsAnnotationsTypes.STRICT_SEQUENCE_TESTS_SETS //
+				) //
+				+ " annotations" //
+		;
+	}
+
+	/** Indicateur de ne pas effectuer de tests automatisés **/
+	private boolean skipTesting;
+
+	/** Indicateur de test de couverture seulement **/
+	private boolean coverageOnly;
+
+	/** Indicateur que les tests automatisés doivent être faits avec les valeurs de @StrictAutomatedTests seulement **/
+	private boolean strictTesting;
+
+	/** Indicateur d'utiliser ce construteur pour les tests automatisés de la méthode boolean equals(Object obj) **/
+	private boolean equalsTests;
+
+	/** Indicateur d'utiliser ce construteur pour les tests automatisés des méthodes **/
+	private boolean testMethodsInstance;
+
+	/** Indicateur de ne pas utiliser ce constructeur pour les tests automatisés des méthodes **/
+	private boolean notForTestMethodsInstance;
+
+	/** Indicateur de permettre les exceptions d'exécution (i.e. RuntimeException) dans les tests automatisés **/
+	private boolean allowRuntimeExceptions;
+
+	/** Indicateur d'ignorer toutes les exceptions dans les tests automatisés **/
+	private boolean skipAllExceptions;
+
+	/** Indicateur d'ajout de la valeur JunitHelper.FAIL_STRING aux cas de tests **/
+	private boolean addFailTestValue;
+
+	/** Ordre d'exécution du test du constructeur ou de la méthode (ordre croissant) **/
+	private int executionOrder;
+
+	/** Données pour le traitement du tableau à analyser **/
+	private TestInfoData arrayType;
+
+	/** Type de l'élément à analyser **/
+	private final ElementType elementType;
+
+	/** Données du type de classe associé au données du test **/
+	private final TypeInfoData classInfoData;
+
+	/** Données du type de retour de classe associé au données du test **/
+	private final TypeInfoData returnTypeInfoData;
+
+	/** Indicateur de textes en français **/
+	private final boolean french;
+
+	/** Nom du projet **/
+	private final String project;
+
+	/** Répertoire des fichiers ressources **/
+	private final String resourcesDir;
+
+	/** Liste des classes qui doivent toujours être référencées au long (i.e. package.class) afin d'éviter les confilts **/
+	private final List<Class<?>> fullnameClassesRequiredList;
+
+	/** Liste des exceptions de l'élément à analyser **/
+	private final List<TypeInfoData> exceptionsList;
+
+	/** Liste des exceptions à ignorer dans les tests automatisés **/
+	private final List<Class<?>> skipExceptionsList;
+
+	/** Dictionnaire des valeurs par défaut à utiliser pour les paramètres **/
+	private final Map<String, TestInfoValueData> defaultParametersTestsValuesDict;
+
+	/** Dictionnaire des valeurs par défaut à utiliser pour les paramètres d'un type de classe donnée **/
+	private final Map<String, TestInfoValueData> defaultTestsValuesDict;
+
+	/** Liste des paramètres qui sont des fichiers **/
+	private final Map<String, Integer> defaultFilenamesDict;
+
+	/** Dictionnaire des types des noms génériques de types (ex: T[] -> String[]) à substituer **/
+	private final Map<String, TypeInfoData> genericTestTypesDict;
+
+	/** Dictionnaire des types des noms génériques des types génériques (ex: List<E> -> List<Integer>) à substituer **/
+	private final Map<String, TypeInfoData> genericGenericTestTypesDict;
+
+	/** Liste des classes de données des tests automatisés générés par programmation **/
+	private final List<Class<?>> automatedTestsCasesClassesList;
+
+	/** Dictionnaire des classes de données des tests automatisés générés par programmation **/
+	private final Map<Class<?>, List<String>> automatedTestsCasesClassesDict;
+
+	/** Liste des lignes de code des tests automatisés par programmation **/
+	private final List<String> testsCasesCodeList;
+
+	/** Liste des ensembles de données de tests **/
+	private final List<TestSetData> testsSetsList;
+
+	/** Liste des ensembles de données de tests pour la méthode boolean equals(Object obj) **/
+	private final List<TestSetData> equalsSetsList;
+
+	/** Message d'erreur des annotations des valeurs de tests mutuellement exclusives **/
+	private final String automatedTestsErrorMessage;
+
+	/** Message d'erreur des annotations des valeurs de tests des constructeurs pour la méthode boolean equals(Object obj) mutuellement exclusives **/
+	private final String equalsTestsErrorMessage;
+
+	/** Message d'erreur des annotations du test des méthodes mutuellement exclusives **/
+	private final String testMethodsErrorMessage;
+
+	/** Message d'erreur des annotations des valeurs de tests mutuellement exclusives **/
+	private final String addFailTestValueErrorMessage;
 
 	/**
 	 * Constructeur de base
+	 * @param elementType Type de l'élément à analyser
+	 * @param classInfoData Données du type de classe associé au données du test
+	 * @param returnTypeInfoData Données du type de retour du constructeur ou de la méthode associé au données du test
+	 * @param coverageOnly Indicateur de test de couverture seulement
+	 * @param allowRuntimeExceptions Indicateur de permettre les exceptions d'exécution (i.e. RuntimeException) dans les tests automatisés
+	 * @param skipAllExceptions Indicateur d'ignorer toutes les exceptions dans les tests automatisés
+	 * @param french Indicateur de textes en français
+	 * @param project Nom du projet
+	 * @param resourcesDir Répertoire des fichiers ressources
+	 * @param fullnameClassesRequiredList Liste des classes qui doivent toujours être référencées au long (i.e. package.class) afin d'éviter les confilts
+	 * @param exceptionsList Liste des exceptions de l'élément à analyser
+	 * @param skipExcetionsList Liste des exceptions à ignorer dans les tests automatisés
+	 * @param defaultParametesTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres
+	 * @param defaultTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres d'un type de classe donnée
+	 * @param genericTestTypesDict Dictionnaire des types des noms génériques de types (ex: T[] -> String[]) à substituer
+	 * @param genericGenericTestTypesDict Dictionnaire des types des noms génériques des types génériques (ex: List<E> -> List<Integer>) à substituer
+	 * @throws Exception en cas d'erreur...
 	 */
-	public Iterations() {
-		this.itemsList = new ArrayList<>();
-		this.iterationsList = new ArrayList<>();
+	private TestData(ElementType elementType, TypeInfoData classInfoData, TypeInfoData returnTypeInfoData, boolean coverageOnly, boolean allowRuntimeExceptions, boolean skipAllExceptions, boolean french, String project, String resourcesDir, List<Class<?>> fullnameClassesRequiredList, List<TypeInfoData> exceptionsList, List<Class<?>> skipExcetionsList, Map<String, TestInfoValueData> defaultParametesTestsValuesDict, Map<String, TestInfoValueData> defaultTestsValuesDict,
+			Map<String, TypeInfoData> genericTestTypesDict, Map<String, TypeInfoData> genericGenericTestTypesDict) throws Exception {
+		this.skipTesting = false;
+		this.coverageOnly = coverageOnly;
+		this.strictTesting = false;
+		this.equalsTests = false;
+		this.testMethodsInstance = false;
+		this.notForTestMethodsInstance = false;
+		this.allowRuntimeExceptions = allowRuntimeExceptions;
+		this.skipAllExceptions = skipAllExceptions;
+		this.addFailTestValue = false;
+		this.executionOrder = 0;
+		this.arrayType = null;
+		this.elementType = elementType;
+		this.classInfoData = classInfoData;
+		this.returnTypeInfoData = returnTypeInfoData;
+		this.french = french;
+		this.project = project;
+		this.resourcesDir = resourcesDir;
+		this.fullnameClassesRequiredList = fullnameClassesRequiredList;
+		this.exceptionsList = new ArrayList<>();
+		this.skipExceptionsList = new ArrayList<>();
+		this.defaultParametersTestsValuesDict = defaultParametesTestsValuesDict;
+		this.defaultTestsValuesDict = defaultTestsValuesDict;
+		this.defaultFilenamesDict = new HashMap<>();
+		this.automatedTestsCasesClassesList = new ArrayList<>();
+		this.automatedTestsCasesClassesDict = new HashMap<>();
+		this.genericTestTypesDict = genericTestTypesDict;
+		this.genericGenericTestTypesDict = genericGenericTestTypesDict;
+		this.testsCasesCodeList = new ArrayList<>();
+		this.testsSetsList = new ArrayList<>();
+		this.equalsSetsList = new ArrayList<>();
+		this.automatedTestsErrorMessage = french ? AUTOMATED_TESTS_ERROR_MESSAGE_FRA : AUTOMATED_TESTS_ERROR_MESSAGE_ENG;
+		this.equalsTestsErrorMessage = french ? EQUALS_TESTS_ERROR_MESSAGE_FRA : EQUALS_TESTS_ERROR_MESSAGE_ENG;
+		this.testMethodsErrorMessage = french ? TEST_METHODS_ERROR_MESSAGE_FRA : TEST_METHODS_ERROR_MESSAGE_ENG;
+		this.addFailTestValueErrorMessage = french ? ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_FRA : ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_ENG;
+
+		if (!BasicsHelper.isEmpty(exceptionsList)) {
+			this.exceptionsList.addAll(exceptionsList);
+		}
+
+		if (!BasicsHelper.isEmpty(skipExcetionsList)) {
+			this.skipExceptionsList.addAll(skipExcetionsList);
+		}
+
+		setStartTag("<#");
+		setEndTag("#>");
 	}
 
 	/**
 	 * Constructeur de base
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param items Tableau des items à itérer
+	 * @param constructorInfoData Données du constructeur
+	 * @param coverageOnly Indicateur de test de couverture seulement
+	 * @param allowRuntimeExceptions Indicateur de permettre les exceptions d'exécution (i.e. RuntimeException) dans les tests automatisés
+	 * @param skipAllExceptions Indicateur d'ignorer toutes les exceptions dans les tests automatisés
+	 * @param french Indicateur de textes en français
+	 * @param project Nom du projet
+	 * @param resourcesDir Répertoire des fichiers ressources
+	 * @param fullnameClassesRequiredList Liste des classes qui doivent toujours être référencées au long (i.e. package.class) afin d'éviter les confilts
+	 * @param skipExcetionsList Liste des exceptions à ignorer dans les tests automatisés
+	 * @param defaultParametesTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres
+	 * @param defaultTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres d'un type de classe donnée
+	 * @param genericTestTypesDict Dictionnaire des types des noms génériques de types (ex: T[] -> String[]) à substituer
+	 * @param genericGenericTestTypesDict Dictionnaire des types des noms génériques des types génériques (ex: List<E> -> List<Integer>) à substituer
+	 * @throws Exception en cas d'erreur...
 	 */
-	@SafeVarargs
-	public Iterations(boolean forward, boolean contiguous, T[]... items) {
-		this(forward, contiguous, null, items);
+	@StrictAutomatedTestsCases(value = JunitAutomatedTestsCases.class, name = "ConstructorInfoData")
+	public TestData(ConstructorInfoData constructorInfoData, boolean coverageOnly, boolean allowRuntimeExceptions, boolean skipAllExceptions, boolean french, String project, String resourcesDir, List<Class<?>> fullnameClassesRequiredList, List<Class<?>> skipExcetionsList, Map<String, TestInfoValueData> defaultParametesTestsValuesDict, Map<String, TestInfoValueData> defaultTestsValuesDict, Map<String, TypeInfoData> genericTestTypesDict, Map<String, TypeInfoData> genericGenericTestTypesDict)
+			throws Exception {
+		this(ElementType.CONSTRUCTOR, false, constructorInfoData, constructorInfoData, constructorInfoData.getName(), constructorInfoData.getSignature(), constructorInfoData.getConstructor().getAnnotations(), constructorInfoData.getParametersList(), constructorInfoData.getExceptionsList(), coverageOnly, allowRuntimeExceptions, skipAllExceptions, french, project, resourcesDir, fullnameClassesRequiredList, skipExcetionsList, defaultParametesTestsValuesDict, defaultTestsValuesDict, genericTestTypesDict,
+				genericGenericTestTypesDict);
 	}
 
 	/**
 	 * Constructeur de base
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param items Tableau des items à itérer
+	 * @param methodInfoData Données de la méthode
+	 * @param coverageOnly Indicateur de test de couverture seulement
+	 * @param allowRuntimeExceptions Indicateur de permettre les exceptions d'exécution (i.e. RuntimeException) dans les tests automatisés
+	 * @param skipAllExceptions Indicateur d'ignorer toutes les exceptions dans les tests automatisés
+	 * @param french Indicateur de textes en français
+	 * @param project Nom du projet
+	 * @param resourcesDir Répertoire des fichiers ressources
+	 * @param fullnameClassesRequiredList Liste des classes qui doivent toujours être référencées au long (i.e. package.class) afin d'éviter les confilts
+	 * @param skipExcetionsList Liste des exceptions à ignorer dans les tests automatisés
+	 * @param defaultParametesTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres
+	 * @param defaultTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres d'un type de classe donnée
+	 * @param genericTestTypesDict Dictionnaire des types des noms génériques de types (ex: T[] -> String[]) à substituer
+	 * @param genericGenericTestTypesDict Dictionnaire des types des noms génériques des types génériques (ex: List<E> -> List<Integer>) à substituer
+	 * @throws Exception en cas d'erreur...
 	 */
-	@SafeVarargs
-	public Iterations(boolean forward, boolean contiguous, IterateValueFilter iterateValueFilter, T[]... items) {
-		this();
-		iterate(forward, contiguous, iterateValueFilter, items);
+	@StrictAutomatedTestsCases(value = JunitAutomatedTestsCases.class, name = "MethodInfoData")
+	public TestData(MethodInfoData methodInfoData, boolean coverageOnly, boolean allowRuntimeExceptions, boolean skipAllExceptions, boolean french, String project, String resourcesDir, List<Class<?>> fullnameClassesRequiredList, List<Class<?>> skipExcetionsList, Map<String, TestInfoValueData> defaultParametesTestsValuesDict, Map<String, TestInfoValueData> defaultTestsValuesDict, Map<String, TypeInfoData> genericTestTypesDict, Map<String, TypeInfoData> genericGenericTestTypesDict) throws Exception {
+		this(ElementType.METHOD, methodInfoData.isEqualsMethod(), new TypeInfoData(methodInfoData.getMethod().getDeclaringClass()), methodInfoData, methodInfoData.getName(), (Modifier.isStatic(methodInfoData.getMethod().getModifiers()) ? "static " : "") + methodInfoData.getSignature(), methodInfoData.getMethod().getAnnotations(), methodInfoData.getParametersList(), methodInfoData.getExceptionsList(), coverageOnly, allowRuntimeExceptions, skipAllExceptions, french, project, resourcesDir,
+				fullnameClassesRequiredList, skipExcetionsList, defaultParametesTestsValuesDict, defaultTestsValuesDict, genericTestTypesDict, genericGenericTestTypesDict);
 	}
 
 	/**
 	 * Constructeur de base
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param items Liste des items à itérer
+	 * @param elementType Type de l'élément à analyser
+	 * @param sequence Indicateur d'ajouter la séquence de valeurs de tests supplémentaires
+	 * @param classInfoData Données du type de classe associé aux données du test
+	 * @param returnTypeInfoData Données du type de retour du constructeur ou de la méthode associé au données du test
+	 * @param name Nom du constructeur ou méthode
+	 * @param signature Signature du constructeur ou méthode
+	 * @param annotations Annotation du constructeur ou méthode
+	 * @param parametersList Liste des paramètres du constructeur ou méthode
+	 * @param exceptionsList Liste des exceptions du constructeur ou méthode
+	 * @param coverageOnly Indicateur de test de couverture seulement
+	 * @param allowRuntimeExceptions Indicateur de permettre les exceptions d'exécution (i.e. RuntimeException) dans les tests automatisés
+	 * @param skipAllExceptions Indicateur d'ignorer toutes les exceptions dans les tests automatisés
+	 * @param french Indicateur de textes en français
+	 * @param project Nom du projet
+	 * @param resourcesDir Répertoire des fichiers ressources
+	 * @param fullnameClassesRequiredList Liste des classes qui doivent toujours être référencées au long (i.e. package.class) afin d'éviter les confilts
+	 * @param skipExceptionsList Liste des exceptions à ignorer dans les tests automatisés
+	 * @param defaultParametesTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres
+	 * @param defaultTestsValuesDict Dictionnaire des valeurs par défaut à utiliser pour les paramètres d'un type de classe donnée
+	 * @param genericTestTypesDict Dictionnaire des types des noms génériques de types (ex: T[] -> String[]) à substituer
+	 * @param genericGenericTestTypesDict Dictionnaire des types des noms génériques des types génériques (ex: List<E> -> List<Integer>) à substituer
+	 * @throws Exception en cas d'erreur...
 	 */
-	@SafeVarargs
-	public Iterations(boolean forward, boolean contiguous, List<T>... items) {
-		this(forward, contiguous, null, items);
+	@SkipTesting
+	public TestData(ElementType elementType, boolean sequence, TypeInfoData classInfoData, TypeInfoData returnTypeInfoData, String name, String signature, Annotation[] annotations, List<ParameterInfoData> parametersList, List<TypeInfoData> exceptionsList, boolean coverageOnly, boolean allowRuntimeExceptions, boolean skipAllExceptions, boolean french, String project, String resourcesDir, List<Class<?>> fullnameClassesRequiredList, List<Class<?>> skipExceptionsList,
+			Map<String, TestInfoValueData> defaultParametesTestsValuesDict, Map<String, TestInfoValueData> defaultTestsValuesDict, Map<String, TypeInfoData> genericTestTypesDict, Map<String, TypeInfoData> genericGenericTestTypesDict) throws Exception {
+		this(elementType, classInfoData, returnTypeInfoData, coverageOnly, allowRuntimeExceptions, skipAllExceptions, french, project, resourcesDir, fullnameClassesRequiredList, exceptionsList, skipExceptionsList, defaultParametesTestsValuesDict, defaultTestsValuesDict, genericTestTypesDict, genericGenericTestTypesDict);
+
+		if (parametersList == null) {
+			throw new Exception(french ? "Pas de liste de paramètres de spécifiée" : "No specified parameter list");
+		}
+
+		if (classInfoData.isEnumType() && returnTypeInfoData.getClassData().equals(classInfoData.getClassData())) {
+			if (parametersList.size() == 1) {
+				if (String.class.equals(parametersList.get(0).getClassData())) {
+					// Pour obtenir 100% de couverture lors du test d'une énumération
+
+					this.strictTesting = BasicsHelper.areEquals("valueOf", name);
+
+					for (Enum<?> value : classInfoData.getEnumValuesList()) {
+						this.testsSetsList.add(new TestSetData("\"" + value.name() + "\""));
+					}
+				}
+			}
+		}
+
+		List<TestSetData> annotationTestSetsList = new ArrayList<>();
+
+		boolean hasAutomatedTests = false;
+		boolean hasStrictAutomatedTests = false;
+
+		if (!BasicsHelper.isEmpty(annotations)) {
+			for (Annotation annotation : annotations) {
+				AutomatedTestsAnnotationsTypes type = AutomatedTestsAnnotationsTypes.getAutomatedTestsAnnotationType(annotation.annotationType());
+
+				if (type != null) {
+					switch (type) {
+						case AUTOMATED_TESTS:
+							if (hasStrictAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							}
+
+							AutomatedTests automatedTests = (AutomatedTests) annotation;
+							annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, type, parametersList, automatedTests.filenames(), automatedTests.process(), automatedTests.iterate(), automatedTests.separator(), automatedTests.throwsException(), automatedTests.value()));
+							hasAutomatedTests = true;
+							break;
+						case AUTOMATED_TESTS_LIST:
+							if (hasStrictAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							}
+
+							AutomatedTests.List automatedTestsList = (AutomatedTests.List) annotation;
+
+							for (AutomatedTests item : automatedTestsList.value()) {
+								annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS, parametersList, item.filenames(), item.process(), item.iterate(), item.separator(), item.throwsException(), item.value()));
+							}
+
+							hasAutomatedTests = true;
+							break;
+						case AUTOMATED_TESTS_CASES:
+							if (hasStrictAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							}
+
+							AutomatedTestsCases automatedTestsCases = (AutomatedTestsCases) annotation;
+							annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, type, parametersList, automatedTestsCases.value(), automatedTestsCases.name()));
+							hasAutomatedTests = true;
+							break;
+						case AUTOMATED_TESTS_CASES_LIST:
+							if (hasStrictAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							}
+
+							AutomatedTestsCases.List automatedTestsCasesList = (AutomatedTestsCases.List) annotation;
+
+							for (AutomatedTestsCases item : automatedTestsCasesList.value()) {
+								annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS_CASES, parametersList, item.value(), item.name()));
+							}
+
+							hasAutomatedTests = true;
+							break;
+						case STRICT_AUTOMATED_TESTS:
+							if (hasAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							} else if (this.addFailTestValue) {
+								throw new Exception(addFailTestValueErrorMessage);
+							}
+
+							this.strictTesting = true;
+
+							StrictAutomatedTests strictAutomatedTests = (StrictAutomatedTests) annotation;
+							annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, type, parametersList, strictAutomatedTests.filenames(), strictAutomatedTests.process(), strictAutomatedTests.iterate(), strictAutomatedTests.separator(), strictAutomatedTests.throwsException(), strictAutomatedTests.value()));
+							hasStrictAutomatedTests = true;
+							break;
+						case STRICT_AUTOMATED_TESTS_LIST:
+							if (hasAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							} else if (this.addFailTestValue) {
+								throw new Exception(addFailTestValueErrorMessage);
+							}
+
+							this.strictTesting = true;
+
+							StrictAutomatedTests.List strictAutomatedTestsList = (StrictAutomatedTests.List) annotation;
+
+							for (StrictAutomatedTests item : strictAutomatedTestsList.value()) {
+								annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS, parametersList, item.filenames(), item.process(), item.iterate(), item.separator(), item.throwsException(), item.value()));
+							}
+
+							hasStrictAutomatedTests = true;
+							break;
+						case STRICT_AUTOMATED_TESTS_CASES:
+							if (hasAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							} else if (this.addFailTestValue) {
+								throw new Exception(addFailTestValueErrorMessage);
+							}
+
+							this.strictTesting = true;
+
+							StrictAutomatedTestsCases strictAutomatedTestsCases = (StrictAutomatedTestsCases) annotation;
+							annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, type, parametersList, strictAutomatedTestsCases.value(), strictAutomatedTestsCases.name()));
+							hasStrictAutomatedTests = true;
+							break;
+						case STRICT_AUTOMATED_TESTS_CASES_LIST:
+							if (hasAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							} else if (this.addFailTestValue) {
+								throw new Exception(addFailTestValueErrorMessage);
+							}
+
+							this.strictTesting = true;
+
+							StrictAutomatedTestsCases.List strictAutomatedTestsCasesList = (StrictAutomatedTestsCases.List) annotation;
+
+							for (StrictAutomatedTestsCases item : strictAutomatedTestsCasesList.value()) {
+								annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES, parametersList, item.value(), item.name()));
+							}
+
+							hasStrictAutomatedTests = true;
+							break;
+						case STRICT_AUTOMATED_TESTS_SETS:
+							if (hasAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							} else if (this.addFailTestValue) {
+								throw new Exception(addFailTestValueErrorMessage);
+							}
+
+							this.strictTesting = true;
+
+							StrictAutomatedTestsSets strictAutomatedTestsSets = (StrictAutomatedTestsSets) annotation;
+							annotationTestSetsList.addAll(getTestsSetsList(strictAutomatedTestsSets.sequence(), strictAutomatedTestsSets.sequence(), !strictAutomatedTestsSets.sequence() && !strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.contiguous(), strictAutomatedTestsSets.forward(), parametersList));
+							hasStrictAutomatedTests = true;
+							break;
+						case STRICT_SEQUENCE_TESTS_SETS:
+							if (hasAutomatedTests) {
+								throw new Exception(automatedTestsErrorMessage);
+							} else if (this.addFailTestValue) {
+								throw new Exception(addFailTestValueErrorMessage);
+							}
+
+							this.strictTesting = true;
+
+							StrictSequenceTestsSets strictSequenceTestsSets = (StrictSequenceTestsSets) annotation;
+							annotationTestSetsList.addAll(getTestsSetsList(strictSequenceTestsSets.sequence(), strictSequenceTestsSets.sequence(), !strictSequenceTestsSets.sequence() && !strictSequenceTestsSets.nullables(), strictSequenceTestsSets.nullables(), strictSequenceTestsSets.contiguous(), strictSequenceTestsSets.forward(), parametersList));
+							hasStrictAutomatedTests = true;
+							break;
+						case EQUALS_TESTS:
+							// Annotation présente seulement pour un constructeur
+							if (this.coverageOnly) {
+								throw new Exception(equalsTestsErrorMessage);
+							}
+
+							this.equalsTests = true;
+
+							EqualsTests equalsTests = (EqualsTests) annotation;
+							this.equalsSetsList.addAll(getAnnotationTestSetsList(signature, type, parametersList, equalsTests.filenames(), equalsTests.process(), equalsTests.iterate(), equalsTests.separator(), equalsTests.throwsException(), equalsTests.value()));
+							break;
+						case EQUALS_TESTS_LIST:
+							// Annotation présente seulement pour un constructeur
+							if (this.coverageOnly) {
+								throw new Exception(equalsTestsErrorMessage);
+							}
+
+							this.equalsTests = true;
+
+							EqualsTests.List equalsTestsList = (EqualsTests.List) annotation;
+
+							for (EqualsTests item : equalsTestsList.value()) {
+								this.equalsSetsList.addAll(getAnnotationTestSetsList(signature, AutomatedTestsAnnotationsTypes.EQUALS_TESTS, parametersList, item.filenames(), item.process(), item.iterate(), item.separator(), item.throwsException(), item.value()));
+							}
+
+							break;
+						case EQUALS_TESTS_CASES:
+							// Annotation présente seulement pour un constructeur
+							if (this.coverageOnly) {
+								throw new Exception(equalsTestsErrorMessage);
+							}
+
+							this.equalsTests = true;
+
+							EqualsTestsCases equalsTestsCases = (EqualsTestsCases) annotation;
+							this.equalsSetsList.addAll(getAnnotationTestSetsList(signature, type, parametersList, equalsTestsCases.value(), equalsTestsCases.name()));
+							break;
+						case EQUALS_TESTS_CASES_LIST:
+							// Annotation présente seulement pour un constructeur
+							if (this.coverageOnly) {
+								throw new Exception(equalsTestsErrorMessage);
+							}
+
+							this.equalsTests = true;
+
+							EqualsTestsCases.List equalsTestsCasesList = (EqualsTestsCases.List) annotation;
+
+							for (EqualsTestsCases item : equalsTestsCasesList.value()) {
+								this.equalsSetsList.addAll(getAnnotationTestSetsList(signature, AutomatedTestsAnnotationsTypes.EQUALS_TESTS_CASES, parametersList, item.value(), item.name()));
+							}
+							break;
+						case EQUALS_TESTS_SETS:
+							// Annotation présente seulement pour un constructeur
+							if (this.coverageOnly) {
+								throw new Exception(equalsTestsErrorMessage);
+							}
+
+							this.equalsTests = true;
+
+							EqualsTestsSets equalsTestsSets = (EqualsTestsSets) annotation;
+							this.equalsSetsList.addAll(getTestsSetsList(equalsTestsSets.sequence(), equalsTestsSets.sequence(), !equalsTestsSets.sequence() && !equalsTestsSets.nullables(), equalsTestsSets.nullables(), true, false, parametersList));
+							break;
+						case ADD_FAIL_TEST_VALUE:
+							if (hasStrictAutomatedTests) {
+								throw new Exception(addFailTestValueErrorMessage);
+							}
+
+							this.addFailTestValue = true;
+							break;
+						case NOT_FOR_TEST_METHODS_INSTANCE:
+							// Annotation présente seulement pour un constructeur
+							if (this.testMethodsInstance) {
+								throw new Exception(testMethodsErrorMessage);
+							}
+
+							this.notForTestMethodsInstance = true;
+							break;
+						case COVERAGE_ONLY:
+							if (this.testMethodsInstance) {
+								throw new Exception(testMethodsErrorMessage);
+							} else if (this.equalsTests) {
+								throw new Exception(equalsTestsErrorMessage);
+							}
+
+							this.notForTestMethodsInstance = true;
+							this.coverageOnly = true;
+							break;
+						case SKIP_TESTING:
+							this.skipTesting = true;
+							break;
+						case TEST_METHODS_INSTANCE:
+							// Annotation présente seulement pour un constructeur
+							if (this.notForTestMethodsInstance || this.coverageOnly) {
+								throw new Exception(testMethodsErrorMessage);
+							}
+
+							this.testMethodsInstance = true;
+							break;
+						case TEST_EXECUTION_ORDER:
+							TestExecutionOrder testExecutionOrder = (TestExecutionOrder) annotation;
+
+							if (testExecutionOrder.first() && testExecutionOrder.last()) {
+								String message = french ? //
+										"L'ordre d'exécution du test ne peut être en première et dernière position en même temps !!! " + AutomatedTestsAnnotationsTypes.TEST_EXECUTION_ORDER + "(first = true, last = true)" //
+										: "The test execution order cannot be both first and last at the same time !!! " + AutomatedTestsAnnotationsTypes.TEST_EXECUTION_ORDER + "(first = true, last = true)" //
+								;
+
+								throw new Exception(message);
+							}
+
+							if (testExecutionOrder.first()) {
+								executionOrder = Integer.MIN_VALUE;
+							} else if (testExecutionOrder.last()) {
+								executionOrder = Integer.MAX_VALUE;
+							} else {
+								executionOrder = testExecutionOrder.value();
+							}
+
+							break;
+						case ALLOW_RUNTIME_EXCEPTIONS:
+							if (this.skipAllExceptions) {
+								String message = french ? //
+										"L'utilisation de l'annotation " + AutomatedTestsAnnotationsTypes.ALLOW_RUNTIME_EXCEPTIONS + " est mutuellement exclusive avec l'annotation " + AutomatedTestsAnnotationsTypes.SKIP_ALL_EXCEPTIONS //
+										: "Use of " + AutomatedTestsAnnotationsTypes.ALLOW_RUNTIME_EXCEPTIONS + " annotation is mutually exclusive with " + AutomatedTestsAnnotationsTypes.SKIP_ALL_EXCEPTIONS + " annotation" //
+								;
+
+								throw new Exception(message);
+							}
+
+							this.allowRuntimeExceptions = true;
+							break;
+						case SKIP_ALL_EXCEPTIONS:
+							this.skipExceptionsList.clear();
+							this.skipAllExceptions = true;
+							break;
+						case SKIP_EXCEPTIONS:
+							if (this.skipAllExceptions) {
+								String message = french ? //
+										"L'utilisation de l'annotation " + AutomatedTestsAnnotationsTypes.SKIP_EXCEPTIONS + " est mutuellement exclusive avec l'annotation " + AutomatedTestsAnnotationsTypes.SKIP_ALL_EXCEPTIONS //
+										: "Use of " + AutomatedTestsAnnotationsTypes.SKIP_EXCEPTIONS + " annotation is mutually exclusive with " + AutomatedTestsAnnotationsTypes.SKIP_ALL_EXCEPTIONS + " annotation" //
+								;
+
+								throw new Exception(message);
+							}
+
+							SkipExceptions skipExceptions = (SkipExceptions) annotation;
+
+							for (Class<?> classe : skipExceptions.value()) {
+								if (Throwable.class.isAssignableFrom(classe)) {
+									this.skipExceptionsList.add(classe);
+								} else {
+									throw new Exception(AutomatedTestsAnnotationsTypes.SKIP_EXCEPTIONS + "(" + classe.getTypeName() + ") " + (french ? "doit être un descendant de Throwable" : "must extend the Throwable class"));
+								}
+							}
+							break;
+						case SKIP_EXCEPTIONS_LIST:
+							if (this.skipAllExceptions) {
+								String message = french ? //
+										"L'utilisation de l'annotation " + AutomatedTestsAnnotationsTypes.SKIP_EXCEPTIONS + " est mutuellement exclusive avec l'annotation " + AutomatedTestsAnnotationsTypes.SKIP_ALL_EXCEPTIONS //
+										: "Use of " + AutomatedTestsAnnotationsTypes.SKIP_EXCEPTIONS + " annotation is mutually exclusive with " + AutomatedTestsAnnotationsTypes.SKIP_ALL_EXCEPTIONS + " annotation" //
+								;
+
+								throw new Exception(message);
+							}
+
+							SkipExceptions.List skipExceptionsItems = (SkipExceptions.List) annotation;
+
+							List<Class<?>> localList = new ArrayList<>();
+
+							for (SkipExceptions item : skipExceptionsItems.value()) {
+								for (Class<?> classe : item.value()) {
+									if (localList.contains(classe)) {
+										throw new Exception((french ? "Doublon d'exception pour " : "Duplicate exception for ") + AutomatedTestsAnnotationsTypes.SKIP_EXCEPTIONS + "(" + classe.getTypeName() + ")");
+									}
+
+									if (Throwable.class.isAssignableFrom(classe)) {
+										localList.add(classe);
+									} else {
+										throw new Exception(AutomatedTestsAnnotationsTypes.SKIP_EXCEPTIONS + "(" + classe.getTypeName() + ") " + (french ? "doit être un descendant de Throwable" : "must extend the Throwable class"));
+									}
+								}
+							}
+
+							for (Class<?> item : localList) {
+								if (!this.skipExceptionsList.contains(item)) {
+									this.skipExceptionsList.add(item);
+								}
+							}
+							break;
+						default:
+							throw new RuntimeException((french ? "Pas de traitement pour " : "No case statement for ") + type);
+					}
+				}
+			}
+		}
+
+		if (!this.skipAllExceptions && !this.skipExceptionsList.contains(RuntimeException.class) && this.allowRuntimeExceptions) {
+			this.exceptionsList.add(new TypeInfoData(RuntimeException.class));
+		}
+
+		if (this.skipTesting) {
+			if (!annotationTestSetsList.isEmpty() || !this.equalsSetsList.isEmpty()) {
+				String message = french ? //
+						AutomatedTestsAnnotationsTypes.SKIP_TESTING + " n'est pas permit avec " + AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS + ", " + AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS_CASES + ", " + AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS + ", " + AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES + ", " + AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS + ", " + AutomatedTestsAnnotationsTypes.EQUALS_TESTS + ", "
+								+ AutomatedTestsAnnotationsTypes.EQUALS_TESTS_CASES + " ou " + AutomatedTestsAnnotationsTypes.EQUALS_TESTS_SETS + " pour " + signature //
+						: AutomatedTestsAnnotationsTypes.SKIP_TESTING + " is not allowed with " + AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS + ", " + AutomatedTestsAnnotationsTypes.AUTOMATED_TESTS_CASES + ", " + AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS + ", " + AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_CASES + ", " + AutomatedTestsAnnotationsTypes.STRICT_AUTOMATED_TESTS_SETS + ", " + AutomatedTestsAnnotationsTypes.EQUALS_TESTS + ", "
+								+ AutomatedTestsAnnotationsTypes.EQUALS_TESTS_CASES + " or " + AutomatedTestsAnnotationsTypes.EQUALS_TESTS_SETS + " for " + signature //
+				;
+
+				throw new Exception(message);
+			}
+		} else {
+			if (!this.equalsTests || hasAutomatedTests || hasStrictAutomatedTests) {
+				if (!this.strictTesting) {
+					this.testsSetsList.addAll(getTestsSetsList(false, true, false, true, false, false, parametersList));
+				}
+			}
+
+			if (hasAutomatedTests || hasStrictAutomatedTests) {
+				this.testsSetsList.addAll(annotationTestSetsList);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see outils.abstractions.TemplateProducerBase#beforeProduceLine(java.lang.String)
+	 */
+	@Override
+	protected String beforeProduceLine(String line) throws Exception {
+		return getStartTag() + line.replace("{", getStartTag()).replace("}", getEndTag()) + getEndTag();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see outils.abstractions.TemplateProducerBase#afterProduceLine(java.lang.String)
+	 */
+	@Override
+	protected String afterProduceLine(String line) throws Exception {
+		return line.replace("},{", "}, {");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see outils.abstractions.TemplateProducerBase#onTag(java.lang.String)
+	 */
+	@Override
+	protected String onTag(String tag) throws Exception {
+		if (BasicsHelper.isEmpty(tag)) {
+			return "{ }";
+		} else if (tag.startsWith("{") && tag.endsWith("}")) {
+			return "{ " + tag + " }";
+		}
+
+		List<String> itemsList = getItemsList(arrayType, BasicsHelper.parseRowAsList(tag, arrayType.getSeparator()), DEFAULT_ARRAY_GENERIC_TYPE);
+
+		return "{ " + BasicsHelper.toList(itemsList, ", ") + " }";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see outils.abstractions.TemplateProducerBase#beforeProduce()
+	 */
+	@Override
+	protected List<String> beforeProduce() throws Exception {
+		return new ArrayList<>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see outils.abstractions.TemplateProducerBase#afterProduce()
+	 */
+	@Override
+	protected List<String> afterProduce() throws Exception {
+		return new ArrayList<>();
 	}
 
 	/**
-	 * Constructeur de base
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param items Liste des items à itérer
+	 * Extrait la liste des jeux de données de tests d'une annotation
+	 * @param signature Signature du constructeur ou méthode
+	 * @param type Type de l'annotation à extraire la liste
+	 * @param parametersList Liste des paramètres du constructeur ou méthode
+	 * @param annotationFilenames Tableau des positions des traitements de noms de fichiers
+	 * @param annotationProcess Indicateur de traitement des données de l'annotation
+	 * @param annotationIterate Indicateur d'itération des données de l'annotation
+	 * @param annotationSeparator Type du separateur des valeurs de l'annotation
+	 * @param annotationThrowsException Indicateur que les valeurs des cas de tests génèrent des exceptions
+	 * @param annotationValues Valeurs de l'annotation
+	 * @return la liste des jeux de données de tests de l'annotation
+	 * @throws Exception en cas d'erreur...
 	 */
-	@SafeVarargs
-	public Iterations(boolean forward, boolean contiguous, IterateValueFilter iterateValueFilter, List<T>... items) {
-		this();
-		iterate(forward, contiguous, iterateValueFilter, items);
+	protected List<TestSetData> getAnnotationTestSetsList(String signature, AutomatedTestsAnnotationsTypes type, List<ParameterInfoData> parametersList, int[] annotationFilenames, boolean annotationProcess, boolean annotationIterate, char annotationSeparator, boolean annotationThrowsException, String[] annotationValues) throws Exception {
+		List<TestSetData> annotationTestSetsList = new ArrayList<>();
+
+		if (BasicsHelper.isEmpty(annotationValues)) {
+			String message = french ? //
+					"Pas de données pour " + type + "() de " + signature //
+					: "No data for " + type + "() of " + signature //
+			;
+
+			throw new Exception(message);
+		} else if (annotationIterate && (annotationValues.length != parametersList.size())) {
+			String annotationStr = type + "({ " + BasicsHelper.toList(BasicsHelper.asList(annotationValues), ", ", "\"") + " })";
+
+			String message = french ? //
+					"Pour itérer les valeurs, le nombre de valeurs (" + annotationValues.length + ") pour " + annotationStr + " doit être égale au nombre de paramètres de " + signature //
+					: "To iterate the values, the number of values (" + annotationValues.length + ") for " + annotationStr + " must be equal to the number of parameters for " + signature //
+			;
+
+			throw new Exception(message);
+		} else if ((annotationValues.length % parametersList.size()) != 0) {
+			String annotationStr = type + "({ " + BasicsHelper.toList(BasicsHelper.asList(annotationValues), ", ", "\"") + " })";
+
+			String message = french ? //
+					"Le nombre de valeurs pour " + annotationStr + " n'est pas un multiple du nombre de paramètres de " + signature //
+					: "The number of values for " + annotationStr + " is not a multiple of the number of parameters for " + signature //
+			;
+
+			throw new Exception(message);
+		}
+
+		if (annotationIterate) {
+			String[][] items = new String[annotationValues.length][];
+
+			for (int i = 0; i < annotationValues.length; i++) {
+				String[] array = BasicsHelper.parseRowAsArray(annotationValues[i], annotationSeparator);
+
+				if (BasicsHelper.isEmpty(array)) {
+					array = new String[] { null };
+				}
+
+				items[i] = array;
+			}
+
+			Iterations<String> iterations = new Iterations<>(false, false, items);
+
+			for (List<String> iteration : iterations.getIterationsList()) {
+				String[] values = iteration.toArray(new String[iteration.size()]);
+
+				annotationTestSetsList.add(getTestSetData(annotationFilenames, annotationProcess, annotationThrowsException, values, parametersList));
+			}
+		} else {
+			String[] values = new String[parametersList.size()];
+
+			for (int i = 0; i < annotationValues.length; i += parametersList.size()) {
+				for (int j = 0; j < parametersList.size(); j++) {
+					values[j] = annotationValues[i + j];
+				}
+
+				annotationTestSetsList.add(getTestSetData(annotationFilenames, annotationProcess, annotationThrowsException, values, parametersList));
+			}
+		}
+
+		return annotationTestSetsList;
 	}
 
 	/**
-	 * Constructeur de base
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param items Liste des items à itérer
+	 * Extrait la liste des jeux de données de tests d'une annotation
+	 * @param signature Signature du constructeur ou méthode
+	 * @param type Type de l'annotation à extraire la liste
+	 * @param parametersList Liste des paramètres du constructeur ou méthode
+	 * @param automatedTestsCasesClass Classe des données de tests de l'annotation
+	 * @param automatedTestsCasesName Nom du test de l'annotation
+	 * @return la liste des jeux de données de tests de l'annotation
+	 * @throws Exception en cas d'erreur...
 	 */
-	public Iterations(boolean forward, boolean contiguous, List<List<T>> items) {
-		this(forward, contiguous, null, items);
+	protected List<TestSetData> getAnnotationTestSetsList(String signature, AutomatedTestsAnnotationsTypes type, List<ParameterInfoData> parametersList, Class<?> automatedTestsCasesClass, String automatedTestsCasesName) throws Exception {
+		List<TestSetData> annotationTestSetsList = new ArrayList<>();
+
+		if (BasicsHelper.isEmpty(automatedTestsCasesClass)) {
+			String message = french ? //
+					"Pas de données pour " + type + "() de " + signature //
+					: "No data for " + type + "() of " + signature //
+			;
+
+			throw new Exception(message);
+		}
+
+		if (!IAutomatedTestsCases.class.isAssignableFrom(automatedTestsCasesClass)) {
+			String message = french ? //
+					"La classe " + automatedTestsCasesClass.getName() + " de l'annotation " + type.toString() + " doit implémenter l'interface " + IAutomatedTestsCases.class.getName() //
+					: "The " + automatedTestsCasesClass.getName() + " class of the " + type.toString() + " annotation must implement the " + IAutomatedTestsCases.class.getName() + " interface" //
+			;
+
+			throw new Exception(message);
+		}
+
+		if (!automatedTestsCasesClassesList.contains(automatedTestsCasesClass)) {
+			automatedTestsCasesClassesList.add(automatedTestsCasesClass);
+		}
+
+		if (BasicsHelper.isEmpty(automatedTestsCasesName)) {
+			automatedTestsCasesName = signature;
+		}
+
+		List<String> namesList;
+
+		if (automatedTestsCasesClassesDict.containsKey(automatedTestsCasesClass)) {
+			namesList = automatedTestsCasesClassesDict.get(automatedTestsCasesClass);
+		} else {
+			namesList = new ArrayList<>();
+			automatedTestsCasesClassesDict.put(automatedTestsCasesClass, namesList);
+		}
+
+		String item = elementType.name() + ":" + automatedTestsCasesName;
+
+		if (namesList.contains(item)) {
+			String errElementType;
+
+			switch (elementType) {
+				case CONSTRUCTOR:
+					errElementType = french ? " de constructeur " : " of constructor ";
+					break;
+				case METHOD:
+					errElementType = french ? " de méthode " : " of method";
+					break;
+				default:
+					errElementType = (french ? " de " : " of ") + elementType.name() + " ";
+					break;
+			}
+
+			String message = french ? //
+					"Doublon sur le nom \"" + automatedTestsCasesName + "\"" + errElementType + " pour la classe des tests automatisés par programmation " + automatedTestsCasesClass.getName() //
+					: "Duplicate on the name \"" + automatedTestsCasesName + "\"" + errElementType + " for the class of automated tests by programming " + automatedTestsCasesClass.getName() //
+			;
+
+			throw new Exception(message);
+		} else {
+			namesList.add(item);
+		}
+
+		IAutomatedTestsCases automatedTestsCases = (IAutomatedTestsCases) automatedTestsCasesClass.getDeclaredConstructor().newInstance();
+
+		// Pour obtenir 100% de couverture pour les tests automatisés par programmation
+		Class<?>[] testClassesList = new Class<?>[] { null, classInfoData.getClassData() };
+
+		String[] elementSignaturesList = new String[] { null, automatedTestsCasesName };
+
+		for (Class<?> testClass : testClassesList) {
+			for (String elementSignature : elementSignaturesList) {
+				String message = "IAutomatedTestsCases -> " + type.toString() + "(" + automatedTestsCasesClass.getName() + ".class, \"" + automatedTestsCasesName + "\")";
+
+				List<AutomatedTestsCaseData> automatedTestsCaseDataList = null;
+
+				switch (elementType) {
+					case CONSTRUCTOR:
+						automatedTestsCaseDataList = automatedTestsCases.getConstructorValues(testClass, elementSignature);
+						break;
+					case METHOD:
+						automatedTestsCaseDataList = automatedTestsCases.getMethodValues(testClass, elementSignature);
+						break;
+					default:
+						throw new RuntimeException((french ? "Pas de traitement pour " : "No case statement for ") + elementType);
+				}
+
+				if (!BasicsHelper.isEmpty(automatedTestsCaseDataList)) {
+					testsCasesCodeList.add(AutomatedTestsHelper.getTestCaseCode(automatedTestsCasesClass, testClass, elementType, elementSignature, message));
+
+					for (AutomatedTestsCaseData automatedTestsCaseData : automatedTestsCaseDataList) {
+						annotationTestSetsList.addAll(getAnnotationTestSetsList(signature, type, parametersList, automatedTestsCaseData.getFilenames(), automatedTestsCaseData.isProcess(), automatedTestsCaseData.isIterate(), automatedTestsCaseData.getSeparator(), automatedTestsCaseData.isThrowsException(), automatedTestsCaseData.getValues()));
+					}
+				}
+			}
+		}
+
+		return annotationTestSetsList;
 	}
 
 	/**
-	 * Constructeur de base
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param items Liste des items à itérer
+	 * Indicateur de type simple pour un type donné
+	 * @param typeInfoData Le type à extraire l'indicateur
+	 * @return vrai si c'est un type simple
 	 */
-	public Iterations(boolean forward, boolean contiguous, IterateValueFilter iterateValueFilter, List<List<T>> items) {
-		this();
-		iterate(forward, contiguous, iterateValueFilter, items);
+	protected boolean isSimpleType(TypeInfoData typeInfoData) {
+		boolean simpleType = !typeInfoData.isInnerClass() && !typeInfoData.isEnumType();
+
+		if (simpleType) {
+			for (Class<?> classe : fullnameClassesRequiredList) {
+				if (classe.equals(typeInfoData.getClassData())) {
+					simpleType = false;
+					break;
+				}
+			}
+		}
+
+		return simpleType;
 	}
 
 	/**
-	 * Génération de toutes les itérations possibles depuis le début des items pour les groupes d'eléments d'une liste ex: [a, b, c], [d], [e, f] -> [[a, d, e], [b, d, e], [c, d, e], [a, d, f], [b, d, f], [c, d, f]]
-	 * @param index Index du groupe d'éléments
-	 * @param list Liste de l'itération courante
-	 * @return la liste des listes d'itérations de l'index courant
+	 * Extrait l'item du jeu de données pour un test donné
+	 * @param testInfoData Données pour le traitement du jeu de données à extraire
+	 * @param value La données à extraire
+	 * @param defaultGenericType Type générique par défaut pour les valeurs non présentes dans le dictionnaire
+	 * @return l'item du jeu de données du test
+	 * @throws Exception en cas d'erreur...
 	 */
-	protected List<List<T>> generateForwardIterations(int index, List<T> list) {
-		List<List<T>> iterations = new ArrayList<>();
-	
-		if (index >= 0) {
-			for (T item : itemsList.get(index)) {
-				List<T> iterationCourante = new ArrayList<>();
-				iterationCourante.addAll(list);
-				iterationCourante.add(0, item);
-	
-				if ((index - 1) >= 0) {
-					iterations.addAll(generateForwardIterations(index - 1, iterationCourante));
+	protected String getItem(TestInfoData testInfoData, String value, TypeInfoData defaultGenericType) throws Exception {
+		if (!BasicsHelper.isEmpty(value)) {
+			if (value.contains("JunitHelper.")) {
+				return value;
+			}
+		}
+
+		if (testInfoData.isProcess()) {
+			TypeInfoData itemInfoData = testInfoData.getTypeInfoData().asSpecificTypeInfoData(genericTestTypesDict, genericGenericTestTypesDict, defaultGenericType);
+
+			boolean simpleType = isSimpleType(itemInfoData);
+
+			if (itemInfoData.isPrimitive() || itemInfoData.hasPrimitiveAsClass()) {
+				value = !BasicsHelper.isEmpty(value) ? value : itemInfoData.getDefaultValue();
+
+				String primitiveTypeName = itemInfoData.getTypeName(true, true);
+
+				String castAs = "(" + primitiveTypeName + ")";
+
+				if (!BasicsHelper.isEmpty(value) && !BasicsHelper.areEquals(value, "null")) {
+					switch (primitiveTypeName) {
+						case "char":
+							if (!value.startsWith("'") && !value.endsWith("'")) {
+								if (!value.startsWith(castAs)) {
+									try {
+										return castAs + " " + Byte.parseByte(value);
+									} catch (NumberFormatException e) {
+										return "'" + value + "'";
+									}
+								}
+							} else {
+								return value;
+							}
+							break;
+						case "Character":
+							if (!value.startsWith("'") && !value.endsWith("'")) {
+								if (!value.startsWith("(char)")) {
+									try {
+										return "Character.valueOf((char) " + Byte.parseByte(value) + ")";
+									} catch (NumberFormatException e) {
+										return "Character.valueOf('" + value + "')";
+									}
+								} else {
+									return "Character.valueOf(" + value + ")";
+								}
+							} else {
+								return "Character.valueOf(" + value + ")";
+							}
+						case "byte":
+						case "Byte":
+							if (!BasicsHelper.startsWithIgnoreCase(value, castAs)) {
+								try {
+									return castAs.toLowerCase() + " " + Byte.parseByte(value);
+								} catch (NumberFormatException e) {
+									return value;
+								}
+							}
+							break;
+						case "double":
+						case "Double":
+							if (!BasicsHelper.startsWithIgnoreCase(value, castAs)) {
+								try {
+									return Double.parseDouble(value) + "d";
+								} catch (NumberFormatException e) {
+									return value;
+								}
+							}
+							break;
+						case "float":
+						case "Float":
+							if (!BasicsHelper.startsWithIgnoreCase(value, castAs)) {
+								try {
+									return Float.parseFloat(value) + "f";
+								} catch (NumberFormatException e) {
+									return value;
+								}
+							}
+							break;
+						case "long":
+						case "Long":
+							if (!BasicsHelper.startsWithIgnoreCase(value, castAs)) {
+								try {
+									return Long.parseLong(value) + "L";
+								} catch (NumberFormatException e) {
+									return value;
+								}
+							}
+							break;
+						case "short":
+						case "Short":
+							if (!BasicsHelper.startsWithIgnoreCase(value, castAs)) {
+								try {
+									return castAs.toLowerCase() + " " + Short.parseShort(value);
+								} catch (NumberFormatException e) {
+									return value;
+								}
+							}
+							break;
+						case "boolean":
+						case "Boolean":
+						case "int":
+						case "Integer":
+							// Pas de traitement requis
+							break;
+						default:
+							throw new Exception((french ? "Pas de traitement pour " : "No case statement for ") + primitiveTypeName);
+					}
 				} else {
-					iterations.add(iterationCourante);
-				}
-			}
-		}
-	
-		return iterations;
-	}
-
-	/**
-	 * Génération de toutes les itérations possibles depuis la fin des items pour les groupes d'eléments d'une liste ex: [a, b, c], [d], [e, f] -> [[a, d, e], [a, d, f], [b, d, e], [b, d, f], [c, d, e], [c, d, f]]
-	 * @param index Index du groupe d'éléments
-	 * @param list Liste de l'itération courante
-	 * @return la liste des listes d'itérations de l'index courant
-	 */
-	protected List<List<T>> generateReverseIterations(int index, List<T> list) {
-		List<List<T>> iterations = new ArrayList<>();
-
-		if (index < itemsList.size()) {
-			for (T item : itemsList.get(index)) {
-				List<T> iterationCourante = new ArrayList<>();
-				iterationCourante.addAll(list);
-				iterationCourante.add(item);
-
-				if ((index + 1) < itemsList.size()) {
-					iterations.addAll(generateReverseIterations(index + 1, iterationCourante));
-				} else {
-					iterations.add(iterationCourante);
-				}
-			}
-		}
-
-		return iterations;
-	}
-
-	/**
-	 * Génération de toutes les itérations contiguës possibles depuis le début des items pour les groupes d'eléments d'une liste ex: [null, b, c], [null, d], [null, f] -> [[null, null, null], [b, null, null], [c, null, null], [b, d, null], [c, d, null], [b, d, f], [c, d, f]]
-	 * @param index Index du groupe d'éléments
-	 * @param contigues Liste des indexes pour la contiguité
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param list Liste de l'itération courante
-	 * @return la liste des listes d'itérations de l'index courant
-	 */
-	protected List<List<T>> generateForwardContiguousIterations(int index, Set<Integer> contiguous, IterateValueFilter iterateValueFilter, List<T> list) {
-		List<List<T>> iterations = new ArrayList<List<T>>();
-	
-		if (index >= 0) {
-			for (T item : itemsList.get(index)) {
-				boolean isNullItem = iterateValueFilter.isNullItem(item);
-				
-				if (!isNullItem || !contiguous.contains(index)) {
-					if (isNullItem) {
-						contiguous.add(index);
+					switch (primitiveTypeName) {
+						case "Character":
+						case "Byte":
+						case "Double":
+						case "Float":
+						case "Long":
+						case "Short":
+						case "Boolean":
+						case "Integer":
+							return castAs + " null";
+						default:
+							throw new Exception((french ? "Pas de traitement pour " : "No case statement for ") + castAs + " null");
 					}
-	
-					List<T> iterationCourante = new ArrayList<T>();
-					iterationCourante.addAll(list);
-					iterationCourante.add(0, item);
-	
-					if ((index - 1) >= 0) {
-						iterations.addAll(generateForwardContiguousIterations(index - 1, contiguous, iterateValueFilter, iterationCourante));
-					} else {
-						iterations.add(iterationCourante);
-					}
-				}
-			}
-		}
-	
-		return iterations;
-	}
-
-	/**
-	 * Génération de toutes les itérations contiguës possibles depuis la fin des items pour les groupes d'eléments d'une liste ex: [null, b, c], [null, d], [null, f] -> [[null, null, null], [null, null, f], [null, d, f], [b, d, f], [c, d, f]]
-	 * @param index Index du groupe d'éléments
-	 * @param contiguous Liste des indexes pour la contiguité
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param list Liste de l'itération courante
-	 * @return la liste des listes d'itérations de l'index courant
-	 */
-	protected List<List<T>> generateReverseContiguousIterations(int index, Set<Integer> contiguous, IterateValueFilter iterateValueFilter, List<T> list) {
-		List<List<T>> iterations = new ArrayList<>();
-
-		if (index < itemsList.size()) {
-			for (T item : itemsList.get(index)) {
-				boolean isNullItem = iterateValueFilter.isNullItem(item);
-				
-				if (!isNullItem || !contiguous.contains(index)) {
-					if (isNullItem) {
-						contiguous.add(index);
-					}
-
-					List<T> iterationCourante = new ArrayList<>();
-					iterationCourante.addAll(list);
-					iterationCourante.add(item);
-
-					if ((index + 1) < itemsList.size()) {
-						iterations.addAll(generateReverseContiguousIterations(index + 1, contiguous, iterateValueFilter, iterationCourante));
-					} else {
-						iterations.add(iterationCourante);
-					}
-				}
-			}
-		}
-
-		return iterations;
-	}
-
-	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'éléments de la liste d'items courante à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 */
-	public void iterate(boolean forward, boolean contiguous) {
-		iterate(forward, contiguous, (IterateValueFilter) null);
-	}
-
-	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'éléments de la liste d'items courante à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 */
-	public void iterate(boolean forward, boolean contiguous, IterateValueFilter iterateValueFilter) {
-		iterationsList.clear();
-
-		if (!itemsList.isEmpty()) {
-			if ((iterateValueFilter == null) && contiguous) {
-				iterateValueFilter = (item) -> item == null;
-			}
-			
-			if (forward) {
-				if (contiguous) {
-					iterationsList.addAll(generateForwardContiguousIterations(itemsList.size() - 1, new HashSet<>(), iterateValueFilter, new ArrayList<T>()));
-				} else {
-					iterationsList.addAll(generateForwardIterations(itemsList.size() - 1, new ArrayList<T>()));
 				}
 			} else {
-				if (contiguous) {
-					iterationsList.addAll(generateReverseContiguousIterations(0, new HashSet<>(), iterateValueFilter, new ArrayList<T>()));
-				} else {
-					iterationsList.addAll(generateReverseIterations(0, new ArrayList<T>()));
+				if ((value == null) || BasicsHelper.areEquals(value, "null")) {
+					if (itemInfoData.isArrayType()) {
+						return "(" + itemInfoData.getTypeName(simpleType, true) + ") null";
+					}
+
+					return "(" + itemInfoData.getTypeName(simpleType) + ") null";
+				} else if (itemInfoData.isStringType()) {
+					if (testInfoData.isFilename()) {
+						return AutomatedTestsHelper.extractAutomatedFilenameTests(value, project, resourcesDir);
+					}
+
+					return CommonHelper.asJavaString(value);
+				} else if (File.class.equals(itemInfoData.getClassData()) || Path.class.equals(itemInfoData.getClassData()) || FileInputStream.class.equals(itemInfoData.getClassData()) || InputStream.class.equals(itemInfoData.getClassData())) {
+					String filename = AutomatedTestsHelper.extractAutomatedFilenameTests(value, project, resourcesDir);
+
+					if (File.class.equals(itemInfoData.getClassData())) {
+						return "new File(" + filename + ")";
+					} else if (Path.class.equals(itemInfoData.getClassData())) {
+						return "new java.io.File(" + filename + ").toPath()";
+					} else if (FileInputStream.class.equals(itemInfoData.getClassData())) {
+						return "new java.io.FileInputStream(new java.io.File(" + filename + "))";
+					} else if (InputStream.class.equals(itemInfoData.getClassData())) {
+						return "(java.io.InputStream) new java.io.FileInputStream(new java.io.File(" + filename + "))";
+					}
 				}
 			}
 		}
+
+		return value;
 	}
 
 	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param items Tableau des items à itérer
+	 * Extrait la liste des items du jeu de données pour un test donné
+	 * @param testInfoData Données pour le traitement du jeu de données à extraire
+	 * @param valuesList Liste des données à extraire
+	 * @param defaultGenericType Type générique par défaut pour les valeurs non présentes dans le dictionnaire
+	 * @return la liste des items du jeu de données du test
+	 * @throws Exception en cas d'erreur...
 	 */
-	public void iterate(boolean forward, boolean contiguous, @SuppressWarnings("unchecked") T[]... items) {
-		iterate(forward, contiguous, null, items);
-	}
+	protected List<String> getItemsList(TestInfoData testInfoData, List<String> valuesList, TypeInfoData defaultGenericType) throws Exception {
+		List<String> itemsList = new ArrayList<>();
 
-	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param items Tableau des items à itérer
-	 */
-	public void iterate(boolean forward, boolean contiguous, IterateValueFilter iterateValueFilter, @SuppressWarnings("unchecked") T[]... items) {
-		itemsList.clear();
-
-		if (items != null) {
-			for (int i = 0; i < items.length; i++) {
-				itemsList.add(BasicsHelper.asList(items[i]));
-			}
+		for (String value : valuesList) {
+			itemsList.add(getItem(testInfoData, value, defaultGenericType));
 		}
 
-		iterate(forward, contiguous, iterateValueFilter);
-	}
-
-	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param items Liste des items à itérer
-	 */
-	public void iterate(boolean forward, boolean contiguous, @SuppressWarnings("unchecked") List<T>... items) {
-		iterate(forward, contiguous, null, items);
-	}
-
-	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param items Liste des items à itérer
-	 */
-	public void iterate(boolean forward, boolean contiguous, IterateValueFilter iterateValueFilter, @SuppressWarnings("unchecked") List<T>... items) {
-		itemsList.clear();
-
-		if (items != null) {
-			itemsList.addAll(BasicsHelper.asList(items));
-		}
-
-		iterate(forward, contiguous, iterateValueFilter);
-	}
-
-	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param items Liste des items à itérer
-	 */
-	public void iterate(boolean forward, boolean contiguous, List<List<T>> items) {
-		itemsList.clear();
-		itemsList.addAll(items);
-
-		iterate(forward, contiguous, null, items);
-	}
-
-	/**
-	 * Génération de toutes les itérations possibles pour les groupes d'eléments de la liste d'items à itérer
-	 * @param forward Indicateur de génération depuis le début des items des itérations
-	 * @param contiguous Indicateur de génération contiguë des itérations
-	 * @param iterateValueFilter Filtre des données d'une itération
-	 * @param items Liste des items à itérer
-	 */
-	public void iterate(boolean forward, boolean contiguous, IterateValueFilter iterateValueFilter, List<List<T>> items) {
-		itemsList.clear();
-		itemsList.addAll(items);
-
-		iterate(forward, contiguous, iterateValueFilter);
-	}
-
-	/**
-	 * Extrait le champ itemsList
-	 * @return un List<List<T>>
-	 */
-	public List<List<T>> getItemsList() {
 		return itemsList;
 	}
 
 	/**
-	 * Extrait le champ iterationsList
-	 * @return un List<List<T>>
+	 * Extrait le jeu de données pour un test
+	 * @param filename Indicateur de traitement de nom de fichier
+	 * @param process Indicateur de traitement des données
+	 * @param testValuesThrowsException Indicateur que les valeurs des cas de tests génèrent des exceptions
+	 * @param testValues Les valeurs du test
+	 * @param parameter Paramètre du constructeur ou méthode
+	 * @return le jeu de données extrait
+	 * @throws Exception en cas d'erreur...
 	 */
-	public List<List<T>> getIterationsList() {
-		return iterationsList;
+	protected TestSetData getTestSetData(boolean filename, boolean process, boolean testValuesThrowsException, String testValue, ParameterInfoData parameter) throws Exception {
+		TestSetData testSetData = new TestSetData();
+
+		if (testValue == null) {
+			testValue = "null";
+		}
+
+		testSetData.setValuesThrowsException(testValuesThrowsException);
+
+		if (process) {
+			TypeInfoData defaultGenericType = parameter.isEnumClassType() ? DEFAULT_ENUM_GENERIC_TYPE : DEFAULT_GENERIC_TYPE;
+
+			TypeInfoData testInfoData;
+
+			if ((parameter.isEnumClassType() || parameter.isClassType()) && parameter.isArrayType()) {
+				testInfoData = parameter;
+			} else if (parameter.isListType() && parameter.getListType().isClassType()) {
+				testInfoData = parameter;
+			} else {
+				testInfoData = parameter.asSpecificTypeInfoData(genericTestTypesDict, genericGenericTestTypesDict, defaultGenericType);
+			}
+
+			boolean isNew = BasicsHelper.startsWith(testValue, "new " + testInfoData.getTypeName()) || BasicsHelper.startsWith(testValue, "new " + testInfoData.getTypeName(true)) || BasicsHelper.startsWith(testValue, "new " + testInfoData.getTypeName(false, true)) || BasicsHelper.startsWith(testValue, "new " + testInfoData.getTypeName(true, true));
+			boolean isNull = BasicsHelper.areEquals(testValue, "null");
+			boolean isCastAsNull = BasicsHelper.areEquals(testValue, "(" + testInfoData.getTypeName() + ") null") || BasicsHelper.areEquals(testValue, "(" + testInfoData.getTypeName(true) + ") null");
+
+			if (isNew || isCastAsNull) {
+				testSetData.getValuesList().add(testValue);
+			} else {
+				if (testInfoData.isArrayType()) {
+					if (isNull) {
+						testSetData.getValuesList().add("(" + testInfoData.getTypeName(isSimpleType(testInfoData)) + ") null");
+					} else {
+						arrayType = new TestInfoData(testInfoData, filename, process, AutomatedTestsCaseData.SEPARATOR_CHAR_DEFAULT);
+
+						List<String> itemsList = produce(BasicsHelper.asList(testValue));
+
+						if (parameter.getParameter().isVarArgs()) {
+							testSetData.getValuesList().add(itemsList.get(0).replace("{", "").replace("}", "").trim());
+						} else {
+							testSetData.getValuesList().add("new " + testInfoData.getTypeName(isSimpleType(testInfoData)) + " " + itemsList.get(0));
+						}
+					}
+				} else if (testInfoData.isListType()) {
+					if (isNull) {
+						testSetData.getValuesList().add("(List<" + testInfoData.getListType().getTypeName(isSimpleType(testInfoData.getListType())) + ">) null");
+					} else {
+						List<String> itemsList = getItemsList(new TestInfoData(testInfoData.getListType(), filename, process, AutomatedTestsCaseData.SEPARATOR_CHAR_DEFAULT), BasicsHelper.parseRowAsList(testValue, AutomatedTestsCaseData.SEPARATOR_CHAR_DEFAULT), defaultGenericType);
+
+						boolean asArrayList = false;
+
+						if (itemsList.size() == 1) {
+							asArrayList = testValue.startsWith("new " + ArrayList.class.getName()) || testValue.startsWith("new " + ArrayList.class.getSimpleName());
+						}
+
+						if (asArrayList) {
+							testSetData.getValuesList().add(testValue);
+						} else {
+							testSetData.getValuesList().add("JunitHelper.asList(" + BasicsHelper.toList(itemsList, ", ") + ")");
+						}
+					}
+				} else if (testInfoData.isMapType()) {
+					if (isNull) {
+						testSetData.getValuesList().add("(Map<" + testInfoData.getMapKeysType().getTypeName(isSimpleType(testInfoData.getMapKeysType())) + ", " + testInfoData.getMapValuesType().getTypeName(isSimpleType(testInfoData.getMapValuesType())) + ">) null");
+					} else {
+						List<String> itemsList = BasicsHelper.parseRowAsList(testValue, AutomatedTestsCaseData.SEPARATOR_CHAR_DEFAULT);
+
+						if (BasicsHelper.isOdd(itemsList.size())) {
+							boolean asHashMap = false;
+
+							if (itemsList.size() == 1) {
+								asHashMap = testValue.startsWith("new " + HashMap.class.getName()) && testValue.startsWith("new " + HashMap.class.getSimpleName());
+							}
+
+							if (asHashMap) {
+								testSetData.getValuesList().add(testValue);
+							} else {
+								String message = french ? //
+										"Le nombre d'items (" + itemsList.size() + ") doit être un nombre pair pour la valeur de test \"" + testValue + "\" pour le paramètre " + parameter.getParam() //
+										: "The number of items (" + itemsList.size() + ") must be an even number for the \"" + testValue + "\" test value for the " + parameter.getParam() + " parameter" //
+								;
+
+								throw new Exception(message);
+							}
+						} else {
+							List<String> keysList = new ArrayList<>();
+							List<String> valuesList = new ArrayList<>();
+
+							int count = itemsList.size() / 2;
+
+							for (int index = 0; index < count; index++) {
+								keysList.add(itemsList.get(index));
+								valuesList.add(itemsList.get(index + count));
+							}
+
+							keysList = getItemsList(new TestInfoData(testInfoData.getMapKeysType(), filename, process, AutomatedTestsCaseData.SEPARATOR_CHAR_DEFAULT), keysList, defaultGenericType);
+							valuesList = getItemsList(new TestInfoData(testInfoData.getMapValuesType(), filename, process, AutomatedTestsCaseData.SEPARATOR_CHAR_DEFAULT), valuesList, defaultGenericType);
+
+							testSetData.getValuesList().add("JunitHelper.asMap(new " + testInfoData.getMapKeysType().getTypeName(isSimpleType(testInfoData.getMapKeysType())) + "[] { " + BasicsHelper.toList(keysList, ", ") + " }, new " + testInfoData.getMapValuesType().getTypeName(isSimpleType(testInfoData.getMapValuesType())) + "[] { " + BasicsHelper.toList(valuesList, ", ") + " })");
+						}
+					}
+				} else {
+					testSetData.getValuesList().add(getItem(new TestInfoData(testInfoData, filename, process, AutomatedTestsCaseData.SEPARATOR_CHAR_DEFAULT), testValue, defaultGenericType));
+				}
+			}
+		} else {
+			testSetData.getValuesList().add(testValue);
+		}
+
+		return testSetData;
+	}
+
+	/**
+	 * Extrait le jeu de données pour un test
+	 * @param filenames Tableau des positions des traitements de noms de fichiers
+	 * @param process Indicateur de traitement des données
+	 * @param testValuesThrowsException Indicateur que les valeurs des cas de tests génèrent des exceptions
+	 * @param testValues Les valeurs du test
+	 * @param parametersList Liste des paramètres du constructeur ou méthode
+	 * @return le jeu de données extrait
+	 * @throws Exception en cas d'erreur...
+	 */
+	protected TestSetData getTestSetData(int[] filenames, boolean process, boolean testValuesThrowsException, String[] testValues, List<ParameterInfoData> parametersList) throws Exception {
+		TestSetData testSetData = new TestSetData();
+		testSetData.setValuesThrowsException(testValuesThrowsException);
+
+		for (int i = 0; i < testValues.length; i++) {
+			String testValue = testValues[i];
+			ParameterInfoData parameter = parametersList.get(i);
+
+			boolean filename = false;
+
+			if (!BasicsHelper.isEmpty(filenames)) {
+				for (int index : filenames) {
+					if (index == i) {
+						defaultFilenamesDict.put(parameter.getName(), i);
+						filename = true;
+						break;
+					}
+				}
+			}
+
+			testSetData.getValuesList().addAll(getTestSetData(filename, process, testValuesThrowsException, testValue, parameter).getValuesList());
+		}
+
+		return testSetData;
+	}
+
+	/**
+	 * Extrait la liste des jeux de données pour une liste de paramètres
+	 * @param sequence Indicateur d'ajouter la séquence de valeurs de tests supplémentaires
+	 * @param sequenceBooleans Indicateur d'ajouter la séquence de valeurs de tests supplémentaires pour les booléens seulement
+	 * @param strict Indicateur d'ajouter aucun cas de test nullable
+	 * @param nullables Indicateur d'ajouter un cas de test avec toutes les valeurs nullables si possible
+	 * @param contiguous Indicateur d'effectuer les itérations en séquence complete contiguë
+	 * @param forward Indicateur d'effectuer les itérations en ordre de séquence des paramètres (false -> ordre de séquence inverse des paramètres)
+	 * @param parametersList Liste des paramètres du constructeur ou méthode
+	 * @return la liste des jeux de données extraite
+	 * @throws Exception en cas d'erreur...
+	 */
+	protected List<TestSetData> getTestsSetsList(boolean sequence, boolean sequenceBooleans, boolean strict, boolean nullables, boolean contiguous, boolean forward, List<ParameterInfoData> parametersList) throws Exception {
+		List<TestSetData> testsSetsList = new ArrayList<>();
+
+		if (parametersList.isEmpty()) {
+			testsSetsList.add(new TestSetData());
+		} else {
+			testsSetsList.addAll(getValuesList(sequence, sequenceBooleans, strict, nullables, contiguous, forward, parametersList));
+		}
+
+		return testsSetsList;
+	}
+
+	/**
+	 * Extrait la liste d'un ensemble donné
+	 * @param constructor Le constructeur de l'ensemble
+	 * @param set L'ensemble de base
+	 * @param count Le nombre d'itérations de l'ensemble
+	 * @return la liste de l'ensemble extraire
+	 */
+	protected List<String> getSetsList(String constructor, String set, int count) {
+		List<String> list = new ArrayList<>();
+
+		for (int i = 1; i <= count; i++) {
+			String leftBackets = BasicsHelper.duplicate("{ ", count - i);
+			String rightBackets = BasicsHelper.duplicate(" }", count - i);
+
+			list.add("new " + constructor + " " + leftBackets + set + rightBackets);
+
+			set = "{ " + set + " }, { " + set + " }";
+		}
+
+		return list;
+	}
+
+	/**
+	 * Extrait la liste des données pour une liste de paramètres
+	 * @param sequence Indicateur d'ajouter la séquence de valeurs de tests supplémentaires
+	 * @param sequenceBooleans Indicateur d'ajouter la séquence de valeurs de tests supplémentaires pour les booléens seulement
+	 * @param strict Indicateur d'ajouter aucun cas de test nullable
+	 * @param nullables Indicateur d'ajouter un cas de test avec toutes les valeurs nullables si possible
+	 * @param contiguous Indicateur d'effectuer les itérations en séquence complete contiguë
+	 * @param forward Indicateur d'effectuer les itérations en ordre de séquence des paramètres (false -> ordre de séquence inverse des paramètres)
+	 * @param parametersList Liste des paramètres du constructeur ou méthode
+	 * @return la liste des données extraite
+	 * @throws Exception en cas d'erreur...
+	 */
+	protected List<TestSetData> getValuesList(boolean sequence, boolean sequenceBooleans, boolean strict, boolean nullables, boolean contiguous, boolean forward, List<ParameterInfoData> parametersList) throws Exception {
+		SortedMap<String, List<TestSetData>> valuesDict = getValuesDict(sequence, sequenceBooleans, strict, nullables, parametersList, 0);
+
+		List<TestSetData> valuesList = new ArrayList<>();
+
+		List<List<String>> testsList = new ArrayList<>();
+
+		boolean suppressWarnings = false;
+
+		boolean valuesThrowsException = false;
+
+		for (int index = 0; index < parametersList.size(); index++) {
+			String name = parametersList.get(index).getName();
+
+			List<String> items = new ArrayList<>();
+
+			for (TestSetData dictTest : valuesDict.get(name)) {
+				suppressWarnings |= dictTest.isSuppressWarnings();
+
+				valuesThrowsException |= dictTest.isValuesThrowsException();
+
+				items.addAll(dictTest.getValuesList());
+			}
+
+			testsList.add(items);
+		}
+
+		List<List<String>> iterationsList = new Iterations<String>(forward, contiguous, ITERATE_VALUE_FILTER, testsList).getIterationsList();
+
+		for (List<String> iterationValues : iterationsList) {
+			TestSetData testSetData = new TestSetData();
+			testSetData.getValuesList().addAll(iterationValues);
+			testSetData.setSuppressWarnings(suppressWarnings);
+			testSetData.setValuesThrowsException(valuesThrowsException);
+
+			valuesList.add(testSetData);
+		}
+
+		return valuesList;
+	}
+
+	/**
+	 * Extrait le dictionnaire des données pour une liste de paramètres
+	 * @param sequence Indicateur d'ajouter la séquence de valeurs de tests supplémentaires
+	 * @param sequenceBooleans Indicateur d'ajouter la séquence de valeurs de tests supplémentaires pour les booléens seulement
+	 * @param strict Indicateur d'ajouter aucun cas de test nullable
+	 * @param nullables Indicateur d'ajouter un cas de test avec toutes les valeurs nullables si possible
+	 * @param parametersList Liste des paramètres du constructeur ou méthode
+	 * @param index Index du paramètre à extraire
+	 * @return le dictionnaire des données extraite
+	 * @throws Exception en cas d'erreur...
+	 */
+	protected SortedMap<String, List<TestSetData>> getValuesDict(boolean sequence, boolean sequenceBooleans, boolean strict, boolean nullables, List<ParameterInfoData> parametersList, int index) throws Exception {
+		SortedMap<String, List<TestSetData>> valuesDict = new TreeMap<>();
+
+		List<TestSetData> valuesList = new ArrayList<>();
+
+		if (index < parametersList.size()) {
+			boolean paramStrict = strict;
+
+			ParameterInfoData parameter = parametersList.get(index);
+
+			TypeInfoData defaultGenericType = parameter.isEnumClassType() ? DEFAULT_ENUM_GENERIC_TYPE : DEFAULT_GENERIC_TYPE;
+
+			TypeInfoData typeInfoData;
+
+			if (parameter.isClassType()) {
+				typeInfoData = parameter;
+			} else if (parameter.isEnumClassType() && parameter.isArrayType()) {
+				typeInfoData = parameter;
+			} else if (parameter.isListType() && parameter.getListType().isClassType()) {
+				typeInfoData = parameter;
+			} else if (parameter.isMapType() && parameter.getMapKeysType().isClassType() && parameter.getMapValuesType().isClassType()) {
+				typeInfoData = parameter;
+			} else {
+				typeInfoData = parameter.asSpecificTypeInfoData(genericTestTypesDict, genericGenericTestTypesDict, defaultGenericType);
+
+				if (parameter.isEnumType()) {
+					parameter.getImportRequiredList().clear();
+				} else {
+					parameter.addImportRequiredList(typeInfoData);
+				}
+			}
+
+			List<String> list = new ArrayList<>();
+
+			boolean simpleType = isSimpleType(typeInfoData);
+
+			boolean hasTestValue = false;
+
+			boolean throwsException = false;
+
+			String testValue = null;
+
+			String[] keys = new String[] { //
+					parameter.getParam(false), //
+					parameter.getParam(true), //
+					typeInfoData.getTypeName(false, true) + " " + parameter.getName(), //
+					typeInfoData.getTypeName(true, true) + " " + parameter.getName(), //
+			};
+
+			for (String key : keys) {
+				if (defaultParametersTestsValuesDict.containsKey(key)) {
+					TestInfoValueData testInfoValueData = defaultParametersTestsValuesDict.get(key);
+
+					if (nullables || !BasicsHelper.isEmpty(testInfoValueData.getValue())) {
+						paramStrict |= testInfoValueData.isStrict();
+
+						throwsException |= testInfoValueData.isValueThrowsException();
+
+						hasTestValue = true;
+
+						testValue = getTestSetData(testInfoValueData.isFilename(), testInfoValueData.isProcess(), testInfoValueData.isValueThrowsException(), testInfoValueData.getValue(), parameter).getValuesList().get(0);
+					}
+
+					break;
+				}
+			}
+
+			if (!hasTestValue) {
+				keys = new String[] { //
+						parameter.getParam(false), //
+						parameter.getParam(true), //
+						typeInfoData.getTypeName(false, true), //
+						typeInfoData.getTypeName(true, true), //
+				};
+
+				for (String key : keys) {
+					if (defaultTestsValuesDict.containsKey(key)) {
+						TestInfoValueData testInfoValueData = defaultTestsValuesDict.get(key);
+
+						if (nullables || !BasicsHelper.isEmpty(testInfoValueData.getValue())) {
+							paramStrict |= testInfoValueData.isStrict();
+
+							throwsException |= testInfoValueData.isValueThrowsException();
+
+							hasTestValue = true;
+
+							testValue = getTestSetData(testInfoValueData.isFilename(), testInfoValueData.isProcess(), testInfoValueData.isValueThrowsException(), testInfoValueData.getValue(), parameter).getValuesList().get(0);
+						}
+
+						break;
+					}
+				}
+			}
+
+			boolean hasNull = false;
+
+			if (!paramStrict && nullables && (typeInfoData.isArrayType() || !typeInfoData.isPrimitive())) {
+				hasNull = true;
+
+				list.add("(" + typeInfoData.getTypeName(simpleType) + ") null");
+			}
+
+			List<String> itemsList = new ArrayList<>();
+
+			if (typeInfoData.isObjectType()) {
+				if (!hasTestValue || !paramStrict) {
+					String defValue = "(Object) JunitHelper.TEST_STRING";
+					String defFailValue = "(Object) JunitHelper.FAIL_STRING";
+					String baseValue = hasTestValue ? testValue : defValue;
+
+					if (!hasTestValue) {
+						itemsList.add(baseValue);
+					}
+
+					if (sequence || nullables) {
+						if (!BasicsHelper.areEquals(baseValue, defValue) && !BasicsHelper.areEquals(baseValue, "JunitHelper.TEST_STRING")) {
+							itemsList.add(defValue);
+						}
+
+						if (addFailTestValue) {
+							if (!BasicsHelper.areEquals(baseValue, defFailValue) && !BasicsHelper.areEquals(baseValue, "JunitHelper.FAIL_STRING")) {
+								itemsList.add(defFailValue);
+							}
+						}
+					}
+				}
+			} else if (typeInfoData.isStringType()) {
+				if (!hasTestValue || !paramStrict) {
+					String defValue = defaultFilenamesDict.containsKey(parameter.getName()) ? "JunitHelper.TEST_FILENAME" : "JunitHelper.TEST_STRING";
+					String defFailValue = "JunitHelper.FAIL_STRING";
+					String baseValue = hasTestValue ? testValue : defValue;
+
+					if (!hasTestValue) {
+						itemsList.add(baseValue);
+					}
+
+					if (sequence || nullables) {
+						if (!BasicsHelper.areEquals(baseValue, defValue)) {
+							itemsList.add(defValue);
+						}
+
+						if (addFailTestValue) {
+							if (!BasicsHelper.areEquals(baseValue, defFailValue)) {
+								itemsList.add(defFailValue);
+							}
+						}
+					}
+				}
+			} else if (!hasTestValue && typeInfoData.isClassType()) {
+				itemsList.add(hasTestValue ? testValue : "String.class");
+			} else if (typeInfoData.isEnumClassType()) {
+				if (!hasTestValue || !paramStrict) {
+					if (sequence || nullables) {
+						for (JunitHelper.TestEnum value : JunitHelper.TestEnum.values()) {
+							itemsList.add("JunitHelper.TestEnum." + value.name());
+						}
+					} else {
+						itemsList.add("JunitHelper.TestEnum.A");
+					}
+				}
+			} else if (typeInfoData.isEnumType()) {
+				if (!hasTestValue || !paramStrict) {
+					try {
+						String testEnumClassName = typeInfoData.getClassName(false);
+
+						List<Enum<?>> values = ReflexionsHelper.getEnumClassValuesList(typeInfoData.getClassData());
+
+						if (sequence || nullables) {
+							for (Enum<?> value : values) {
+								itemsList.add(testEnumClassName + "." + value.name());
+							}
+						} else {
+							if (!values.isEmpty()) {
+								itemsList.add(testEnumClassName + "." + values.get(0).name());
+							}
+						}
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			} else if (typeInfoData.isPrimitive() || typeInfoData.hasPrimitiveAsClass()) {
+				if (!hasTestValue || !paramStrict) {
+					String defValue = typeInfoData.getDefaultSimpleValue();
+					String defEqualsValue = typeInfoData.getDefaultSimpleEqualsValue();
+					String baseValue = hasTestValue ? testValue : defValue;
+
+					if (!hasTestValue) {
+						itemsList.add(baseValue);
+					}
+
+					boolean isBoolean = !paramStrict && sequenceBooleans && (boolean.class.equals(typeInfoData.getClassData()) || Boolean.class.equals(typeInfoData.getClassData()));
+
+					if (sequence || isBoolean || nullables) {
+						if (!BasicsHelper.areEquals(baseValue, defValue)) {
+							itemsList.add(defValue);
+						}
+					}
+
+					if ((isBoolean && sequenceBooleans) || (sequence && (paramStrict || typeInfoData.isPrimitive()))) {
+						if (!BasicsHelper.areEquals(baseValue, defEqualsValue)) {
+							itemsList.add(defEqualsValue);
+						}
+					}
+				}
+			} else if (!hasTestValue && java.util.Date.class.equals(typeInfoData.getClassData())) {
+				itemsList.add("new java.util.Date(JunitHelper.TEST_TIME)");
+			} else if (!hasTestValue && java.sql.Date.class.equals(typeInfoData.getClassData())) {
+				itemsList.add("new java.sql.Date(JunitHelper.TEST_TIME)");
+			} else if (!hasTestValue && java.sql.Time.class.equals(typeInfoData.getClassData())) {
+				itemsList.add("new java.sql.Time(JunitHelper.TEST_TIME)");
+			} else if (!hasTestValue && java.sql.Timestamp.class.equals(typeInfoData.getClassData())) {
+				itemsList.add("new java.sql.Timestamp(JunitHelper.TEST_TIME)");
+			} else if (!hasTestValue && java.time.Instant.class.equals(typeInfoData.getClassData())) {
+				itemsList.add("java.time.Instant.ofEpochMilli(JunitHelper.TEST_TIME)");
+			} else if (!hasTestValue && (typeInfoData.isListTypeGeneric() || typeInfoData.isListType())) {
+				itemsList.add("new java.util.ArrayList<>()");
+			} else if (!hasTestValue && (typeInfoData.isMapTypeGeneric() || typeInfoData.isMapType())) {
+				itemsList.add("new java.util.HashMap<>()");
+			} else if (!hasTestValue && File.class.equals(typeInfoData.getClassData())) {
+				itemsList.add("JunitHelper.TEST_FILE");
+			} else if (!hasTestValue && Path.class.equals(typeInfoData.getClassData())) {
+				itemsList.add("JunitHelper.TEST_PATH");
+			} else if (!hasTestValue && FileInputStream.class.equals(typeInfoData.getClassData())) {
+				throwsException = true;
+				itemsList.add("new java.io.FileInputStream(JunitHelper.TEST_FILE)");
+			} else if (!hasTestValue && InputStream.class.equals(typeInfoData.getClassData())) {
+				throwsException = true;
+				itemsList.add("(java.io.InputStream) new java.io.FileInputStream(JunitHelper.TEST_FILE)");
+			} else if (!hasTestValue && typeInfoData.isSerializableType()) {
+				itemsList.add("JunitHelper.TEST_STRING");
+
+				if (addFailTestValue && sequence) {
+					itemsList.add("JunitHelper.FAIL_STRING");
+				}
+			}
+
+			if (!hasTestValue && itemsList.isEmpty()) {
+				if (!typeInfoData.isInterfaceType() && !typeInfoData.isGenericType()) {
+					Class<?> classData = typeInfoData.getClassData(true);
+
+					if (!Modifier.isAbstract(classData.getModifiers())) {
+						ConstructorInfoData constructorInfoData = ReflexionsHelper.findEmptyConstructor(classData, new ConstructorModifiersFilter() {
+
+							@Override
+							public boolean accept(Constructor<?> constructor, int modifiers) {
+								return Modifier.isPublic(modifiers);
+							}
+						});
+
+						if (constructorInfoData != null) {
+							itemsList.add("new " + constructorInfoData.getTypeName(false, genericTestTypesDict, genericGenericTestTypesDict, defaultGenericType) + "()");
+						}
+					}
+				}
+			}
+
+			if (!hasTestValue && itemsList.isEmpty() && !hasNull) {
+				// Dernière chance...
+				itemsList.add("(" + typeInfoData.getTypeName(simpleType, true) + ") null");
+			}
+
+			boolean typeless = false;
+
+			if (typeInfoData.isArrayType()) {
+				if (!itemsList.isEmpty()) {
+					if (!typeInfoData.isClassType() && !typeInfoData.isGenericType()) {
+						typeless = typeInfoData.isListTypeGeneric() || typeInfoData.isListType() || typeInfoData.isMapTypeGeneric() || typeInfoData.isMapType();
+					}
+
+					List<String> setsList = getSetsList(typeInfoData.getTypeName(simpleType, false, typeless), BasicsHelper.toList(itemsList, ", "), typeInfoData.getArrayDimensions());
+
+					if (!paramStrict || sequence) {
+						list.addAll(setsList);
+					} else {
+						list.add(setsList.get(setsList.size() - 1));
+					}
+
+					if (!paramStrict && nullables) {
+						List<String> finalList = new ArrayList<>();
+
+						if (typeInfoData.isPrimitive()) {
+							finalList.addAll(itemsList);
+						} else {
+							if (nullables) {
+								finalList.add("null");
+							}
+						}
+
+						finalList.addAll(itemsList);
+
+						if (nullables) {
+							list.addAll(getSetsList(typeInfoData.getTypeName(simpleType, false, typeless), "", typeInfoData.getArrayDimensions()));
+						}
+
+						list.addAll(getSetsList(typeInfoData.getTypeName(simpleType, false, typeless), BasicsHelper.toList(finalList, ", "), typeInfoData.getArrayDimensions()));
+					}
+				}
+			} else {
+				list.addAll(itemsList);
+			}
+
+			if (hasTestValue) {
+				list.add(testValue);
+			}
+
+			boolean suppressWarnings = typeless;
+
+			boolean valuesThrowsException = throwsException;
+
+			SortedMap<String, List<TestSetData>> nextDict;
+
+			List<TestSetData> nextList;
+
+			int nextIndex = index + 1;
+
+			if (nextIndex < parametersList.size()) {
+				nextDict = getValuesDict(sequence, sequenceBooleans, strict, nullables, parametersList, nextIndex);
+				nextList = nextDict.get(parametersList.get(nextIndex).getName());
+				valuesDict.putAll(nextDict);
+
+				if (!suppressWarnings || !valuesThrowsException) {
+					for (TestSetData nextTest : nextList) {
+						suppressWarnings |= nextTest.isSuppressWarnings();
+						valuesThrowsException |= nextTest.isValuesThrowsException();
+					}
+				}
+			} else {
+				valuesDict = new TreeMap<>();
+				nextList = new ArrayList<>();
+			}
+
+			for (String value : list) {
+				TestSetData testSetData = new TestSetData(value);
+				testSetData.setSuppressWarnings(suppressWarnings);
+				testSetData.setValuesThrowsException(valuesThrowsException);
+
+				valuesList.add(testSetData);
+			}
+
+			valuesDict.put(parameter.getName(), valuesList);
+		}
+
+		return valuesDict;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "TestData [skipTesting=" + skipTesting + ", coverageOnly=" + coverageOnly + ", strictTesting=" + strictTesting + ", equalsTests=" + equalsTests + ", testMethodsInstance=" + testMethodsInstance + ", notForTestMethodsInstance=" + notForTestMethodsInstance + ", allowRuntimeExceptions=" + allowRuntimeExceptions + ", skipAllExceptions=" + skipAllExceptions + ", addFailTestValue=" + addFailTestValue + ", executionOrder=" + executionOrder + ", arrayType=" + arrayType + ", elementType=" + elementType
+				+ ", classInfoData=" + classInfoData + ", returnTypeInfoData=" + returnTypeInfoData + ", french=" + french + ", project=" + project + ", resourcesDir=" + resourcesDir + ", fullnameClassesRequiredList=" + fullnameClassesRequiredList + ", exceptionsList=" + exceptionsList + ", skipExceptionsList=" + skipExceptionsList + ", defaultParametersTestsValuesDict=" + defaultParametersTestsValuesDict + ", defaultTestsValuesDict=" + defaultTestsValuesDict + ", defaultFilenamesDict="
+				+ defaultFilenamesDict + ", genericTestTypesDict=" + genericTestTypesDict + ", automatedTestsCasesClassesList=" + automatedTestsCasesClassesList + ", automatedTestsCasesClassesDict=" + automatedTestsCasesClassesDict + ", testsCasesCodeList=" + testsCasesCodeList + ", testsSetsList=" + testsSetsList + ", equalsSetsList=" + equalsSetsList + ", automatedTestsErrorMessage=" + automatedTestsErrorMessage + ", equalsTestsErrorMessage=" + equalsTestsErrorMessage + ", testMethodsErrorMessage="
+				+ testMethodsErrorMessage + ", addFailTestValueErrorMessage=" + addFailTestValueErrorMessage + "]";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TestData other = (TestData) obj;
+		return addFailTestValue == other.addFailTestValue && Objects.equals(addFailTestValueErrorMessage, other.addFailTestValueErrorMessage) && allowRuntimeExceptions == other.allowRuntimeExceptions && Objects.equals(arrayType, other.arrayType) && Objects.equals(automatedTestsCasesClassesDict, other.automatedTestsCasesClassesDict) && Objects.equals(automatedTestsCasesClassesList, other.automatedTestsCasesClassesList) && Objects.equals(automatedTestsErrorMessage, other.automatedTestsErrorMessage)
+				&& Objects.equals(classInfoData, other.classInfoData) && coverageOnly == other.coverageOnly && Objects.equals(defaultFilenamesDict, other.defaultFilenamesDict) && Objects.equals(defaultParametersTestsValuesDict, other.defaultParametersTestsValuesDict) && Objects.equals(defaultTestsValuesDict, other.defaultTestsValuesDict) && elementType == other.elementType && Objects.equals(equalsSetsList, other.equalsSetsList) && equalsTests == other.equalsTests
+				&& Objects.equals(equalsTestsErrorMessage, other.equalsTestsErrorMessage) && Objects.equals(exceptionsList, other.exceptionsList) && executionOrder == other.executionOrder && french == other.french && Objects.equals(fullnameClassesRequiredList, other.fullnameClassesRequiredList) && Objects.equals(genericTestTypesDict, other.genericTestTypesDict) && notForTestMethodsInstance == other.notForTestMethodsInstance && Objects.equals(resourcesDir, other.resourcesDir)
+				&& Objects.equals(project, other.project) && Objects.equals(returnTypeInfoData, other.returnTypeInfoData) && skipAllExceptions == other.skipAllExceptions && Objects.equals(skipExceptionsList, other.skipExceptionsList) && skipTesting == other.skipTesting && strictTesting == other.strictTesting && Objects.equals(testMethodsErrorMessage, other.testMethodsErrorMessage) && testMethodsInstance == other.testMethodsInstance && Objects.equals(testsCasesCodeList, other.testsCasesCodeList)
+				&& Objects.equals(testsSetsList, other.testsSetsList);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(addFailTestValue, addFailTestValueErrorMessage, allowRuntimeExceptions, arrayType, automatedTestsCasesClassesDict, automatedTestsCasesClassesList, automatedTestsErrorMessage, classInfoData, coverageOnly, defaultFilenamesDict, defaultParametersTestsValuesDict, defaultTestsValuesDict, elementType, equalsSetsList, equalsTests, equalsTestsErrorMessage, exceptionsList, executionOrder, french, fullnameClassesRequiredList, genericTestTypesDict, notForTestMethodsInstance, resourcesDir,
+				project, returnTypeInfoData, skipAllExceptions, skipExceptionsList, skipTesting, strictTesting, testMethodsErrorMessage, testMethodsInstance, testsCasesCodeList, testsSetsList);
+	}
+
+	/**
+	 * Extrait la liste des ensembles de données de tests
+	 * @param equalsMethod Indicateur d'extraire la liste des ensembles de données de tests pour la méthode boolean equals(Object obj)
+	 * @return la liste des ensembles de données de tests
+	 */
+	public List<TestSetData> getTestsSetsList(boolean equalsMethod) {
+		if (equalsMethod && !equalsSetsList.isEmpty()) {
+			return equalsSetsList;
+		} else if (!equalsMethod && testsSetsList.isEmpty()) {
+			return equalsSetsList;
+		}
+
+		return testsSetsList;
+	}
+
+	/**
+	 * Extrait le champ skipTesting
+	 * @return un boolean
+	 */
+	public boolean isSkipTesting() {
+		return skipTesting;
+	}
+
+	/**
+	 * Modifie le champ skipTesting
+	 * @param skipTesting La valeur du champ skipTesting
+	 */
+	public void setSkipTesting(boolean skipTesting) {
+		this.skipTesting = skipTesting;
+	}
+
+	/**
+	 * Extrait le champ coverageOnly
+	 * @return un boolean
+	 */
+	public boolean isCoverageOnly() {
+		return coverageOnly;
+	}
+
+	/**
+	 * Modifie le champ coverageOnly
+	 * @param coverageOnly La valeur du champ coverageOnly
+	 */
+	public void setCoverageOnly(boolean coverageOnly) {
+		this.coverageOnly = coverageOnly;
+	}
+
+	/**
+	 * Extrait le champ strictTesting
+	 * @return un boolean
+	 */
+	public boolean isStrictTesting() {
+		return strictTesting;
+	}
+
+	/**
+	 * Modifie le champ strictTesting
+	 * @param strictTesting La valeur du champ strictTesting
+	 */
+	public void setStrictTesting(boolean strictTesting) {
+		this.strictTesting = strictTesting;
+	}
+
+	/**
+	 * Extrait le champ equalsTests
+	 * @return un boolean
+	 */
+	public boolean isEqualsTests() {
+		return equalsTests;
+	}
+
+	/**
+	 * Modifie le champ equalsTests
+	 * @param equalsTests La valeur du champ equalsTests
+	 */
+	public void setEqualsTests(boolean equalsTests) {
+		this.equalsTests = equalsTests;
+	}
+
+	/**
+	 * Extrait le champ testMethodsInstance
+	 * @return un boolean
+	 */
+	public boolean isTestMethodsInstance() {
+		return testMethodsInstance;
+	}
+
+	/**
+	 * Modifie le champ testMethodsInstance
+	 * @param testMethodsInstance La valeur du champ testMethodsInstance
+	 */
+	public void setTestMethodsInstance(boolean testMethodsInstance) {
+		this.testMethodsInstance = testMethodsInstance;
+	}
+
+	/**
+	 * Extrait le champ notForTestMethodsInstance
+	 * @return un boolean
+	 */
+	public boolean isNotForTestMethodsInstance() {
+		return notForTestMethodsInstance;
+	}
+
+	/**
+	 * Modifie le champ notForTestMethodsInstance
+	 * @param notForTestMethodsInstance La valeur du champ notForTestMethodsInstance
+	 */
+	public void setNotForTestMethodsInstance(boolean notForTestMethodsInstance) {
+		this.notForTestMethodsInstance = notForTestMethodsInstance;
+	}
+
+	/**
+	 * Extrait le champ allowRuntimeExceptions
+	 * @return un boolean
+	 */
+	public boolean isAllowRuntimeExceptions() {
+		return allowRuntimeExceptions;
+	}
+
+	/**
+	 * Modifie le champ allowRuntimeExceptions
+	 * @param allowRuntimeExceptions La valeur du champ allowRuntimeExceptions
+	 */
+	public void setAllowRuntimeExceptions(boolean allowRuntimeExceptions) {
+		this.allowRuntimeExceptions = allowRuntimeExceptions;
+	}
+
+	/**
+	 * Extrait le champ skipAllExceptions
+	 * @return un boolean
+	 */
+	public boolean isSkipAllExceptions() {
+		return skipAllExceptions;
+	}
+
+	/**
+	 * Modifie le champ skipAllExceptions
+	 * @param skipAllExceptions La valeur du champ skipAllExceptions
+	 */
+	public void setSkipAllException(boolean skipAllExceptions) {
+		this.skipAllExceptions = skipAllExceptions;
+	}
+
+	/**
+	 * Extrait le champ executionOrder
+	 * @return un int
+	 */
+	public int getExecutionOrder() {
+		return executionOrder;
+	}
+
+	/**
+	 * Modifie le champ executionOrder
+	 * @param executionOrder La valeur du champ executionOrder
+	 */
+	public void setExecutionOrder(int executionOrder) {
+		this.executionOrder = executionOrder;
+	}
+
+	/**
+	 * Extrait le champ elementType
+	 * @return un ElementType
+	 */
+	public ElementType getElementType() {
+		return elementType;
+	}
+
+	/**
+	 * Extrait le champ classInfoData
+	 * @return un TypeInfoData
+	 */
+	public TypeInfoData getClassInfoData() {
+		return classInfoData;
+	}
+
+	/**
+	 * Extrait le champ returnTypeInfoData
+	 * @return un TypeInfoData
+	 */
+	public TypeInfoData getReturnTypeInfoData() {
+		return returnTypeInfoData;
+	}
+
+	/**
+	 * Extrait le champ french
+	 * @return un boolean
+	 */
+	public boolean isFrench() {
+		return french;
+	}
+
+	/**
+	 * Extrait le champ project
+	 * @return un String
+	 */
+	public String getProject() {
+		return project;
+	}
+
+	/**
+	 * Extrait le champ resourcesDir
+	 * @return un String
+	 */
+	public String getResourcesDir() {
+		return resourcesDir;
+	}
+
+	/**
+	 * Extrait le champ fullnameClassesRequiredList
+	 * @return un List<Class<?>>
+	 */
+	public List<Class<?>> getFullnameClassesRequiredList() {
+		return fullnameClassesRequiredList;
+	}
+
+	/**
+	 * Extrait le champ exceptionsList
+	 * @return un List<TypeInfoData>
+	 */
+	public List<TypeInfoData> getExceptionsList() {
+		return exceptionsList;
+	}
+
+	/**
+	 * Extrait le champ skipExceptionsList
+	 * @return un List<Class<?>>
+	 */
+	public List<Class<?>> getSkipExceptionsList() {
+		return skipExceptionsList;
+	}
+
+	/**
+	 * Extrait le champ defaultParametersTestsValuesDict
+	 * @return un Map<String,TestInfoValueData>
+	 */
+	public Map<String, TestInfoValueData> getDefaultParametersTestsValuesDict() {
+		return defaultParametersTestsValuesDict;
+	}
+
+	/**
+	 * Extrait le champ defaultTestsValuesDict
+	 * @return un Map<String,TestInfoValueData>
+	 */
+	public Map<String, TestInfoValueData> getDefaultTestsValuesDict() {
+		return defaultTestsValuesDict;
+	}
+
+	/**
+	 * Extrait le champ defaultFilenamesDict
+	 * @return un Map<String,Integer>
+	 */
+	public Map<String, Integer> getDefaultFilenamesDict() {
+		return defaultFilenamesDict;
+	}
+
+	/**
+	 * Extrait le champ genericTestTypesDict
+	 * @return un Map<String,TypeInfoData>
+	 */
+	public Map<String, TypeInfoData> getGenericTestTypesDict() {
+		return genericTestTypesDict;
+	}
+
+	/**
+	 * Extrait le champ genericGenericTestTypesDict
+	 * @return un Map<String,TypeInfoData>
+	 */
+	public Map<String, TypeInfoData> getGenericGenericTestTypesDict() {
+		return genericGenericTestTypesDict;
+	}
+
+	/**
+	 * Extrait le champ automatedTestsCasesClassesList
+	 * @return un List<Class<?>>
+	 */
+	public List<Class<?>> getAutomatedTestsCasesClassesList() {
+		return automatedTestsCasesClassesList;
+	}
+
+	/**
+	 * Extrait le champ automatedTestsCasesClassesDict
+	 * @return un Map<Class<?>, List<String>>
+	 */
+	public Map<Class<?>, List<String>> getAutomatedTestsCasesClassesDict() {
+		return automatedTestsCasesClassesDict;
+	}
+
+	/**
+	 * Extrait le champ testsCasesCodeList
+	 * @return un List<String>
+	 */
+	public List<String> getTestsCasesCodeList() {
+		return testsCasesCodeList;
+	}
+
+	/**
+	 * Extrait le champ testsSetsList
+	 * @return un List<TestSetData>
+	 */
+	public List<TestSetData> getTestsSetsList() {
+		return testsSetsList;
+	}
+
+	/**
+	 * Extrait le champ equalsSetsList
+	 * @return un List<TestSetData>
+	 */
+	public List<TestSetData> getEqualsSetsList() {
+		return equalsSetsList;
 	}
 }

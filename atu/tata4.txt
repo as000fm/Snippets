@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,6 @@ import automated.tests.cases.JunitAutomatedTestsCases;
 import automated.tests.helpers.AutomatedTestsHelper;
 import automated.tests.helpers.abstractions.TemplateProducerBase;
 import automated.tests.helpers.base.BasicsHelper;
-import automated.tests.helpers.base.IterateValueFilter;
 import automated.tests.helpers.base.Iterations;
 import automated.tests.helpers.common.CommonHelper;
 import automated.tests.helpers.reflexions.ReflexionsHelper;
@@ -93,9 +93,6 @@ public class TestData extends TemplateProducerBase {
 
 	/** Message d'erreur des annotations du test des méthodes mutuellement exclusives en anglais **/
 	private static final String ADD_FAIL_TEST_VALUE_ERROR_MESSAGE_ENG;
-
-	/** Filtre des données d'une itération **/
-	private static final IterateValueFilter ITERATE_VALUE_FILTER = (item) -> (item == null) || "null".equals(item) || ((String) item).contains(" null");
 
 	static {
 		AUTOMATED_TESTS_ERROR_MESSAGE_FRA = "Les annotations " //
@@ -583,7 +580,7 @@ public class TestData extends TemplateProducerBase {
 							this.strictTesting = true;
 
 							StrictAutomatedTestsSets strictAutomatedTestsSets = (StrictAutomatedTestsSets) annotation;
-							annotationTestSetsList.addAll(getTestsSetsList(strictAutomatedTestsSets.sequence(), strictAutomatedTestsSets.sequence(), !strictAutomatedTestsSets.sequence() && !strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.contiguous(), strictAutomatedTestsSets.forward(), parametersList));
+							annotationTestSetsList.addAll(getTestsSetsList(strictAutomatedTestsSets.sequence(), strictAutomatedTestsSets.sequence(), !strictAutomatedTestsSets.sequence() && !strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.nullables(), strictAutomatedTestsSets.contiguous(), strictAutomatedTestsSets.forward(), false, strictAutomatedTestsSets.alphabetic(), strictAutomatedTestsSets.order(), parametersList));
 							hasStrictAutomatedTests = true;
 							break;
 						case STRICT_SEQUENCE_TESTS_SETS:
@@ -596,7 +593,7 @@ public class TestData extends TemplateProducerBase {
 							this.strictTesting = true;
 
 							StrictSequenceTestsSets strictSequenceTestsSets = (StrictSequenceTestsSets) annotation;
-							annotationTestSetsList.addAll(getTestsSetsList(strictSequenceTestsSets.sequence(), strictSequenceTestsSets.sequence(), !strictSequenceTestsSets.sequence() && !strictSequenceTestsSets.nullables(), strictSequenceTestsSets.nullables(), strictSequenceTestsSets.contiguous(), strictSequenceTestsSets.forward(), parametersList));
+							annotationTestSetsList.addAll(getTestsSetsList(strictSequenceTestsSets.sequence(), strictSequenceTestsSets.sequence(), !strictSequenceTestsSets.sequence() && !strictSequenceTestsSets.nullables(), strictSequenceTestsSets.nullables(), strictSequenceTestsSets.contiguous(), strictSequenceTestsSets.forward(), false, strictSequenceTestsSets.alphabetic(), strictSequenceTestsSets.order(), parametersList));
 							hasStrictAutomatedTests = true;
 							break;
 						case EQUALS_TESTS:
@@ -659,7 +656,7 @@ public class TestData extends TemplateProducerBase {
 							this.equalsTests = true;
 
 							EqualsTestsSets equalsTestsSets = (EqualsTestsSets) annotation;
-							this.equalsSetsList.addAll(getTestsSetsList(equalsTestsSets.sequence(), equalsTestsSets.sequence(), !equalsTestsSets.sequence() && !equalsTestsSets.nullables(), equalsTestsSets.nullables(), true, false, parametersList));
+							this.equalsSetsList.addAll(getTestsSetsList(equalsTestsSets.sequence(), equalsTestsSets.sequence(), !equalsTestsSets.sequence() && !equalsTestsSets.nullables(), equalsTestsSets.nullables(), true, true, true, equalsTestsSets.alphabetic(), equalsTestsSets.order(), parametersList));
 							break;
 						case ADD_FAIL_TEST_VALUE:
 							if (hasStrictAutomatedTests) {
@@ -813,7 +810,7 @@ public class TestData extends TemplateProducerBase {
 		} else {
 			if (!this.equalsTests || hasAutomatedTests || hasStrictAutomatedTests) {
 				if (!this.strictTesting) {
-					this.testsSetsList.addAll(getTestsSetsList(false, true, false, true, false, false, parametersList));
+					this.testsSetsList.addAll(getTestsSetsList(false, true, false, true, false, false, false, false, null, parametersList));
 				}
 			}
 
@@ -1433,17 +1430,20 @@ public class TestData extends TemplateProducerBase {
 	 * @param nullables Indicateur d'ajouter un cas de test avec toutes les valeurs nullables si possible
 	 * @param contiguous Indicateur d'effectuer les itérations en séquence complete contiguë
 	 * @param forward Indicateur d'effectuer les itérations en ordre de séquence des paramètres (false -> ordre de séquence inverse des paramètres)
+	 * @param equalsTestsSets Indicateur de l'annotation @EqualsTestsSets
+	 * @param alphabetic Indicateur de traitement des paramètres du constructeur ou méthode en ordre alphabétique à utiliser pour effectuer les itérations en séquence complete contiguë (false -> utilisation du paramètre order)
+	 * @param order Liste des noms des paramètres du constructeur séparés par des virgules afin de spécifier l'ordre à utiliser pour effectuer les itérations en séquence complete contiguë (vide -> ordre des paramètres par défaut)
 	 * @param parametersList Liste des paramètres du constructeur ou méthode
 	 * @return la liste des jeux de données extraite
 	 * @throws Exception en cas d'erreur...
 	 */
-	protected List<TestSetData> getTestsSetsList(boolean sequence, boolean sequenceBooleans, boolean strict, boolean nullables, boolean contiguous, boolean forward, List<ParameterInfoData> parametersList) throws Exception {
+	protected List<TestSetData> getTestsSetsList(boolean sequence, boolean sequenceBooleans, boolean strict, boolean nullables, boolean contiguous, boolean forward, boolean equalsTestsSets, boolean alphabetic, String order, List<ParameterInfoData> parametersList) throws Exception {
 		List<TestSetData> testsSetsList = new ArrayList<>();
 
 		if (parametersList.isEmpty()) {
 			testsSetsList.add(new TestSetData());
 		} else {
-			testsSetsList.addAll(getValuesList(sequence, sequenceBooleans, strict, nullables, contiguous, forward, parametersList));
+			testsSetsList.addAll(getValuesList(sequence, sequenceBooleans, strict, nullables, contiguous, forward, equalsTestsSets, alphabetic, order, parametersList));
 		}
 
 		return testsSetsList;
@@ -1479,14 +1479,78 @@ public class TestData extends TemplateProducerBase {
 	 * @param nullables Indicateur d'ajouter un cas de test avec toutes les valeurs nullables si possible
 	 * @param contiguous Indicateur d'effectuer les itérations en séquence complete contiguë
 	 * @param forward Indicateur d'effectuer les itérations en ordre de séquence des paramètres (false -> ordre de séquence inverse des paramètres)
+	 * @param equalsTestsSets Indicateur de l'annotation @EqualsTestsSets
+	 * @param alphabetic Indicateur de traitement des paramètres du constructeur ou méthode en ordre alphabétique à utiliser pour effectuer les itérations en séquence complete contiguë (false -> utilisation du paramètre order)
+	 * @param order Liste des noms des paramètres du constructeur séparés par des virgules afin de spécifier l'ordre à utiliser pour effectuer les itérations en séquence complete contiguë (vide -> ordre des paramètres par défaut)
 	 * @param parametersList Liste des paramètres du constructeur ou méthode
 	 * @return la liste des données extraite
 	 * @throws Exception en cas d'erreur...
 	 */
-	protected List<TestSetData> getValuesList(boolean sequence, boolean sequenceBooleans, boolean strict, boolean nullables, boolean contiguous, boolean forward, List<ParameterInfoData> parametersList) throws Exception {
+	protected List<TestSetData> getValuesList(boolean sequence, boolean sequenceBooleans, boolean strict, boolean nullables, boolean contiguous, boolean forward, boolean equalsTestsSets, boolean alphabetic, String order, List<ParameterInfoData> parametersList) throws Exception {
 		SortedMap<String, List<TestSetData>> valuesDict = getValuesDict(sequence, sequenceBooleans, strict, nullables, parametersList, 0);
 
-		List<TestSetData> valuesList = new ArrayList<>();
+		List<String> parametersNamesList = new ArrayList<>();
+
+		List<String> sortedList = new ArrayList<>();
+		List<Integer> sortedIndices = new ArrayList<>();
+
+		for (int index = 0; index < parametersList.size(); index++) {
+			String name = parametersList.get(index).getName();
+
+			parametersNamesList.add(name);
+
+			sortedList.add(name);
+			sortedIndices.add(Integer.valueOf(index));
+		}
+
+		if (alphabetic || ((order != null) && !BasicsHelper.isEmpty(order.trim()))) {
+			if (alphabetic) {
+				Collections.sort(sortedList);
+			} else {
+				List<String> orderList = new ArrayList<>();
+
+				for (String name : order.trim().split("\\s*,\\s*")) {
+					if (!sortedList.contains(name)) {
+						if (french) {
+							throw new Exception("Pas de nom de paramètre \"" + name + "\" pour order = \"" + order + "\"");
+						} else {
+							throw new Exception("No parameter name \"" + name + "\" for order = \"" + order + "\"");
+						}
+					}
+
+					orderList.add(name);
+					sortedList.remove(name);
+				}
+
+				if (!sortedList.isEmpty()) {
+					String missing = BasicsHelper.toList(sortedList, ", ", "\"");
+
+					String message;
+
+					if (sortedList.size() > 1) {
+						if (french) {
+							message = "Les noms des paramètres suivants " + missing + " sont manquants" + " pour order = \"" + order + "\"";
+						} else {
+							message = "The following parameter names " + missing + " are missing for order = \"" + order;
+						}
+					} else {
+						if (french) {
+							message = "Le nom du paramètre " + missing + " est manquant" + " pour order = \"" + order + "\"";
+						} else {
+							message = "The parameter name " + missing + " is missing for order = \"" + order;
+						}
+					}
+
+					throw new Exception(message);
+				}
+
+				sortedList = orderList;
+			}
+
+			for (int i = 0; i < sortedList.size(); i++) {
+				sortedIndices.set(i, parametersNamesList.indexOf(sortedList.get(i)));
+			}
+		}
 
 		List<List<String>> testsList = new ArrayList<>();
 
@@ -1494,9 +1558,7 @@ public class TestData extends TemplateProducerBase {
 
 		boolean valuesThrowsException = false;
 
-		for (int index = 0; index < parametersList.size(); index++) {
-			String name = parametersList.get(index).getName();
-
+		for (String name : sortedList) {
 			List<String> items = new ArrayList<>();
 
 			for (TestSetData dictTest : valuesDict.get(name)) {
@@ -1505,18 +1567,31 @@ public class TestData extends TemplateProducerBase {
 				valuesThrowsException |= dictTest.isValuesThrowsException();
 
 				items.addAll(dictTest.getValuesList());
+
+				if (equalsTestsSets && (items.size() == 2)) {
+					break;
+				}
 			}
 
 			testsList.add(items);
 		}
 
-		List<List<String>> iterationsList = new Iterations<String>(forward, contiguous, ITERATE_VALUE_FILTER, testsList).getIterationsList();
+		List<List<String>> iterationsList = new Iterations<String>(forward, contiguous, testsList).getIterationsList();
+
+		List<TestSetData> valuesList = new ArrayList<>();
 
 		for (List<String> iterationValues : iterationsList) {
 			TestSetData testSetData = new TestSetData();
-			testSetData.getValuesList().addAll(iterationValues);
 			testSetData.setSuppressWarnings(suppressWarnings);
 			testSetData.setValuesThrowsException(valuesThrowsException);
+
+			List<String> values = new ArrayList<>(Collections.nCopies(iterationValues.size(), null));
+
+			for (int index = 0; index < iterationValues.size(); index++) {
+				values.set(sortedIndices.get(index), iterationValues.get(index));
+			}
+
+			testSetData.getValuesList().addAll(values);
 
 			valuesList.add(testSetData);
 		}

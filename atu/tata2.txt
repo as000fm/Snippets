@@ -37,4 +37,18 @@ public @interface StrictAutomatedTestsSets {
 	 * @return un boolean
 	 */
 	boolean forward() default false;
+
+	/**
+	 * Indicateur de traitement des paramètres du constructeur en ordre alphabétique à utiliser pour effectuer les itérations en séquence complete contiguë (false -> utilisation du paramètre order)
+	 * @return un boolean
+	 */
+	boolean alphabetic() default false;
+
+	/**
+	 * Liste des noms des paramètres du constructeur séparés par des virgules afin de spécifier l'ordre à utiliser pour effectuer les itérations en séquence complete contiguë
+	 * Si vide, alors c'est l'ordre actuel des paramètres du constructeur qui sera utilisé pour effectuer les itérations en séquence complete contiguë
+	 * Il est à noter que le paramètre alphabetic doit être à false pour utiliser le paramètre order
+	 * @return un String
+	 */
+	String order() default "";
 }

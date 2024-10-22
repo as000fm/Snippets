@@ -1,0 +1,94 @@
+package sgbd.exceptions;
+
+import outils.base.OutilsBase;
+
+/**
+ * Runtime exception de base pour DataSet
+ */
+public class RuntimeDataSetException extends RuntimeException {
+	/** Champ serialVersionUID **/
+	private static final long serialVersionUID = -9151941441536920786L;
+
+	/** Code de l'erreur SQL **/
+	private int sqlCode;
+
+	/** Code de l'état de l'erreur SQL **/
+	private String sqlState;
+
+	/**
+	 * Constructeur de base
+	 */
+	public RuntimeDataSetException() {
+		this(null, 0, null);
+	}
+
+	/**
+	 * Constructeur de base
+	 * @param cause Exception DataSet
+	 */
+	public RuntimeDataSetException(DataSetException cause) {
+		this(cause.getSuperMessage(), cause.getSqlCode(), cause.getSqlState());
+	}
+
+	/**
+	 * Constructeur de base
+	 * @param cause Exception SGBD
+	 */
+	public RuntimeDataSetException(SGBDException cause) {
+		this(cause.getMessage(), cause.getSqlCode(), cause.getSqlState());
+	}
+
+	/**
+	 * Constructeur de base
+	 * @param msg Message
+	 */
+	public RuntimeDataSetException(String msg) {
+		this(msg, 0, null);
+	}
+
+	/**
+	 * Constructeur de base
+	 * @param msg Message
+	 * @param sqlCode Code de l'erreur SQL
+	 * @param sqlState Code de l'état de l'erreur SQL
+	 */
+	public RuntimeDataSetException(String msg, int sqlCode, String sqlState) {
+		super(msg);
+		this.sqlCode = sqlCode;
+		this.sqlState = sqlState;
+	}
+
+	/**
+	 * Extrait le message parent
+	 * @return le message parent
+	 */
+	protected String getSuperMessage() {
+		return super.getMessage();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Throwable#getMessage()
+	 */
+	@Override
+	public String getMessage() {
+		return super.getMessage() + " [" + sqlCode + ":  " + OutilsBase.asString(sqlState) + "]";
+	}
+
+	/**
+	 * Extrait le champ sqlCode
+	 * @return un int
+	 */
+	public int getSqlCode() {
+		return sqlCode;
+	}
+
+	/**
+	 * Extrait le champ sqlState
+	 * @return un String
+	 */
+	public String getSqlState() {
+		return sqlState;
+	}
+
+}

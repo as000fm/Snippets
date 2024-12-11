@@ -517,41 +517,52 @@ public class SchedulingHelper {
 			return;
 		}
 
+		// Phase 1: Equipment Separation
+		// Create separate lists for on-site and off-site equipment
+		// Each piece of equipment gets its own LocationData object for easier distribution
 		List<LocationData> onSiteLocations = new ArrayList<>();
 		List<LocationData> offSiteLocations = new ArrayList<>();
 
 		for (List<LocationData> locations : dailySchedule.getTechniciansLocationsMap().values()) {
 			for (LocationData location : locations) {
+				// Split each on-site equipment into its own location
 				for (String onSiteEquipment : location.getOnSiteEquipmentsList()) {
 					LocationData onSiteLocation = new LocationData(location.getLocationName());
 					onSiteLocation.addOnSiteEquipment(onSiteEquipment);
-
 					onSiteLocations.add(onSiteLocation);
 				}
 
+				// Split each off-site equipment into its own location
 				for (Map.Entry<String, List<String>> sublocationEntry : location.getOffSiteEquipmentsSublocationsMap().entrySet()) {
 					for (String offSiteEquipment : sublocationEntry.getValue()) {
 						LocationData offSiteLocation = new LocationData(location.getLocationName());
 						offSiteLocation.addOffSiteEquipmentToSublocation(sublocationEntry.getKey(), offSiteEquipment);
-
 						offSiteLocations.add(offSiteLocation);
 					}
 				}
 			}
 		}
 
+		// Phase 2: Distribution Calculation
+		// Calculate how many equipments each technician should get
 		int totalOnSite = onSiteLocations.size();
 		int totalOffSite = offSiteLocations.size();
 		int numTechnicians = techniciansList.size();
 
+		// Create array to store distribution:
+		// distributionByTechnician[0] = on-site equipment counts
+		// distributionByTechnician[1] = off-site equipment counts
 		int[][] distributionByTechnician = new int[2][numTechnicians];
 
+		// Calculate base distribution and extras for both types
 		int baseOnSite = totalOnSite / numTechnicians;
 		int extraOnSite = totalOnSite % numTechnicians;
 
 		int baseOffSite = totalOffSite / numTechnicians;
 		int extraOffSite = totalOffSite % numTechnicians;
 
+		// Distribute base amounts and extra equipment
+		// Priority: distribute extra on-site equipment first, then extra off-site
 		for (int i = 0; i < numTechnicians; i++) {
 			boolean addOnSite = (extraOnSite != 0);
 			boolean addOffSite = ((extraOnSite == 0) && (extraOffSite != 0));
@@ -568,17 +579,22 @@ public class SchedulingHelper {
 			}
 		}
 
+		// Phase 3: Equipment Assignment
+		// Assign equipment to technicians based on calculated distribution
 		int technicianIndex = 0;
-		int onSiteIndex = 0;
-		int offSiteIndex = 0;
+		int onSiteIndex = 0; // Track position in onSiteLocations list
+		int offSiteIndex = 0; // Track position in offSiteLocations list
 
 		for (List<LocationData> locations : dailySchedule.getTechniciansLocationsMap().values()) {
+			// Clear existing assignments for this technician
 			locations.clear();
 
+			// Assign on-site equipment first
 			for (int i = 0; i < distributionByTechnician[0][technicianIndex]; i++) {
 				locations.add(onSiteLocations.get(onSiteIndex++));
 			}
 
+			// Then assign off-site equipment
 			for (int i = 0; i < distributionByTechnician[1][technicianIndex]; i++) {
 				locations.add(offSiteLocations.get(offSiteIndex++));
 			}

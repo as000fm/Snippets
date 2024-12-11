@@ -29,7 +29,7 @@ public class TestSchedulingFixNumberOfDays {
 
 		List<DailyScheduleData> scheduleList = SchedulingHelper.extractScheduleFixNumberOfDays(2, new Date(), TestsHelper.LOCATIONS_LIST, techniciansList, openBusinessDays);
 
-		TestsHelper.displayScheduleList("fix number of days", scheduleList);
+		TestsHelper.displayScheduleList("fix number of days", scheduleList, true);
 	}
 
 }

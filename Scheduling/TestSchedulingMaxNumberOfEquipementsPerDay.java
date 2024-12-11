@@ -19,7 +19,9 @@ public class TestSchedulingMaxNumberOfEquipementsPerDay {
 		List<String> techniciansList = new ArrayList<>();
 		techniciansList.add("T1");
 		techniciansList.add("T2");
-		// techniciansList.add("T3");
+		techniciansList.add("T3");
+		techniciansList.add("T4");
+		techniciansList.add("T5");
 
 		int[] openBusinessDays = new int[] { //
 				Calendar.MONDAY, // Monday
@@ -30,10 +32,10 @@ public class TestSchedulingMaxNumberOfEquipementsPerDay {
 		};
 
 		Map<Date, Integer> maxNumberEquipmentsForGivenDaysMap = new HashMap<>();
-		maxNumberEquipmentsForGivenDaysMap.put(new Date(), 10);
+		//maxNumberEquipmentsForGivenDaysMap.put(new Date(), 10);
 
-		List<DailyScheduleData> scheduleList = SchedulingHelper.extractScheduleMaxNumberOfEquipmentsPerDay(10, maxNumberEquipmentsForGivenDaysMap, new Date(), TestsHelper.LOCATIONS_LIST, techniciansList, openBusinessDays);
+		List<DailyScheduleData> scheduleList = SchedulingHelper.extractScheduleMaxNumberOfEquipmentsPerDay(30, maxNumberEquipmentsForGivenDaysMap, new Date(), TestsHelper.LOCATIONS_LIST, techniciansList, openBusinessDays);
 
-		TestsHelper.displayScheduleList("max number of equipments per day", scheduleList);
+		TestsHelper.displayScheduleList("max number of equipments per day", scheduleList, false);
 	}
 }

@@ -43,8 +43,9 @@ public class SchedulingHelper {
 		// Calculate total equipment counts
 		int totalOnSiteEquipment = 0;
 		int totalOffSiteEquipment = 0;
+
 		for (LocationData location : locationsList) {
-			totalOnSiteEquipment += location.getOnsiteEquipmentsCount();
+			totalOnSiteEquipment += location.getOnSiteEquipmentsCount();
 			totalOffSiteEquipment += location.getTotalOffSiteEquipmentsSublocationsCount();
 		}
 
@@ -73,17 +74,18 @@ public class SchedulingHelper {
 		// Sort locations by equipment count
 		List<LocationData> sortedLocations = new ArrayList<>(locationsList);
 		sortedLocations.sort((a, b) -> {
-			int aTotal = a.getOnsiteEquipmentsCount() + a.getTotalOffSiteEquipmentsSublocationsCount();
-			int bTotal = b.getOnsiteEquipmentsCount() + b.getTotalOffSiteEquipmentsSublocationsCount();
+			int aTotal = a.getOnSiteEquipmentsCount() + a.getTotalOffSiteEquipmentsSublocationsCount();
+			int bTotal = b.getOnSiteEquipmentsCount() + b.getTotalOffSiteEquipmentsSublocationsCount();
 			return Integer.compare(bTotal, aTotal);
 		});
 
 		// Calculate base and extra equipment per day for global distribution
 		int baseEquipmentPerDay = (int) Math.floor((double) (totalOnSiteEquipment + totalOffSiteEquipment) / numberOfDays);
 		int extraEquipment = (totalOnSiteEquipment + totalOffSiteEquipment) - (baseEquipmentPerDay * numberOfDays);
-		
+
 		// Create array to track equipment count per day
 		int[] equipmentPerDay = new int[numberOfDays];
+
 		for (int i = 0; i < numberOfDays; i++) {
 			equipmentPerDay[i] = baseEquipmentPerDay + (extraEquipment > i ? 1 : 0);
 		}
@@ -91,15 +93,15 @@ public class SchedulingHelper {
 		// Schedule equipment for each location
 		for (LocationData location : sortedLocations) {
 			// Handle on-site equipment
-			scheduleOnSiteEquipment(location, scheduleList, numberOfDays, targetOnSitePerDay, equipmentPerDay);
+			scheduleOnSiteEquipment(location, scheduleList, targetOnSitePerDay, equipmentPerDay);
 
 			// Handle off-site equipment by sublocation
-			scheduleOffSiteEquipment(location, scheduleList, numberOfDays, targetOffSitePerDay, equipmentPerDay);
+			scheduleOffSiteEquipment(location, scheduleList, targetOffSitePerDay, equipmentPerDay);
 		}
 
 		// Distribute locations evenly among technicians for each day
 		for (DailyScheduleData dailySchedule : scheduleList) {
-			distributeLocationsToTechnicians(dailySchedule, techniciansList);
+			distributeEquipmentsToTechnicians(dailySchedule, techniciansList);
 		}
 
 		return scheduleList;
@@ -122,7 +124,7 @@ public class SchedulingHelper {
 		if (openBusinessDays == null || openBusinessDays.length == 0) {
 			openBusinessDays = getDefaultOpenBusinessDays();
 		}
-		
+
 		if (maxNumberEquipmentsForGivenDaysMap == null) {
 			maxNumberEquipmentsForGivenDaysMap = new HashMap<>();
 		}
@@ -139,22 +141,21 @@ public class SchedulingHelper {
 		// Calculate total number of equipment to schedule
 		int totalOnSiteEquipment = 0;
 		int totalOffSiteEquipment = 0;
+
 		for (LocationData location : locationsList) {
-			totalOnSiteEquipment += location.getOnsiteEquipmentsCount();
+			totalOnSiteEquipment += location.getOnSiteEquipmentsCount();
 			totalOffSiteEquipment += location.getTotalOffSiteEquipmentsSublocationsCount();
 		}
 
 		// Create schedules until all equipment is allocated
 		int remainingOnSite = totalOnSiteEquipment;
 		int remainingOffSite = totalOffSiteEquipment;
-		
-		while (remainingOnSite > 0 || remainingOffSite > 0) {
+
+		while ((remainingOnSite > 0) || (remainingOffSite > 0)) {
 			Date currentDate = calendar.getTime();
 
 			// Get max equipment limit for current day
-			int currentDayMaxEquipment = maxNumberEquipmentsForGivenDaysMap.containsKey(currentDate) 
-				? maxNumberEquipmentsForGivenDaysMap.get(currentDate)
-				: maxNumberEquipmentsPerDay;
+			int currentDayMaxEquipment = maxNumberEquipmentsForGivenDaysMap.containsKey(currentDate) ? maxNumberEquipmentsForGivenDaysMap.get(currentDate) : maxNumberEquipmentsPerDay;
 
 			// Create schedule for current date
 			DailyScheduleData dailySchedule = new DailyScheduleData(currentDate);
@@ -169,16 +170,17 @@ public class SchedulingHelper {
 			// Calculate target equipment counts for even distribution
 			int totalRemaining = remainingOnSite + remainingOffSite;
 			int maxToSchedule = Math.min(currentDayMaxEquipment, totalRemaining);
-			
+
 			// Calculate target numbers for on-site and off-site
 			int targetOnSite = 0;
 			int targetOffSite = 0;
-			
-			if (remainingOnSite > 0 && remainingOffSite > 0) {
+
+			if ((remainingOnSite > 0) && (remainingOffSite > 0)) {
 				// Both types remaining - try to schedule evenly
-				targetOnSite = (int) Math.ceil(maxToSchedule / 2.0);
+				double ratioOnSite = ((double) remainingOnSite) / ((double) totalRemaining);
+				targetOnSite = (int) Math.ceil(maxToSchedule * ratioOnSite);
 				targetOffSite = maxToSchedule - targetOnSite;
-				
+
 				// Adjust if we don't have enough of either type
 				if (targetOnSite > remainingOnSite) {
 					targetOnSite = remainingOnSite;
@@ -197,13 +199,18 @@ public class SchedulingHelper {
 			}
 
 			// Schedule on-site equipment
-			scheduleOnSiteEquipmentByPriority(locationsList, dailySchedule, targetOnSite);
+			int onSiteScheduled = scheduleOnSiteEquipmentByPriority(locationsList, dailySchedule, targetOnSite);
+
+			// If the on-site target has not been reached, then the excess is given to the off-site target.
+			if (onSiteScheduled < targetOnSite) {
+				targetOffSite += (targetOnSite - onSiteScheduled);
+			}
 
 			// Schedule off-site equipment
-			scheduleOffSiteEquipmentByPriority(locationsList, dailySchedule, targetOffSite);
+			int offSiteScheduled = scheduleOffSiteEquipmentByPriority(locationsList, dailySchedule, targetOffSite);
 
-			remainingOnSite -= targetOnSite;
-			remainingOffSite -= targetOffSite;
+			remainingOnSite -= onSiteScheduled;
+			remainingOffSite -= offSiteScheduled;
 
 			// Move to next business day
 			do {
@@ -211,7 +218,7 @@ public class SchedulingHelper {
 			} while (!isBusinessDay(calendar.get(java.util.Calendar.DAY_OF_WEEK), openBusinessDays));
 
 			// Distribute locations evenly among technicians for the day
-			distributeLocationsToTechnicians(dailySchedule, techniciansList);
+			distributeEquipmentsToTechnicians(dailySchedule, techniciansList);
 		}
 
 		return scheduleList;
@@ -223,6 +230,7 @@ public class SchedulingHelper {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -230,9 +238,12 @@ public class SchedulingHelper {
 		return new int[] { java.util.Calendar.MONDAY, java.util.Calendar.TUESDAY, java.util.Calendar.WEDNESDAY, java.util.Calendar.THURSDAY, java.util.Calendar.FRIDAY };
 	}
 
-	private static void scheduleOnSiteEquipment(LocationData location, List<DailyScheduleData> scheduleList, int numberOfDays, int targetPerDay, int[] equipmentPerDay) {
-		int onSiteCount = location.getOnsiteEquipmentsCount();
-		if (onSiteCount == 0) return;
+	private static void scheduleOnSiteEquipment(LocationData location, List<DailyScheduleData> scheduleList, int targetPerDay, int[] equipmentPerDay) {
+		int onSiteCount = location.getOnSiteEquipmentsCount();
+
+		if (onSiteCount == 0) {
+			return;
+		}
 
 		// Create a copy of the location with only on-site equipment
 		LocationData onSiteLocation = new LocationData(location.getLocationName());
@@ -246,7 +257,7 @@ public class SchedulingHelper {
 					minDay = i;
 				}
 			}
-			
+
 			// Schedule single equipment on the day with least equipment
 			scheduleList.get(minDay).getTechniciansLocationsMap().values().iterator().next().add(onSiteLocation);
 			location.getOnSiteEquipmentsList().clear();
@@ -272,7 +283,7 @@ public class SchedulingHelper {
 					LocationData dayLocation = new LocationData(location.getLocationName());
 					for (int i = 0; i < toSchedule; i++) {
 						String equipment = onSiteLocation.getOnSiteEquipmentsList().get(i);
-						dayLocation.getOnSiteEquipmentsList().add(equipment);
+						dayLocation.addOnSiteEquipment(equipment);
 					}
 
 					// Remove scheduled equipment
@@ -289,8 +300,10 @@ public class SchedulingHelper {
 		}
 	}
 
-	private static void scheduleOffSiteEquipment(LocationData location, List<DailyScheduleData> scheduleList, int numberOfDays, int targetPerDay, int[] equipmentPerDay) {
-		if (location.getTotalOffSiteEquipmentsSublocationsCount() == 0) return;
+	private static void scheduleOffSiteEquipment(LocationData location, List<DailyScheduleData> scheduleList, int targetPerDay, int[] equipmentPerDay) {
+		if (location.getTotalOffSiteEquipmentsSublocationsCount() == 0) {
+			return;
+		}
 
 		Map<String, List<String>> sublocationMap = location.getOffSiteEquipmentsSublocationsMap();
 
@@ -356,28 +369,40 @@ public class SchedulingHelper {
 	}
 
 	private static int scheduleOnSiteEquipmentForDay(LocationData location, DailyScheduleData dailySchedule, int maxEquipment) {
-		int onSiteCount = location.getOnsiteEquipmentsCount();
-		if (onSiteCount == 0) return 0;
+		int onSiteCount = location.getOnSiteEquipmentsCount();
+
+		if (onSiteCount == 0) {
+			return 0;
+		}
 
 		// Create a copy of the location with only on-site equipment
 		LocationData onSiteLocation = new LocationData(location.getLocationName());
 		List<String> equipmentToSchedule = new ArrayList<>(location.getOnSiteEquipmentsList());
-		
-		// Calculate 50% limit for this location
-		int maxLocationLimit = (int) Math.ceil(equipmentToSchedule.size() * 0.5);
-		
+
+		int maxLocationLimit;
+
+		if (location.isSplitRequiredOnSiteEquipments()) {
+			location.setSplitRequiredOnSiteEquipments(false);
+
+			// Calculate 50% limit for this location
+			maxLocationLimit = (int) Math.ceil(equipmentToSchedule.size() * 0.5);
+		} else {
+			// The 50% limit has already been applied for this location
+			maxLocationLimit = equipmentToSchedule.size();
+		}
+
 		// Take minimum of global limit, location limit, and available equipment
 		int toSchedule = Math.min(maxEquipment, Math.min(maxLocationLimit, equipmentToSchedule.size()));
-		
+
 		if (toSchedule > 0) {
 			// Add equipment to the schedule
 			for (int i = 0; i < toSchedule; i++) {
-				onSiteLocation.getOnSiteEquipmentsList().add(equipmentToSchedule.get(i));
+				onSiteLocation.addOnSiteEquipment(equipmentToSchedule.get(i));
 			}
-			
+
 			// Remove scheduled equipment from the original location
 			location.getOnSiteEquipmentsList().removeAll(onSiteLocation.getOnSiteEquipmentsList());
-			
+
 			// Add location to schedule
 			dailySchedule.getTechniciansLocationsMap().values().iterator().next().add(onSiteLocation);
 		}
@@ -386,9 +411,12 @@ public class SchedulingHelper {
 	}
 
 	private static int scheduleOffSiteEquipmentForDay(LocationData location, DailyScheduleData dailySchedule, int maxEquipment) {
-		if (location.getTotalOffSiteEquipmentsSublocationsCount() == 0) return 0;
+		if (location.getTotalOffSiteEquipmentsSublocationsCount() == 0) {
+			return 0;
+		}
 
 		int totalScheduled = 0;
+
 		Map<String, List<String>> sublocationMap = location.getOffSiteEquipmentsSublocationsMap();
 
 		// Convert sublocation entries to a list and sort by equipment count (descending)
@@ -397,17 +425,30 @@ public class SchedulingHelper {
 
 		// Handle each sublocation in order of most equipment
 		for (Map.Entry<String, List<String>> sublocationEntry : sortedSublocations) {
-			if (maxEquipment <= 0) break;
+			if (maxEquipment <= 0) {
+				break;
+			}
 
 			String sublocationName = sublocationEntry.getKey();
 			List<String> equipmentList = sublocationEntry.getValue();
-			
+
 			if (!equipmentList.isEmpty()) {
 				LocationData dayLocation = new LocationData(location.getLocationName());
-				
-				// Calculate 50% limit for this sublocation
-				int maxSublocationLimit = (int) Math.ceil(equipmentList.size() * 0.5);
-				
+
+				boolean splitRequired = location.getSplitRequiredOffSiteEquipmentsSublocationsMap().get(sublocationName);
+
+				int maxSublocationLimit;
+
+				if (splitRequired) {
+					location.getSplitRequiredOffSiteEquipmentsSublocationsMap().put(sublocationName, Boolean.FALSE);
+
+					// Calculate 50% limit for this sublocation
+					maxSublocationLimit = (int) Math.ceil(equipmentList.size() * 0.5);
+				} else {
+					// The 50% limit has already been applied for this location
+					maxSublocationLimit = equipmentList.size();
+				}
+
 				// Take minimum of global limit, sublocation limit, and available equipment
 				int toSchedule = Math.min(maxEquipment, Math.min(maxSublocationLimit, equipmentList.size()));
 
@@ -429,66 +470,120 @@ public class SchedulingHelper {
 		return totalScheduled;
 	}
 
-	private static void scheduleOnSiteEquipmentByPriority(List<LocationData> locationsList, DailyScheduleData dailySchedule, int targetOnSite) {
-		if (targetOnSite <= 0) return;
-
+	private static int scheduleOnSiteEquipmentByPriority(List<LocationData> locationsList, DailyScheduleData dailySchedule, int targetOnSite) {
 		// Create a sorted list of locations by on-site equipment count (descending)
 		List<LocationData> sortedLocations = new ArrayList<>(locationsList);
-		sortedLocations.sort((a, b) -> Integer.compare(b.getOnsiteEquipmentsCount(), a.getOnsiteEquipmentsCount()));
+		sortedLocations.sort((a, b) -> Integer.compare(b.getOnSiteEquipmentsCount(), a.getOnSiteEquipmentsCount()));
 
 		int onSiteScheduled = 0;
+
 		for (LocationData location : sortedLocations) {
-			if (location.getOnsiteEquipmentsCount() > 0) {
+			if (location.getOnSiteEquipmentsCount() > 0) {
 				int scheduledForDay = scheduleOnSiteEquipmentForDay(location, dailySchedule, targetOnSite - onSiteScheduled);
 				onSiteScheduled += scheduledForDay;
 
-				if (onSiteScheduled >= targetOnSite) break;
+				if (onSiteScheduled >= targetOnSite) {
+					break;
+				}
 			}
 		}
+
+		return onSiteScheduled;
 	}
 
-	private static void scheduleOffSiteEquipmentByPriority(List<LocationData> locationsList, DailyScheduleData dailySchedule, int targetOffSite) {
-		if (targetOffSite <= 0) return;
-
+	private static int scheduleOffSiteEquipmentByPriority(List<LocationData> locationsList, DailyScheduleData dailySchedule, int targetOffSite) {
 		// Create a sorted list of locations by off-site equipment count (descending)
 		List<LocationData> sortedLocations = new ArrayList<>(locationsList);
-		sortedLocations.sort((a, b) -> Integer.compare(
-			b.getTotalOffSiteEquipmentsSublocationsCount(),
-			a.getTotalOffSiteEquipmentsSublocationsCount()
-		));
+		sortedLocations.sort((a, b) -> Integer.compare(b.getTotalOffSiteEquipmentsSublocationsCount(), a.getTotalOffSiteEquipmentsSublocationsCount()));
 
 		int offSiteScheduled = 0;
+
 		for (LocationData location : sortedLocations) {
 			if (location.getTotalOffSiteEquipmentsSublocationsCount() > 0) {
 				int scheduledForDay = scheduleOffSiteEquipmentForDay(location, dailySchedule, targetOffSite - offSiteScheduled);
 				offSiteScheduled += scheduledForDay;
 
-				if (offSiteScheduled >= targetOffSite) break;
+				if (offSiteScheduled >= targetOffSite) {
+					break;
+				}
 			}
 		}
+
+		return offSiteScheduled;
 	}
 
-	private static void distributeLocationsToTechnicians(DailyScheduleData dailySchedule, List<String> techniciansList) {
-		if (techniciansList.size() <= 1)
+	private static void distributeEquipmentsToTechnicians(DailyScheduleData dailySchedule, List<String> techniciansList) {
+		if (techniciansList.size() <= 1) {
 			return;
-	
-		// Get all locations for the day
-		List<LocationData> allLocations = new ArrayList<>();
-		for (List<LocationData> locations : dailySchedule.getTechniciansLocationsMap().values()) {
-			allLocations.addAll(locations);
-			locations.clear();
 		}
-	
-		// Distribute locations evenly among technicians
-		int locationsPerTechnician = (int) Math.ceil((double) allLocations.size() / techniciansList.size());
-		int currentLocation = 0;
-	
-		for (String technician : techniciansList) {
-			List<LocationData> technicianLocations = dailySchedule.getTechniciansLocationsMap().get(technician);
-	
-			for (int i = 0; i < locationsPerTechnician && currentLocation < allLocations.size(); i++) {
-				technicianLocations.add(allLocations.get(currentLocation++));
+
+		List<LocationData> onSiteLocations = new ArrayList<>();
+		List<LocationData> offSiteLocations = new ArrayList<>();
+
+		for (List<LocationData> locations : dailySchedule.getTechniciansLocationsMap().values()) {
+			for (LocationData location : locations) {
+				for (String onSiteEquipment : location.getOnSiteEquipmentsList()) {
+					LocationData onSiteLocation = new LocationData(location.getLocationName());
+					onSiteLocation.addOnSiteEquipment(onSiteEquipment);
+
+					onSiteLocations.add(onSiteLocation);
+				}
+
+				for (Map.Entry<String, List<String>> sublocationEntry : location.getOffSiteEquipmentsSublocationsMap().entrySet()) {
+					for (String offSiteEquipment : sublocationEntry.getValue()) {
+						LocationData offSiteLocation = new LocationData(location.getLocationName());
+						offSiteLocation.addOffSiteEquipmentToSublocation(sublocationEntry.getKey(), offSiteEquipment);
+
+						offSiteLocations.add(offSiteLocation);
+					}
+				}
 			}
+		}
+
+		int totalOnSite = onSiteLocations.size();
+		int totalOffSite = offSiteLocations.size();
+		int numTechnicians = techniciansList.size();
+
+		int[][] distributionByTechnician = new int[2][numTechnicians];
+
+		int baseOnSite = totalOnSite / numTechnicians;
+		int extraOnSite = totalOnSite % numTechnicians;
+
+		int baseOffSite = totalOffSite / numTechnicians;
+		int extraOffSite = totalOffSite % numTechnicians;
+
+		for (int i = 0; i < numTechnicians; i++) {
+			boolean addOnSite = (extraOnSite != 0);
+			boolean addOffSite = ((extraOnSite == 0) && (extraOffSite != 0));
+
+			distributionByTechnician[0][i] = baseOnSite + (addOnSite ? 1 : 0);
+			distributionByTechnician[1][i] = baseOffSite + (addOffSite ? 1 : 0);
+
+			if (addOnSite) {
+				extraOnSite--;
+			}
+
+			if (addOffSite) {
+				extraOffSite--;
+			}
+		}
+
+		int technicianIndex = 0;
+		int onSiteIndex = 0;
+		int offSiteIndex = 0;
+
+		for (List<LocationData> locations : dailySchedule.getTechniciansLocationsMap().values()) {
+			locations.clear();
+
+			for (int i = 0; i < distributionByTechnician[0][technicianIndex]; i++) {
+				locations.add(onSiteLocations.get(onSiteIndex++));
+			}
+
+			for (int i = 0; i < distributionByTechnician[1][technicianIndex]; i++) {
+				locations.add(offSiteLocations.get(offSiteIndex++));
+			}
+
+			technicianIndex++;
 		}
 	}
 }

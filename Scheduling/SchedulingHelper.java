@@ -548,6 +548,10 @@ public class SchedulingHelper {
 		int totalOnSite = onSiteLocations.size();
 		int totalOffSite = offSiteLocations.size();
 		int numTechnicians = techniciansList.size();
+		
+		int total = totalOnSite + totalOffSite;
+		
+		System.out.println("--> " + total);
 
 		// Create array to store distribution:
 		// distributionByTechnician[0] = on-site equipment counts
@@ -561,18 +565,24 @@ public class SchedulingHelper {
 		int baseOffSite = totalOffSite / numTechnicians;
 		int extraOffSite = totalOffSite % numTechnicians;
 
-		// Distribute base amounts and extra equipment
-		// Priority: distribute extra on-site equipment first, then extra off-site
+		// Distribute base amounts and extra  on-site equipment
+		// Distribute extra on-site equipment first
 		for (int i = 0; i < numTechnicians; i++) {
 			boolean addOnSite = (extraOnSite != 0);
-			boolean addOffSite = ((extraOnSite == 0) && (extraOffSite != 0));
 
 			distributionByTechnician[0][i] = baseOnSite + (addOnSite ? 1 : 0);
-			distributionByTechnician[1][i] = baseOffSite + (addOffSite ? 1 : 0);
 
 			if (addOnSite) {
 				extraOnSite--;
 			}
+		}
+
+		// Distribute base amounts and extra  off-site equipment
+		// Distribute extra off-site equipment last
+		for (int i = numTechnicians - 1; i >= 0; i--) {
+			boolean addOffSite = (extraOffSite != 0);
+
+			distributionByTechnician[1][i] = baseOffSite + (addOffSite ? 1 : 0);
 
 			if (addOffSite) {
 				extraOffSite--;

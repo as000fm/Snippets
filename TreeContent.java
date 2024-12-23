@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import outils.base.OutilsBase;
 
@@ -30,6 +31,9 @@ public class TreeContent {
 	/** Dernière branche du niveau par défaut **/
 	public static final String LAST_BRANCH_LEVEL_DEF = "└── ";
 
+	/** Séparateur d'un répertoire par défaut **/
+	public static final String DIRECTORY_SEPARATOR_DEF = File.separator;
+
 	/** Profondeur maximale de l'arborescence **/
 	private int maxDepth;
 
@@ -47,6 +51,9 @@ public class TreeContent {
 
 	/** Dernière branche du niveau **/
 	private String lastBranchLevel;
+
+	/** Séparateur d'un répertoire **/
+	private String directorySeparator;
 
 	/** Nombre total de répertoires **/
 	private int directoriesCount;
@@ -67,7 +74,8 @@ public class TreeContent {
 				SPACING_LEVEL_DEF, //
 				DIRECTORY_SPACING_LEVEL_DEF, //
 				BRANCH_LEVEL_DEF, //
-				LAST_BRANCH_LEVEL_DEF //
+				LAST_BRANCH_LEVEL_DEF, //
+				DIRECTORY_SEPARATOR_DEF //
 		);
 	}
 
@@ -82,7 +90,8 @@ public class TreeContent {
 				SPACING_LEVEL_DEF, //
 				DIRECTORY_SPACING_LEVEL_DEF, //
 				BRANCH_LEVEL_DEF, //
-				LAST_BRANCH_LEVEL_DEF //
+				LAST_BRANCH_LEVEL_DEF, //
+				DIRECTORY_SEPARATOR_DEF //
 		);
 	}
 
@@ -97,7 +106,8 @@ public class TreeContent {
 				SPACING_LEVEL_DEF, //
 				DIRECTORY_SPACING_LEVEL_DEF, //
 				BRANCH_LEVEL_DEF, //
-				LAST_BRANCH_LEVEL_DEF //
+				LAST_BRANCH_LEVEL_DEF, //
+				DIRECTORY_SEPARATOR_DEF //
 		);
 	}
 
@@ -113,7 +123,8 @@ public class TreeContent {
 				SPACING_LEVEL_DEF, //
 				DIRECTORY_SPACING_LEVEL_DEF, //
 				BRANCH_LEVEL_DEF, //
-				LAST_BRANCH_LEVEL_DEF //
+				LAST_BRANCH_LEVEL_DEF, //
+				DIRECTORY_SEPARATOR_DEF //
 		);
 	}
 
@@ -123,15 +134,17 @@ public class TreeContent {
 	 * @param directorySpacingLevel Espacement d'un répertoire du niveau
 	 * @param branchLevel Branche du niveau Branche du niveau
 	 * @param lastBranchLevel Dernière branche du niveau
+	 * @param directorySeparator Séparateur d'un répertoire
 	 */
-	public TreeContent(String spacingLevel, String directorySpacingLevel, String branchLevel, String lastBranchLevel) {
+	public TreeContent(String spacingLevel, String directorySpacingLevel, String branchLevel, String lastBranchLevel, String directorySeparator) {
 		this( //
 				MAX_DEPTH_DEF, //
 				DIRECTORIES_FIRST_DEF, //
 				spacingLevel, //
 				directorySpacingLevel, //
 				branchLevel, //
-				lastBranchLevel //
+				lastBranchLevel, //
+				directorySeparator //
 		);
 	}
 
@@ -143,8 +156,9 @@ public class TreeContent {
 	 * @param directorySpacingLevel Espacement d'un répertoire du niveau
 	 * @param branchLevel Branche du niveau Branche du niveau
 	 * @param lastBranchLevel Dernière branche du niveau
+	 * @param directorySeparator Séparateur d'un répertoire
 	 */
-	public TreeContent(int maxDepth, boolean directoriesFirst, String spacingLevel, String directorySpacingLevel, String branchLevel, String lastBranchLevel) {
+	public TreeContent(int maxDepth, boolean directoriesFirst, String spacingLevel, String directorySpacingLevel, String branchLevel, String lastBranchLevel, String directorySeparator) {
 		this.maxDepth = maxDepth;
 		this.directoriesFirst = directoriesFirst;
 		this.spacingLevel = spacingLevel;
@@ -215,14 +229,18 @@ public class TreeContent {
 						filesCount++;
 					}
 
-					if (index == lastIndex) {
-						lines.add(spacing + lastBranchLevel + entry.getName());
+					boolean isDir = entry.isDirectory();
 
-						if (entry.isDirectory()) {
+					String dirSep = isDir ? directorySeparator : "";
+
+					if (index == lastIndex) {
+						lines.add(spacing + lastBranchLevel + entry.getName() + dirSep);
+
+						if (isDir) {
 							addContent(entry, spacing + spacingLevel, level + 1, filter, subdir, showFiles);
 						}
 					} else {
-						lines.add(spacing + branchLevel + entry.getName());
+						lines.add(spacing + branchLevel + entry.getName() + dirSep);
 
 						if (entry.isDirectory()) {
 							addContent(entry, spacing + directorySpacingLevel, level + 1, filter, subdir, showFiles);
@@ -261,6 +279,40 @@ public class TreeContent {
 		}
 
 		return baseDir;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "TreeContent [maxDepth=" + maxDepth + ", directoriesFirst=" + directoriesFirst + ", spacingLevel=" + spacingLevel + ", directorySpacingLevel=" + directorySpacingLevel + ", branchLevel=" + branchLevel + ", lastBranchLevel=" + lastBranchLevel + ", directorySeparator=" + directorySeparator + ", directoriesCount=" + directoriesCount + ", filesCount=" + filesCount + ", lines=" + lines + "]";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TreeContent other = (TreeContent) obj;
+		return Objects.equals(branchLevel, other.branchLevel) && directoriesCount == other.directoriesCount && directoriesFirst == other.directoriesFirst && Objects.equals(directorySeparator, other.directorySeparator) && Objects.equals(directorySpacingLevel, other.directorySpacingLevel) && filesCount == other.filesCount && Objects.equals(lastBranchLevel, other.lastBranchLevel) && Objects.equals(lines, other.lines) && maxDepth == other.maxDepth && Objects.equals(spacingLevel, other.spacingLevel);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(branchLevel, directoriesCount, directoriesFirst, directorySeparator, directorySpacingLevel, filesCount, lastBranchLevel, lines, maxDepth, spacingLevel);
 	}
 
 	/**
@@ -635,6 +687,14 @@ public class TreeContent {
 	 */
 	public void setLastBranchLevel(String lastBranchLevel) {
 		this.lastBranchLevel = lastBranchLevel;
+	}
+
+	public String getDirectorySeparator() {
+		return directorySeparator;
+	}
+
+	public void setDirectorySeparator(String directorySeparator) {
+		this.directorySeparator = directorySeparator;
 	}
 
 	/**

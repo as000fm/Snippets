@@ -1,4 +1,4 @@
-package outils.commun;
+package outils.abstractions;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 import outils.base.OutilsBase;
+import outils.commun.OutilsCommun;
 
 /**
  * Extrait l'arborescence des fichiers et répertoires sous forme de texte
@@ -583,7 +584,7 @@ public class TreeContent {
 		filesCount = 0;
 
 		if (title == null) {
-			lines.add(baseDir.getAbsolutePath());
+			lines.add(baseDir.getAbsolutePath() + directorySeparator);
 		} else if (!title.isEmpty()) {
 			lines.add(title);
 		}

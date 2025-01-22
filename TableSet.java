@@ -1,3 +1,26 @@
+	/**
+	 * Ajout d'un enregistrement
+	 * @param data L'enregistrement à ajouter
+	 * @throws DataSetException en cas d'erreur...
+	 */
+	public void add(T data) throws DataSetException {
+		if (data == null) {
+			throw new DataSetException("Pas de donnée !!!");
+		}
+
+		if (!isActive()) {
+			open();
+		}
+
+		try {
+			append();
+			setRowData(data);
+			post();
+		} catch (DataSetException e) {
+			cancel();
+			throw e;
+		}
+	}
 
 	@Override
 	public void close() throws DataSetException {

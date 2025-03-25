@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<project default="all" name="Test">
+<project default="all" name="Au Menu GWT Pico">
+
+	<!-- Généré par tools.GenerateAntBuildGWTWarAuMenuGWTPico du projet Au Menu GWT Pico -->
+	
 	<property environment="env" />
 
 	<property name="dir.project" location="${basedir}" />
 	<property name="dir.workspace" value="${dir.project}/.." />
 	<property name="dir.deploy" location="${java.io.tmpdir}"/>
-	<property name="dir.deploy.projects" location="${dir.deploy}/project_monitor"/>
+	<property name="dir.deploy.projects" location="${dir.deploy}/project_au_menu"/>
 
 	<tstamp>
 		<format property="builtDateTime" pattern="yyyy-MM-dd HH:mm" />
 	</tstamp>
+
+	<property name="gwt.sdk" value="..\GWT 2.10.1 jars\gwt-2.10.1" />
 
 	<path id="deploy.class.path">
 		<dirset dir="war\WEB-INF\classes" />
@@ -17,43 +22,90 @@
 	</path>
 
 	<target name="version-build" description="New build version">
-		<propertyfile file="src\monitor\version\VersionConstants.properties" comment="Fichier de version du build">
+		<propertyfile file="src\menu\common\version\VersionConstants.properties" comment="Fichier de version du build de Au Menu GWT Pico">
 			<entry key="buildDateTime" value="${builtDateTime}" />
+			<entry key="buildBy" value="Claude Toupin" />
 			<entry key="buildNumber" type="int" operation="+"  default="-1" />
 		</propertyfile>
-		<property file="src\monitor\version\VersionConstants.properties" />
-		<copy file="src\monitor\version\VersionConstants.properties" tofile="war\WEB-INF\classes\monitor\version\VersionConstants.properties" overwrite="true" />
+		<property file="src\menu\common\version\VersionConstants.properties" />
+		<copy file="src\menu\common\version\VersionConstants.properties" tofile="war\WEB-INF\classes\menu\common\version\VersionConstants.properties" overwrite="true" />
 		<echo message="Build number is ${buildNumber}" />
-		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
 	</target>
 
 	<target name="version-rebuild" description="Rebuild version">
-		<property file="src\monitor\version\VersionConstants.properties" />
-		<propertyfile file="src\monitor\version\VersionConstants.properties" comment="Fichier de version du build">
+		<property file="src\menu\common\version\VersionConstants.properties" />
+		<propertyfile file="src\menu\common\version\VersionConstants.properties" comment="Fichier de version du build de Au Menu GWT Pico">
 			<entry key="buildDateTime" value="${builtDateTime}" />
+			<entry key="buildBy" value="Claude Toupin" />
 			<entry key="buildNumber" value="${buildNumber}" />
 		</propertyfile>
-		<property file="src\monitor\version\VersionConstants.properties" />
-		<copy file="src\monitor\version\VersionConstants.properties" tofile="war\WEB-INF\classes\monitor\version\VersionConstants.properties" overwrite="true" />
+		<property file="src\menu\common\version\VersionConstants.properties" />
+		<copy file="src\menu\common\version\VersionConstants.properties" tofile="war\WEB-INF\classes\menu\common\version\VersionConstants.properties" overwrite="true" />
 		<echo message="Rebuild number is ${buildNumber}" />
-		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
 	</target>
 
 	<path id="project.class.path">
 		<pathelement location="war\WEB-INF\classes" />
-		<pathelement location="..\Outils\src" />
-		<pathelement location="..\Outils\bin" />
-		<pathelement location="..\OutilsGWT\src" />
-		<pathelement location="..\OutilsGWT\bin" />
-		<pathelement location="..\SGBD\src" />
-		<pathelement location="..\SGBD\bin" />
+		<pathelement location="..\Ant-Pom libs\outils-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\atu-anno-1.3.jar" />
+		<pathelement location="..\Ant-Pom libs\commons-cli-1.9.0.jar" />
+		<pathelement location="..\Ant-Pom libs\commons-email-1.6.0.jar" />
+		<pathelement location="..\Ant-Pom libs\poi-5.2.5.jar" />
+		<pathelement location="..\Ant-Pom libs\commons-codec-1.16.0.jar" />
+		<pathelement location="..\Ant-Pom libs\commons-collections4-4.4.jar" />
+		<pathelement location="..\Ant-Pom libs\commons-math3-3.6.1.jar" />
+		<pathelement location="..\Ant-Pom libs\commons-io-2.15.0.jar" />
+		<pathelement location="..\Ant-Pom libs\SparseBitSet-1.3.jar" />
+		<pathelement location="..\Ant-Pom libs\log4j-api-2.21.1.jar" />
+		<pathelement location="..\Ant-Pom libs\poi-ooxml-5.2.5.jar" />
+		<pathelement location="..\Ant-Pom libs\poi-ooxml-lite-5.2.5.jar" />
+		<pathelement location="..\Ant-Pom libs\xmlbeans-5.2.0.jar" />
+		<pathelement location="..\Ant-Pom libs\commons-compress-1.25.0.jar" />
+		<pathelement location="..\Ant-Pom libs\curvesapi-1.08.jar" />
+		<pathelement location="..\Ant-Pom libs\groovy-4.0.23.jar" />
 		<pathelement location="..\Ant-Pom libs\gson-2.10.1.jar" />
+		<pathelement location="..\Ant-Pom libs\jakarta.mail-2.0.1.jar" />
+		<pathelement location="..\Ant-Pom libs\jakarta.activation-2.0.1.jar" />
+		<pathelement location="..\Ant-Pom libs\xz-1.10.jar" />
+		<pathelement location="..\Ant-Pom libs\snakeyaml-2.2.jar" />
+		<pathelement location="..\Ant-Pom libs\jackson-dataformat-yaml-2.17.2.jar" />
+		<pathelement location="..\Ant-Pom libs\jackson-core-2.17.2.jar" />
+		<pathelement location="..\Ant-Pom libs\jackson-dataformat-xml-2.17.2.jar" />
+		<pathelement location="..\Ant-Pom libs\jackson-annotations-2.17.2.jar" />
+		<pathelement location="..\Ant-Pom libs\stax2-api-4.2.2.jar" />
+		<pathelement location="..\Ant-Pom libs\woodstox-core-6.7.0.jar" />
+		<pathelement location="..\Ant-Pom libs\jackson-databind-2.17.2.jar" />
+		<pathelement location="..\Ant-Pom libs\outils-generators-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\outils-javadoc-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\maven-model-3.9.9.jar" />
+		<pathelement location="..\Ant-Pom libs\plexus-utils-3.5.1.jar" />
+		<pathelement location="..\Ant-Pom libs\maven-invoker-3.3.0.jar" />
+		<pathelement location="..\Ant-Pom libs\maven-shared-utils-3.4.2.jar" />
+		<pathelement location="..\Ant-Pom libs\javax.inject-1.jar" />
+		<pathelement location="..\Ant-Pom libs\outils-gwt-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\gwt-user-2.10.1.jar" />
+		<pathelement location="..\Ant-Pom libs\jsinterop-annotations-2.0.0.jar" />
+		<pathelement location="..\Ant-Pom libs\validation-api-1.0.0.GA.jar" />
+		<pathelement location="..\Ant-Pom libs\javax.servlet-api-3.1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\sac-1.3.jar" />
+		<pathelement location="..\Ant-Pom libs\gwt-servlet-2.10.1.jar" />
+		<pathelement location="..\Ant-Pom libs\activation-1.1.1.jar" />
+		<pathelement location="..\Ant-Pom libs\outils-gwt-generators-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\outils-gwt-font-awesome-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\outils-gwt-pico-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\outils-gwt-pico-generators-1.0.jar" />
+		<pathelement location="..\Ant-Pom libs\jsoup-1.17.2.jar" />
+		<pathelement location="..\Ant-Pom libs\sgbd-1.0.jar" />
 		<pathelement location="..\Ant-Pom libs\mysql-connector-j-8.4.0.jar" />
 		<pathelement location="..\Ant-Pom libs\protobuf-java-3.25.1.jar" />
 		<pathelement location="..\Ant-Pom libs\sqlite-jdbc-3.45.3.0.jar" />
 		<pathelement location="..\Ant-Pom libs\slf4j-api-1.7.36.jar" />
+		<pathelement location="..\Ant-Pom libs\sgbd-generators-1.0.jar" />
+		<pathelement location="${gwt.sdk}\gwt-user.jar" />
+		<pathelement location="${gwt.sdk}\gwt-dev.jar" />
+		<pathelement location="${gwt.sdk}\validation-api-1.0.0.GA.jar" />
+		<pathelement location="${gwt.sdk}\validation-api-1.0.0.GA-sources.jar" />
 		<fileset dir="war\WEB-INF\lib" includes="**\*.jar" />
-		<fileset dir="C:\eclipse\apache-tomcat-9.0.88\lib" includes="**\*.jar" />
 	</path>
 
 	<target name="projects-jars" description="Packages projects jars">
@@ -61,10 +113,6 @@
 		<delete>
 			<fileset dir="${dir.deploy.projects}" includes="*.jar" />
 		</delete>
-		<jar destfile="${dir.deploy.projects}\Outils.jar">
-			<fileset dir="..\Outils\bin" />
-		</jar>
-		<copy file="${dir.deploy.projects}\Outils.jar" tofile="war\WEB-INF\lib\Outils.jar" overwrite="true" />
 	</target>
 
 	<target name="java-compile" depends="projects-jars" description="Compiles java source to bytecode">
@@ -75,44 +123,721 @@
 				<path refid="project.class.path" />
 			</classpath>
 		</javac>
-		<eclipse.refreshLocal resource="${dir.project}" depth="infinite" />
 		<copy todir="war\WEB-INF\classes">
 			<fileset dir="src" excludes="**\*.java" />
 		</copy>
 	</target>
 
-	<target name="prepare" depends="java-compile" description="Prepares for the war packaging">
-		<java failonerror="true" fork="true" className="tools.DeployUptimeKumaMonitorService" maxMemory="1024m">
+	<target name="gwt-compile" depends="java-compile" description="Compiles to JavaScript">
+		<java failonerror="true" fork="true" className="com.google.gwt.dev.Compiler" maxMemory="1024m">
 			<jvmarg value="-Dfile.encoding=UTF-8" />
 			<jvmarg value="-Denglish.console=true" />
 			<classpath>
-				<path refid="deploy.class.path" />
+				<pathelement location="src" />
+				<pathelement location="..\Outils\src" />
 				<pathelement location="..\Outils\bin" />
-				<pathelement location="..\OutilsGWT\bin" />
+				<pathelement location="..\Outils GWT\src" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\src" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\src" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\Outils GWT Pico Styles\src" />
+				<pathelement location="..\Outils GWT Pico Styles\bin" />
+				<pathelement location="..\SGBD\src" />
 				<pathelement location="..\SGBD\bin" />
+				<path refid="project.class.path" />
 			</classpath>
-			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="-war" />
+			<arg value="war" />
+			<arg value="-style" />
+			<arg value="OBFUSCATED" />
+			<arg value="-strict" />
+			<arg value="menu.AuMenu" />
 		</java>
 	</target>
 
-	<target name="build" depends="version-build,java-compile" description="Builds this project" />
+	<target name="compile" depends="clean,gwt-compile" description="Compiles this project" />
 
-	<target name="rebuild" depends="version-rebuild,java-compile" description="Rebuilds this project" />
+	<target name="build" depends="version-build,gwt-compile" description="Builds this project" />
 
-	<target name="war" description="Creates a war file">
+	<target name="rebuild" depends="version-rebuild,gwt-compile" description="Rebuilds this project" />
+
+	<target name="war-acepc-t11-plus" description="Creates the war file for acepc-t11-plus">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="acepc-t11-plus" />
+			<arg value="${builtDateTime}" />
+		</java>
 		<delete>
-			<fileset dir="." includes="UptimeKumaMonitorService*.war" />
+			<fileset dir="." includes="acepc-t11-plus\AuMenu*.war" />
 		</delete>
-		<war destfile="UptimeKumaMonitorService##${buildNumber}.war" basedir="${dir.deploy}/deploy_monitor" />
+		<war destfile="acepc-t11-plus\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-budibase-cli-vm" description="Creates the war file for debian-budibase-cli-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-budibase-cli-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-budibase-cli-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-budibase-cli-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-budibase-dev-vm" description="Creates the war file for debian-budibase-dev-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-budibase-dev-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-budibase-dev-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-budibase-dev-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-docker-backups-vm" description="Creates the war file for debian-docker-backups-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-docker-backups-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-docker-backups-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-docker-backups-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-docker-empty-vm" description="Creates the war file for debian-docker-empty-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-docker-empty-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-docker-empty-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-docker-empty-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-docker-lab1-vm" description="Creates the war file for debian-docker-lab1-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-docker-lab1-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-docker-lab1-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-docker-lab1-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-docker-lab2-vm" description="Creates the war file for debian-docker-lab2-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-docker-lab2-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-docker-lab2-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-docker-lab2-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-docker-lab3-vm" description="Creates the war file for debian-docker-lab3-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-docker-lab3-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-docker-lab3-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-docker-lab3-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-docker-vm" description="Creates the war file for debian-docker-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-docker-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-docker-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-docker-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-pi-hole-0-a-vm" description="Creates the war file for debian-pi-hole-0-a-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-pi-hole-0-a-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-pi-hole-0-a-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-pi-hole-0-a-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-pi-hole-0-b-vm" description="Creates the war file for debian-pi-hole-0-b-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-pi-hole-0-b-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-pi-hole-0-b-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-pi-hole-0-b-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-pi-hole-1-a-vm" description="Creates the war file for debian-pi-hole-1-a-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-pi-hole-1-a-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-pi-hole-1-a-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-pi-hole-1-a-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-pi-hole-1-b-vm" description="Creates the war file for debian-pi-hole-1-b-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-pi-hole-1-b-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-pi-hole-1-b-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-pi-hole-1-b-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-pi-hole-2-a-vm" description="Creates the war file for debian-pi-hole-2-a-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-pi-hole-2-a-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-pi-hole-2-a-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-pi-hole-2-a-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-debian-pi-hole-2-b-vm" description="Creates the war file for debian-pi-hole-2-b-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="debian-pi-hole-2-b-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="debian-pi-hole-2-b-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="debian-pi-hole-2-b-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-a" description="Creates the war file for hp-800-g3-a">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-a" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-a\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-a\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-b" description="Creates the war file for hp-800-g3-b">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-b" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-b\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-b\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-c" description="Creates the war file for hp-800-g3-c">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-c" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-c\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-c\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-d" description="Creates the war file for hp-800-g3-d">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-d" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-d\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-d\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-e" description="Creates the war file for hp-800-g3-e">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-e" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-e\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-e\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-f" description="Creates the war file for hp-800-g3-f">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-f" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-f\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-f\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-g" description="Creates the war file for hp-800-g3-g">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-g" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-g\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-g\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g3-h" description="Creates the war file for hp-800-g3-h">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g3-h" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g3-h\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g3-h\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-hp-800-g4-i" description="Creates the war file for hp-800-g4-i">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="hp-800-g4-i" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="hp-800-g4-i\AuMenu*.war" />
+		</delete>
+		<war destfile="hp-800-g4-i\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-laptop-15-a" description="Creates the war file for laptop-15-a">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="laptop-15-a" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="laptop-15-a\AuMenu*.war" />
+		</delete>
+		<war destfile="laptop-15-a\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-laptop-15-b" description="Creates the war file for laptop-15-b">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="laptop-15-b" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="laptop-15-b\AuMenu*.war" />
+		</delete>
+		<war destfile="laptop-15-b\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-samsung-2" description="Creates the war file for samsung-2">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="samsung-2" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="samsung-2\AuMenu*.war" />
+		</delete>
+		<war destfile="samsung-2\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-tecra-a9" description="Creates the war file for tecra-a9">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="tecra-a9" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="tecra-a9\AuMenu*.war" />
+		</delete>
+		<war destfile="tecra-a9\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
+	</target>
+
+	<target name="war-ubuntu-docker-empty-vm" description="Creates the war file for ubuntu-docker-empty-vm">
+		<delete dir="${dir.deploy}/deploy_au_menu" failOnError="false" />
+		<java failonerror="true" fork="true" className="tools.DeployAuMenuGWTPico" maxMemory="1024m">
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Denglish.console=true" />
+			<classpath>
+				<pathelement location="..\Outils\bin" />
+				<pathelement location="..\Outils GWT\bin" />
+				<pathelement location="..\Outils GWT Font Awesome\bin" />
+				<pathelement location="..\Outils GWT Pico\bin" />
+				<pathelement location="..\SGBD\bin" />
+				<path refid="deploy.class.path" />
+			</classpath>
+			<sysproperty key="user.dir" value="${basedir}" />
+			<arg value="ubuntu-docker-empty-vm" />
+			<arg value="${builtDateTime}" />
+		</java>
+		<delete>
+			<fileset dir="." includes="ubuntu-docker-empty-vm\AuMenu*.war" />
+		</delete>
+		<war destfile="ubuntu-docker-empty-vm\AuMenu##${buildNumber}.war" basedir="${dir.deploy}/deploy_au_menu" zip64mode="always" />
 	</target>
 
 	<target name="clean" description="Cleans the war directories">
 		<delete dir="war\WEB-INF\classes" failOnError="false" />
+		<delete dir="war\AuMenu" failOnError="false" />
 	</target>
 
-	<target name="rebuild-all" depends="clean,rebuild,war" description="Rebuilds all" />
+	<target name="rebuild-all" depends="clean,rebuild,war-acepc-t11-plus,war-debian-budibase-cli-vm,war-debian-budibase-dev-vm,war-debian-docker-backups-vm,war-debian-docker-empty-vm,war-debian-docker-lab1-vm,war-debian-docker-lab2-vm,war-debian-docker-lab3-vm,war-debian-docker-vm,war-debian-pi-hole-0-a-vm,war-debian-pi-hole-0-b-vm,war-debian-pi-hole-1-a-vm,war-debian-pi-hole-1-b-vm,war-debian-pi-hole-2-a-vm,war-debian-pi-hole-2-b-vm,war-hp-800-g3-a,war-hp-800-g3-b,war-hp-800-g3-c,war-hp-800-g3-d,war-hp-800-g3-e,war-hp-800-g3-f,war-hp-800-g3-g,war-hp-800-g3-h,war-hp-800-g4-i,war-laptop-15-a,war-laptop-15-b,war-samsung-2,war-tecra-a9,war-ubuntu-docker-empty-vm" description="Rebuilds all" />
 
-	<target name="all" depends="clean,build,war" description="Performs all" />
+	<target name="all" depends="clean,build,war-acepc-t11-plus,war-debian-budibase-cli-vm,war-debian-budibase-dev-vm,war-debian-docker-backups-vm,war-debian-docker-empty-vm,war-debian-docker-lab1-vm,war-debian-docker-lab2-vm,war-debian-docker-lab3-vm,war-debian-docker-vm,war-debian-pi-hole-0-a-vm,war-debian-pi-hole-0-b-vm,war-debian-pi-hole-1-a-vm,war-debian-pi-hole-1-b-vm,war-debian-pi-hole-2-a-vm,war-debian-pi-hole-2-b-vm,war-hp-800-g3-a,war-hp-800-g3-b,war-hp-800-g3-c,war-hp-800-g3-d,war-hp-800-g3-e,war-hp-800-g3-f,war-hp-800-g3-g,war-hp-800-g3-h,war-hp-800-g4-i,war-laptop-15-a,war-laptop-15-b,war-samsung-2,war-tecra-a9,war-ubuntu-docker-empty-vm" description="Performs all" />
 
 
 </project>

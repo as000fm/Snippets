@@ -128,12 +128,13 @@
 		setDisplayFilter(params, ignoreCase, conjunction);
 		setDisplayFilterActive(true);
 	}
+
 	/**
 	 * Ajoute un filtre de recherche à la vue et l'active
 	 * @param filter La partie SQL du filtre
 	 * @throws DataSetException en cas d'erreur (voir aussi getLastError()...)
 	 */
-	public void setDisplaySearchFilter(String filter) throws DataSetException {
+	public void setActiveSearchFilter(String filter) throws DataSetException {
 		setSearchFilter(filter);
 		setSearchFilterActive(true);
 	}
@@ -144,7 +145,7 @@
 	 * @param params Les paramètres du filtre
 	 * @throws DataSetException en cas d'erreur (voir aussi getLastError()...)
 	 */
-	public void setDisplaySearchFilter(String filter, DataFieldList params) throws DataSetException {
+	public void setActiveSearchFilter(String filter, DataFieldList params) throws DataSetException {
 		setSearchFilter(filter, params);
 		setSearchFilterActive(true);
 	}
@@ -154,7 +155,7 @@
 	 * @param params Les paramètres du filtre
 	 * @throws DataSetException en cas d'erreur (voir aussi getLastError()...)
 	 */
-	public void setDisplaySearchFilter(DataFieldList params) throws DataSetException {
+	public void setActiveSearchFilter(DataFieldList params) throws DataSetException {
 		setSearchFilter(params);
 		setSearchFilterActive(true);
 	}
@@ -165,7 +166,7 @@
 	 * @param ignoreCase Indicateur d'ignorer la case
 	 * @throws DataSetException en cas d'erreur (voir aussi getLastError()...)
 	 */
-	public void setDisplaySearchFilter(DataFieldList params, boolean ignoreCase) throws DataSetException {
+	public void setActiveSearchFilter(DataFieldList params, boolean ignoreCase) throws DataSetException {
 		setSearchFilter(params, ignoreCase);
 		setSearchFilterActive(true);
 	}
@@ -176,7 +177,7 @@
 	 * @param conjunction La conjonction à utiliser entre chaque paramètre (ex: AND)
 	 * @throws DataSetException en cas d'erreur (voir aussi getLastError()...)
 	 */
-	public void setDisplaySearchFilter(DataFieldList params, String conjunction) throws DataSetException {
+	public void setActiveSearchFilter(DataFieldList params, String conjunction) throws DataSetException {
 		setSearchFilter(params, conjunction);
 		setSearchFilterActive(true);
 	}
@@ -188,7 +189,7 @@
 	 * @param conjunction La conjonction à utiliser entre chaque paramètre (ex: AND)
 	 * @throws DataSetException en cas d'erreur (voir aussi getLastError()...)
 	 */
-	public void setDisplaySearchFilter(DataFieldList params, boolean ignoreCase, String conjunction) throws DataSetException {
+	public void setActiveSearchFilter(DataFieldList params, boolean ignoreCase, String conjunction) throws DataSetException {
 		setSearchFilter(params, ignoreCase, conjunction);
 		setSearchFilterActive(true);
 	}

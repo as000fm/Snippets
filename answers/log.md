@@ -1,10 +1,10 @@
-Totally fair. Here are two **drop-in** ways that ignore Tomcat/JULI config and just write to the file you choose.
+You’re right—that happened because I used the file path in the logger **name** (so the formatter printed it). Here’s a cleaned-up version of **Option A** that:
 
----
+* keeps a per-file logger cache (keyed by the absolute path),
+* uses a short **displayName** (defaults to the filename only),
+* and **does not** print the full path anywhere.
 
-# Option A — Tiny logger class (rotates optional, thread-safe)
-
-**File:** `FileLog.java`
+# Drop-in: `FileLog.java` (clean display)
 
 ```java
 package your.pkg;
@@ -18,48 +18,53 @@ import java.util.logging.*;
 
 public final class FileLog {
   private static final ConcurrentHashMap<String, Logger> CACHE = new ConcurrentHashMap<>();
-  private static final DateTimeFormatter ISO = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+  private static final DateTimeFormatter TS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
   private FileLog() {}
 
-  /** Get a java.util.logging.Logger that writes ONLY to the given file (append=true). */
+  /** Get a logger that writes ONLY to the given file. Log lines show a short display name (filename). */
   public static Logger get(String absolutePath) {
-    return CACHE.computeIfAbsent(absolutePath, FileLog::createLogger);
+    return get(absolutePath, Paths.get(absolutePath).getFileName().toString());
   }
 
-  private static Logger createLogger(String path) {
-    try {
-      // Ensure folder exists
-      Path p = Paths.get(path);
-      Files.createDirectories(p.getParent());
+  /** Same, but let you choose a short display name (e.g., "myapp"). */
+  public static Logger get(String absolutePath, String displayName) {
+    return CACHE.computeIfAbsent(absolutePath, p -> createLogger(p, displayName));
+  }
 
-      Logger logger = Logger.getLogger("FileLog@" + path);
-      logger.setUseParentHandlers(false);           // no console
+  private static Logger createLogger(String path, String displayName) {
+    try {
+      Path p = Paths.get(path);
+      Path dir = p.getParent();
+      if (dir != null) Files.createDirectories(dir);
+
+      // Stable, generic logger name (no path leakage)
+      Logger logger = Logger.getLogger("your.pkg.FileLog");
+      logger.setUseParentHandlers(false);
       logger.setLevel(Level.ALL);
 
-      // Append mode; no size rotation. If you want rotation, see comment below.
-      FileHandler fh = new FileHandler(path, /*append*/ true);
+      // Size-rotating file handler (5 MB, keep 5 files); set 'true' to append to current file
+      FileHandler fh = new FileHandler(path, 5 * 1024 * 1024, 5, true);
       fh.setLevel(Level.ALL);
       fh.setFormatter(new Formatter() {
         @Override public String format(LogRecord r) {
-          String ts = ISO.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(r.getMillis()), ZoneId.systemDefault()));
-          String msg = formatMessage(r);
+          String ts = TS.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(r.getMillis()), ZoneId.systemDefault()));
           StringBuilder sb = new StringBuilder(256)
-            .append(ts).append(" ").append(r.getLevel().getName())
-            .append(" [").append(Thread.currentThread().getName()).append("] ")
-            .append(r.getLoggerName()).append(" - ").append(msg).append(System.lineSeparator());
+              .append(ts).append(' ')
+              .append(r.getLevel().getName()).append(' ')
+              .append('[').append(Thread.currentThread().getName()).append(']').append(' ')
+              .append(displayName).append(" - ")
+              .append(formatMessage(r)).append(System.lineSeparator());
           if (r.getThrown() != null) {
-            try {
-              String stack = getStackTrace(r.getThrown());
-              sb.append(stack);
-            } catch (Exception ignore) {}
+            java.io.StringWriter sw = new java.io.StringWriter();
+            r.getThrown().printStackTrace(new java.io.PrintWriter(sw));
+            sb.append(sw);
           }
           return sb.toString();
         }
       });
       logger.addHandler(fh);
 
-      // Close handlers on JVM shutdown
       Runtime.getRuntime().addShutdownHook(new Thread(() -> {
         for (Handler h : logger.getHandlers()) try { h.close(); } catch (Exception ignored) {}
       }));
@@ -69,94 +74,32 @@ public final class FileLog {
       throw new RuntimeException("Cannot create log file: " + path, e);
     }
   }
-
-  private static String getStackTrace(Throwable t) {
-    java.io.StringWriter sw = new java.io.StringWriter();
-    t.printStackTrace(new java.io.PrintWriter(sw));
-    return sw.toString();
-  }
 }
 ```
 
-**Use it anywhere (servlet, service, etc.):**
+## Use it (no path printed in lines)
 
 ```java
 import your.pkg.FileLog;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 public class Demo {
   private static final Logger LOG =
-      FileLog.get(System.getProperty("user.home") + "/myapp.log");
-  // or Paths.get(System.getProperty("catalina.base"), "logs", "myapp.log").toString()
+      FileLog.get(Paths.get(System.getProperty("catalina.base"), "logs", "myapp.log").toString(),
+                  "myapp"); // short display name
 
   public void run() {
-    LOG.info("It works");
+    LOG.info("Started");
+    LOG.warning("Heads up");
     try { throw new IllegalStateException("Boom"); }
-    catch (Exception e) { LOG.log(java.util.logging.Level.WARNING, "Problem", e); }
+    catch (Exception e) { LOG.log(Level.SEVERE, "Failure", e); }
   }
 }
 ```
 
-> Want simple size rotation? Replace the `FileHandler` with:
->
-> ```java
-> // 5 MB per file, keep 5 files, not append (JUL rotates via index)
-> FileHandler fh = new FileHandler(path, 5 * 1024 * 1024, 5, true);
-> ```
+### Notes
 
----
-
-# Option B — Absolute simplest: append a line to a file
-
-**File:** `Log.java`
-
-```java
-package your.pkg;
-
-import java.nio.file.*;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.nio.charset.StandardCharsets;
-
-public final class Log {
-  private static final DateTimeFormatter ISO = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-  private Log() {}
-
-  public static void info(String file, String message) { write(file, "INFO", message, null); }
-  public static void warn(String file, String message, Throwable t) { write(file, "WARN", message, t); }
-
-  public static synchronized void write(String file, String level, String message, Throwable t) {
-    try {
-      Path p = Paths.get(file);
-      Files.createDirectories(p.getParent());
-      String ts = ISO.format(LocalDateTime.now());
-      StringBuilder sb = new StringBuilder()
-          .append(ts).append(" ").append(level).append(" ").append(message).append(System.lineSeparator());
-      if (t != null) {
-        java.io.StringWriter sw = new java.io.StringWriter();
-        t.printStackTrace(new java.io.PrintWriter(sw));
-        sb.append(sw).append(System.lineSeparator());
-      }
-      Files.write(p, sb.toString().getBytes(StandardCharsets.UTF_8),
-          StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-    } catch (Exception ignored) {}
-  }
-}
-```
-
-**Use:**
-
-```java
-Log.info("C:/temp/myapp.log", "Started");
-try { /* ... */ } catch (Exception e) { Log.warn("C:/temp/myapp.log", "Failure", e); }
-```
-
----
-
-### Pick one
-
-* Want levels, handlers, rotation later? **Option A** (JUL `FileHandler`) is tiny and robust.
-* Want “just write to a file now”? **Option B** is the simplest possible.
-
-If you tell me your desired path (e.g., `${catalina.base}\\logs\\myapp.log`), I’ll plug it into one of these for you.
+* If you want **no name at all**, just remove `displayName` from the formatter line entirely.
+* If you prefer **no rotation**, swap the handler for:
+  `FileHandler fh = new FileHandler(path, /*append*/ true);`
+* This is totally independent of Tomcat/JULI; it will write to your file regardless of server logging config.

@@ -41,4 +41,11 @@ reg query "HKLM\Software\Microsoft\Windows\CurrentVersion" %REGVIEW% /v ProgramF
 endlocal
 ```
 
-If you tell me whether you want “always query the **native OS view**” or “query the **current process view**”, I can tailor the snippet (some scripts want `/reg:64` even when launched from 32-bit).
+---
+
+if defined PROCESSOR_ARCHITEW6432 (
+  set "REGVIEW=/reg:32"
+) else (
+  set "REGVIEW=/reg:64"
+)
+

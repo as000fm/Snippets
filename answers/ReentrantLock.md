@@ -1,76 +1,56 @@
-Yes — in Java 11 you can use `ReentrantLock` with a timeout so a thread **gives up** instead of waiting forever.
+Understood — then keep it **blocking** and simple: use the `writeLock().lock()` drain (no timeout), and `readLock().lock()` for adds. That guarantees the drain is exclusive and every client request will wait its turn.
 
-### The lock + timeout you want
-
-Use:
-
-* `tryLock(long time, TimeUnit unit)` (waits up to the timeout)
-* or `tryLock()` (doesn’t wait at all)
+Here’s the final “must wait” version (same as before, just no tryLock path):
 
 ```java
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Example {
-  private final ReentrantLock lock = new ReentrantLock();
+public final class ClientBuckets {
+  private final ReadWriteLock rw = new ReentrantReadWriteLock();
+  private final HashMap<String, ConcurrentLinkedQueue<String>> map = new HashMap<>();
 
-  public void doWork() throws InterruptedException {
-    if (!lock.tryLock(500, TimeUnit.MILLISECONDS)) {
-      // Couldn’t get the lock in time: fail fast / retry / log / fallback
-      return;
-    }
+  public void add(String clientId, String value) {
+    rw.readLock().lock();
     try {
-      // critical section
+      map.computeIfAbsent(clientId, k -> new ConcurrentLinkedQueue<>()).add(value);
     } finally {
-      lock.unlock();
+      rw.readLock().unlock();
+    }
+  }
+
+  /** Exclusive drain: blocks all adds until done. */
+  public Map<String, List<String>> drain() {
+    rw.writeLock().lock();
+    try {
+      Map<String, List<String>> snapshot = new HashMap<>(map.size());
+      for (Map.Entry<String, ConcurrentLinkedQueue<String>> e : map.entrySet()) {
+        snapshot.put(e.getKey(), new ArrayList<>(e.getValue()));
+      }
+      map.clear();
+      return snapshot;
+    } finally {
+      rw.writeLock().unlock();
     }
   }
 }
 ```
 
-This helps you **avoid indefinite blocking** (classic “thread stuck waiting forever”).
+### Two practical notes
 
-### Important reality check
-
-A timeout **does not prevent deadlocks by itself**. It just means you can *detect/escape* them (or long contention) by failing fast and doing something else.
-
-Deadlocks typically happen when you need **multiple locks** and acquire them in different orders. The safest fixes are:
-
-#### 1) Lock ordering (best)
-
-Always acquire locks in a single global order.
-
-#### 2) Timed acquisition for multiple locks (escape hatch)
-
-Try to acquire both within timeouts; if you can’t, release what you got and back off/retry.
+1. **Fairness (optional):** if you’re worried about a constant stream of `add()` calls starving the drain, you can make the lock “fair”:
 
 ```java
-boolean acquiredA = false;
-boolean acquiredB = false;
-
-try {
-  acquiredA = lockA.tryLock(200, TimeUnit.MILLISECONDS);
-  if (!acquiredA) { return; }
-
-  acquiredB = lockB.tryLock(200, TimeUnit.MILLISECONDS);
-  if (!acquiredB) { return; }
-
-  // critical section needing both locks
-} finally {
-  if (acquiredB) { lockB.unlock(); }
-  if (acquiredA) { lockA.unlock(); }
-}
+private final ReadWriteLock rw = new ReentrantReadWriteLock(true);
 ```
 
-(You’d usually add retry + jitter/backoff so two threads don’t collide forever.)
+Fair locks reduce starvation risk but can lower throughput a bit.
 
-### If you meant “avoid forgetting to unlock”
+2. **Keep drain work minimal while holding the write lock.** In this version, `drain()` *copies* while holding the write lock, which is correct for exclusivity. If the map/queues can get large, this will pause all adds during the copy. (Still correct — just something to be aware of.)
 
-Use `try/finally` (as above). There’s no lock that magically fixes “I forgot to unlock” — structure does.
-
-### Also consider these, depending on what you’re doing
-
-* `StampedLock` (more advanced; has timed `tryReadLock/tryWriteLock`, great for read-heavy workloads, but more complex)
-* `Semaphore` with `tryAcquire(timeout, unit)` if what you really need is “limit N concurrent entries” rather than mutual exclusion.
-
-If you tell me whether you’re protecting **one resource** or you sometimes acquire **multiple locks**, I can suggest the safest pattern (ordering vs timed multi-lock vs redesign).
+If you want, paste your current `add()` logic (especially if you do more than one `add` per call) and I’ll help ensure it stays atomic and fast under this locking scheme.

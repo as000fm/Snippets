@@ -27,9 +27,7 @@ public class ConsolePrompt {
         int CREDUI_MAX_PASSWORD_LENGTH = 256;
 
         int CREDUI_FLAGS_GENERIC_CREDENTIALS   = 0x00040000;
-        int CREDUI_FLAGS_ALWAYS_SHOW_UI        = 0x00001000;
         int CREDUI_FLAGS_DO_NOT_PERSIST        = 0x00000002;
-        int CREDUI_FLAGS_EXCLUDE_CERTIFICATES  = 0x00000008;
 
         // Maps to CREDUI_INFO struct (wincred.h)
         class CREDUI_INFO extends Structure {
@@ -83,9 +81,7 @@ public class ConsolePrompt {
                 password, password.length,
                 save,
                 Credui.CREDUI_FLAGS_GENERIC_CREDENTIALS  |
-                Credui.CREDUI_FLAGS_ALWAYS_SHOW_UI       |
-                Credui.CREDUI_FLAGS_DO_NOT_PERSIST       |
-                Credui.CREDUI_FLAGS_EXCLUDE_CERTIFICATES
+                Credui.CREDUI_FLAGS_DO_NOT_PERSIST
         );
 
         if (result == 0) { // ERROR_SUCCESS

@@ -117,39 +117,47 @@ public class DpapiCredentialStore {
     // -------------------------------------------------------------------------
 
     private byte[] dpApiEncrypt(byte[] data) {
-        DATA_BLOB input  = toBlob(data);
-        DATA_BLOB entropy = toBlob(APP_ENTROPY);
-        DATA_BLOB output = new DATA_BLOB();
+    try (Memory inputMem   = new Memory(data.length);
+         Memory entropyMem = new Memory(APP_ENTROPY.length)) {
+
+        DATA_BLOB input   = toBlob(inputMem,   data);
+        DATA_BLOB entropy = toBlob(entropyMem, APP_ENTROPY);
+        DATA_BLOB output  = new DATA_BLOB();
 
         boolean ok = Crypt32.INSTANCE.CryptProtectData(
                 input, "myapp credentials", entropy, null, null, 0, output);
         if (!ok) throw new RuntimeException("DPAPI encrypt failed: " +
-                com.sun.jna.platform.win32.Kernel32Util.getLastErrorMessage());
+                Kernel32Util.getLastErrorMessage());
 
         return output.getData();
     }
+}
 
-    private byte[] dpApiDecrypt(byte[] data) {
-        DATA_BLOB input   = toBlob(data);
-        DATA_BLOB entropy = toBlob(APP_ENTROPY);
+private byte[] dpApiDecrypt(byte[] data) {
+    try (Memory inputMem   = new Memory(data.length);
+         Memory entropyMem = new Memory(APP_ENTROPY.length)) {
+
+        DATA_BLOB input   = toBlob(inputMem,   data);
+        DATA_BLOB entropy = toBlob(entropyMem, APP_ENTROPY);
         DATA_BLOB output  = new DATA_BLOB();
 
         boolean ok = Crypt32.INSTANCE.CryptUnprotectData(
                 input, null, entropy, null, null, 0, output);
-        if (!ok) throw new RuntimeException("DPAPI decrypt failed — wrong session or corrupt file: " +
-                com.sun.jna.platform.win32.Kernel32Util.getLastErrorMessage());
+        if (!ok) throw new RuntimeException("DPAPI decrypt failed: " +
+                Kernel32Util.getLastErrorMessage());
 
         return output.getData();
     }
+}
 
-    private static DATA_BLOB toBlob(byte[] bytes) {
-        Memory mem = new Memory(bytes.length);
-        mem.write(0, bytes, 0, bytes.length);
-        DATA_BLOB blob = new DATA_BLOB();
-        blob.cbData = bytes.length;
-        blob.pbData = mem;
-        return blob;
-    }
+// Memory is now passed in — no allocation inside, no leak possible
+private static DATA_BLOB toBlob(Memory mem, byte[] bytes) {
+    mem.write(0, bytes, 0, bytes.length);
+    DATA_BLOB blob = new DATA_BLOB();
+    blob.cbData = bytes.length;
+    blob.pbData = mem;
+    return blob;
+}
 }
 ```
 
